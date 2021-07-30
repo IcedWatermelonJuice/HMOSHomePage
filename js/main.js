@@ -50,7 +50,7 @@ require(['jquery'], function ($) {
 	};
 
 	var settingsFn = function (storage) {
-		this.storage = { engines: "baidu", bookcolor: "black", styleThin: true,searchHistory: true };
+		this.storage = { engines: "baidu", bookcolor: "black", styleThin: true, searchHistory: true };
 		this.storage = $.extend({}, this.storage, storage);
 	}
 	settingsFn.prototype = {
@@ -207,7 +207,7 @@ require(['jquery'], function ($) {
 	var bookMarkFn = function (ele, options) {
 		this.$ele = $(ele);
 		this.options = {
-			data: [{ "name": "精选", "url": "choice()", "icon": "img/bookmarks/discover.png" }, { "name": "AirPortal", "url": "https://airportal.cn/", "icon": "img/bookmarks/airportal.png" }, { "name": "Github", "url": "https://github.com/", "icon": "img/bookmarks/github.png" }, { "name": "Gitee", "url": "https://gitee.com", "icon": "img/bookmarks/gitee.png" }, { "name": "学习", "url": "https://www.xuexi.cn/", "icon": "img/bookmarks/xuexi.png" }, { "name": "微博", "url": "https://weibo.com/", "icon": "img/bookmarks/weibo.png" }, { "name": "知乎", "url": "https://www.zhihu.com/", "icon": "img/bookmarks/zhihu.png" }, { "name": "B站", "url": "https://bilibili.com/", "icon": "img/bookmarks/bilibili.png" }, { "name": "爱奇艺", "url": "https://iqiyi.com/", "icon": "img/bookmarks/iqiyi.png" }, { "name": "腾讯视频", "url": "https://v.qq.com/", "icon": "img/bookmarks/tencentvideo.png" }],
+			data: [{ "name": "精选", "url": "choice()", "icon": "img/bookmarks/discover.png" }, { "name": "AirPortal", "url": "https://airportal.cn/", "icon": "img/bookmarks/airportal.png" }, { "name": "Github", "url": "https://github.com/", "icon": "img/bookmarks/github.png" }, { "name": "Gitee", "url": "https://gitee.com", "icon": "img/bookmarks/gitee.png" }, { "name": "学习", "url": "https://www.xuexi.cn/", "icon": "img/bookmarks/xuexi.png" }, { "name": "B站", "url": "https://bilibili.com/", "icon": "img/bookmarks/bilibili.png" }, { "name": "爱奇艺", "url": "https://iqiyi.com/", "icon": "img/bookmarks/iqiyi.png" }, { "name": "腾讯视频", "url": "https://v.qq.com/", "icon": "img/bookmarks/tencentvideo.png" }],
 		};
 		this.options = $.extend({}, this.options, options);
 		this.init();
@@ -725,18 +725,14 @@ require(['jquery'], function ($) {
 			var data = {
 				百科: "https://baike.baidu.com/search?word=%s",
 				视频: "https://m.v.qq.com/search.html?act=0&keyWord=%s",
-				豆瓣: "https://m.douban.com/search/?query=%s",
 				新闻: "http://m.toutiao.com/search/?&keyword=%s",
 				图片: "https://m.baidu.com/sf/vsearch?pd=image_content&word=%s&tn=vsearch&atn=page",
 				微博: "https://m.weibo.cn/search?containerid=100103type=1&q=%s",
 				音乐: "http://m.music.migu.cn/v3/search?keyword=%s",
-				知乎: "https://www.zhihu.com/search?q=%s",
 				小说: "https://m.qidian.com/search?kw=%s",
-				旅游: "https://h5.m.taobao.com/trip/rx-search/list/index.html?&keyword=%s",
 				地图: "https://m.amap.com/search/mapview/keywords=%s",
-				电视剧: "http://m.iqiyi.com/search.html?key=%s",
-				股票: "https://emwap.eastmoney.com/info/search/index?t=14&k=%s",
-				汽车: "https://sou.m.autohome.com.cn/zonghe?q=%s"
+				Github: "https://github.com/search?q=%s",
+				Gitee: "https://search.gitee.com/?q=%s"
 			}
 			if (data[text]) {
 				location.href = data[text].replace("%s", $(".search-input").val());
@@ -788,7 +784,7 @@ require(['jquery'], function ($) {
 				window.via.searchText(text);
 			} else {
 				location.href = {
-					baidu: "https://www.baidu.com/s?wd=%s",
+					baidu: "https://m.baidu.com/s?wd=%s",
 					quark: "https://quark.sm.cn/s?q=%s",
 					google: "https://www.google.com/search?q=%s",
 					bing: "https://cn.bing.com/search?q=%s",
@@ -912,7 +908,7 @@ require(['jquery'], function ($) {
 				}
 			})
 
-			// 热搜榜 | 今日高分影荐 | 知乎热榜
+			// 热搜榜知乎热榜
 			$.ajax({
 				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=newchosen",
 				type: "get",
@@ -920,30 +916,12 @@ require(['jquery'], function ($) {
 				success: function (res) {
 					var data = res.data;
 					for (var i = 0, l = data.length; i < l; i++) {
-						if (data[i].name === "今日冷知识") {
-							$('.trivia').attr('href', data[i].link);
-							$('.trivia').find('.shl').text(data[i].value.subtitle);
-						} else if (data[i].name === "热搜榜") {
+						if (data[i].name === "热搜榜") {
 							var html = '';
 							for (var ii = 0, ll = data[i].value.length; ii < ll; ii++) {
 								html += '<div class="news-item"><div class="news-item-count">' + (ii + 1) + '</div><div class="news-item-title">' + data[i].value[ii].title + '</div><div class="news-item-hot">' + data[i].value[ii].hot + '</div></div>';
 							}
 							$('.news-list').html(html);
-						} else if (data[i].name === "今日高分影荐") {
-							var html = '';
-							for (var ii = 0, ll = data[i].value.content.length; ii < ll; ii++) {
-								html += '<div class="video-preview swiper-slide"><div class="video-title">' + data[i].value.content[ii].title + '</div><div class="video-time">' + data[i].value.content[ii].duration + '</div><div class="video-poster" style="background-image: url(' + data[i].value.content[ii].img + ');"></div></div>';
-							}
-							$('.video-list').find('.swiper-wrapper').html(html);
-							require(['Swiper'], function (Swiper) {
-								var swiper = new Swiper('.video-swipe', {
-									loop: true,
-									autoplay: {
-										delay: 5000,
-										disableOnInteraction: false,
-									}
-								});
-							})
 						} else if (data[i].name === "知乎热榜") {
 							var html = '';
 							for (var ii = 0, ll = data[i].value.length; ii < ll; ii++) {
@@ -969,7 +947,6 @@ require(['jquery'], function ($) {
 
 				}
 			});
-
 		})
 	}
 
@@ -981,7 +958,7 @@ require(['jquery'], function ($) {
 			location.href = "x:bm?sort=default";
 		}
 	}).longPress(() => {
-		var data = [{ "title": "搜索引擎", "type": "select", "value": "engines", "data": [{ "t": "夸克搜索", "v": "quark" }, { "t": "跟随Via浏览器", "v": "via" }, { "t": "百度搜索", "v": "baidu" }, { "t": "谷歌搜索", "v": "google" }, { "t": "必应搜索", "v": "bing" }, { "t": "神马搜索", "v": "sm" }, { "t": "好搜搜索", "v": "haosou" }, { "t": "搜狗搜索", "v": "sogou" }, { "t": "自定义", "v": "diy" }] }, { "title": "设置壁纸", "value": "wallpaper" }, { "title": "设置LOGO", "value": "logo" }, { "title": "恢复默认壁纸和LOGO", "value": "delLogo" }, { "title": "图标颜色", "type": "select", "value": "bookcolor", "data": [{ "t": "深色图标", "v": "black" }, { "t": "浅色图标", "v": "white" }] }, { "title": "主页样式细圆", "type": "checkbox", "value": "styleThin" }, { "title": "夜间模式", "type": "checkbox", "value": "nightMode" }, { "title": "记录搜索历史", "type": "checkbox", "value": "searchHistory" }, { "type": "hr" }, { "title": "导出主页数据", "value": "export" }, { "title": "导入主页数据", "value": "import" }, { "type": "hr" }, { "title": "Github", "value": "openurl", "description": "https://github.com/IcedWatermelonJuice/HMOSHomePage/" }, { "title": "关于", "description": "当前版本：" + app.version }];
+		var data = [{ "title": "搜索引擎", "type": "select", "value": "engines", "data": [{ "t": "夸克搜索", "v": "quark" }, { "t": "跟随Via浏览器", "v": "via" }, { "t": "百度搜索", "v": "baidu" }, { "t": "谷歌搜索", "v": "google" }, { "t": "必应搜索", "v": "bing" }, { "t": "神马搜索", "v": "sm" }, { "t": "好搜搜索", "v": "haosou" }, { "t": "搜狗搜索", "v": "sogou" }, { "t": "自定义", "v": "diy" }] }, { "title": "设置壁纸", "value": "wallpaper" }, { "title": "设置LOGO", "value": "logo" }, { "title": "恢复默认壁纸和LOGO", "value": "delLogo" }, { "title": "图标颜色", "type": "select", "value": "bookcolor", "data": [{ "t": "深色图标", "v": "black" }, { "t": "浅色图标", "v": "white" }] }, { "title": "主页样式细圆", "type": "checkbox", "value": "styleThin" }, { "title": "夜间模式", "type": "checkbox", "value": "nightMode" }, { "title": "记录搜索历史", "type": "checkbox", "value": "searchHistory" }, { "type": "hr" }, { "title": "导出主页数据", "value": "export" }, { "title": "导入主页数据", "value": "import" }, { "type": "hr" }, { "title": "Github", "value": "openurl", "description": "https://github.com/liumingye/quarkHomePage" }, { "title": "关于", "description": "当前版本：" + app.version }];
 		var html = '<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">主页设置</p></div><ul class="set-option-from">';
 		for (var json of data) {
 			if (json.type === 'hr') {
