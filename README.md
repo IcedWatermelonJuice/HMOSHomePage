@@ -9,9 +9,8 @@
 # 感谢
 * liumingye/quarkhomepage 原地址：https://gitee.com/liumingye/quarkHomePage/
 # 小改
+* 更改初始化默认设置：搜索引擎默认为“百度”，搜索栏样式默认为“细圆”，历史记录默认为“不记录”
 * 首页LOGO修改，采用华为“HarmonyOS”官方LOGO图标
 * 首页默认书签更换
 * 精选页调整删改
-* 默认“百度”搜索引擎
-* 默认细圆样式搜索栏
-* 书签、网址栏支持file类型url
+* 书签、网址栏支持“File:///”类型本地文件url(本地主页时可用)
