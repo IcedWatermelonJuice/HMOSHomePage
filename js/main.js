@@ -79,7 +79,7 @@ require(['jquery'], function ($) {
 			if (that.get('logo')) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
 			} else {
-				$(".logo").html('<img src="logo/HarmonyOS_logo(for tablet).png"/>');
+				$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
 			}
 			// 夜间模式 和 壁纸
 			var nightMode = {
