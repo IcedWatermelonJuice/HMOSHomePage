@@ -660,7 +660,7 @@ require(['jquery'], function ($) {
 		} else {
 			$(".history").hide();
 			$(".empty-input").show();
-			$(".search-btn").html(/^\b(((https?|ftp):\/\/)?[-a-z0-9]+(\.[-a-z0-9]+)*\.(?:com|net|org|int|edu|gov|mil|arpa|asia|biz|info|name|pro|coop|aero|museum|[a-z][a-z]|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d))\b(\/[-a-z0-9_:\@&?=+,.!\/~%\$]*)?)$/i.test(wd) ? "进入" : "搜索");
+			$(".search-btn").html(/^\b((((https?|ftp):\/\/)?[-a-z0-9]+(\.[-a-z0-9]+)*\.(?:com|net|org|int|edu|gov|mil|arpa|asia|biz|info|name|pro|coop|aero|museum|[a-z][a-z]|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d))\b(\/[-a-z0-9_:\@&?=+,.!\/~%\$]*)?))|(file:\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])$/i.test(wd) ? "进入" : "搜索");
 			var has_char = escape(wd).indexOf("%u");
 			has_char < 0 ? $(".shortcut2").show() : $(".shortcut3").show();
 			$.ajax({
@@ -725,12 +725,8 @@ require(['jquery'], function ($) {
 			var data = {
 				百科: "https://baike.baidu.com/search?word=%s",
 				视频: "https://m.v.qq.com/search.html?act=0&keyWord=%s",
-				新闻: "http://m.toutiao.com/search/?&keyword=%s",
-				图片: "https://m.baidu.com/sf/vsearch?pd=image_content&word=%s&tn=vsearch&atn=page",
-				微博: "https://m.weibo.cn/search?containerid=100103type=1&q=%s",
-				音乐: "http://m.music.migu.cn/v3/search?keyword=%s",
-				小说: "https://m.qidian.com/search?kw=%s",
-				地图: "https://m.amap.com/search/mapview/keywords=%s",
+				图片: "https://image.baidu.com/search/index?tn=baiduimage&word=%s",
+				贴吧: "https://tieba.baidu.com/f?kw=%s",
 				Github: "https://github.com/search?q=%s",
 				Gitee: "https://search.gitee.com/?q=%s"
 			}
@@ -743,7 +739,7 @@ require(['jquery'], function ($) {
 	$(".search-btn").click(function () {
 		var text = $(".search-input").val();
 		if ($(".search-btn").text() === "进入") {
-			!text.match(/^(ht|f)tp(s?):\/\//) && (text = "http://" + text);
+			!text.match(/^((ht|f)tp(s?)|file):\/\//) && (text = "http://" + text);
 			history.go(-1);
 			setTimeout(function () {
 				location.href = text;
