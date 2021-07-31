@@ -54,6 +54,7 @@ require(['jquery'], function($) {
 			engines: "baidu",
 			bookcolor: "black",
 			styleThin: true,
+			nightMode: true,
 			autonightMode: true
 		};
 		this.storage = $.extend({}, this.storage, storage);
