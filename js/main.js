@@ -54,7 +54,7 @@ require(['jquery'], function($) {
 			engines: "baidu",
 			bookcolor: "black",
 			styleThin: true,
-			// autonightMode: true
+			autonightMode: true
 		};
 		this.storage = $.extend({}, this.storage, storage);
 	}
@@ -86,7 +86,7 @@ require(['jquery'], function($) {
 			} else {
 				$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
 			}
-			// 夜间模式 和 壁纸
+			// 夜间模式 和 壁纸 LOGO
 			var nightMode = {
 				on: function() {
 					$("body").removeClass('theme-black theme-white').addClass('theme-white');
@@ -106,8 +106,18 @@ require(['jquery'], function($) {
 			};
 			if (that.get('nightMode') === true) {
 				nightMode.on();
+				if (that.get('logo')) {
+					$(".logo").html('<img src="' + that.get('logo') + '" />');
+				} else {
+					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightmode).png"/>');
+				}
 			} else {
 				nightMode.off();
+				if (that.get('logo')) {
+					$(".logo").html('<img src="' + that.get('logo') + '" />');
+				} else {
+					$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
+				}
 			}
 
 			// 删除掉VIA浏览器夜间模式的暗色支持
