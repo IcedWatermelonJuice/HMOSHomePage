@@ -109,7 +109,7 @@ require(['jquery'], function($) {
 				if (that.get('logo')) {
 					$(".logo").html('<img src="' + that.get('logo') + '" />');
 				} else {
-					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightmode).png"/>');
+					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightMode).png"/>');
 				}
 			} else {
 				nightMode.off();
