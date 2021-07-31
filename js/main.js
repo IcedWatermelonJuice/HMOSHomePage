@@ -1,4 +1,4 @@
-require.config({
+﻿require.config({
 	urlArgs: `v=${app.version}`,
 	baseUrl: "js/lib"
 });
@@ -110,7 +110,7 @@ require(['jquery'], function($) {
 				if (that.get('logo')) {
 					$(".logo").html('<img src="' + that.get('logo') + '" />');
 				} else {
-					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightMode).png"/>');
+					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightmode).png"/>');
 				}
 			} else {
 				nightMode.off();
@@ -1515,7 +1515,7 @@ require(['jquery'], function($) {
 		}, {
 			"title": "Github",
 			"value": "openurl",
-			"description": "https://github.com/liumingye/quarkHomePage"
+			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
 		}, {
 			"title": "关于",
 			"description": "当前版本：" + app.version
