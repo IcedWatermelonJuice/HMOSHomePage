@@ -253,9 +253,9 @@ require(['jquery'], function($) {
 				"url": "https://gitee.com",
 				"icon": "img/bookmarks/gitee.png"
 			}, {
-				"name": "学习",
-				"url": "https://www.xuexi.cn/",
-				"icon": "img/bookmarks/xuexi.png"
+				"name": "设置",
+				"url": "openSettingPage()",
+				"icon": "img/bookmarks/settings.png"
 			}, {
 				"name": "B站",
 				"url": "https://bilibili.com/",
@@ -474,6 +474,9 @@ require(['jquery'], function($) {
 						switch (url) {
 							case "choice()":
 								choice();
+								break;
+							case "openSettingPage()":
+								openSettingPage();
 								break;
 							default:
 								location.href = url;
@@ -1430,6 +1433,7 @@ require(['jquery'], function($) {
 		})
 	}
 
+
 	$(".logo").click(() => {
 		var browser = browserInfo();
 		if (browser === 'via') {
@@ -1438,6 +1442,11 @@ require(['jquery'], function($) {
 			location.href = "x:bm?sort=default";
 		}
 	}).longPress(() => {
+		openSettingPage();
+	});
+	//设置页面
+	function openSettingPage() {
+		//构建设置HTML
 		var data = [{
 			"type": "hr"
 		}, {
@@ -1500,11 +1509,11 @@ require(['jquery'], function($) {
 			"type": "checkbox",
 			"value": "nightMode"
 		}, {
-			"title": "自动夜间模式(跟随浏览器)",
+			"title": "夜间模式跟随浏览器",
 			"type": "checkbox",
 			"value": "autonightMode"
 		}, {
-			"title": "记录搜索历史",
+			"title": "保存搜索栏历史",
 			"type": "checkbox",
 			"value": "searchHistory"
 		}, {
@@ -1543,7 +1552,7 @@ require(['jquery'], function($) {
 
 		}];
 		var html =
-			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">设置</p></div><ul class="set-option-from">';
+			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">自     定     义     设     置</p></div><ul class="set-option-from">';
 		for (var json of data) {
 			if (json.type === 'hr') {
 				html += `<li class="set-hr"></li>`;
@@ -1714,7 +1723,7 @@ require(['jquery'], function($) {
 			settings.set(item, value);
 		});
 
-	});
+	}
 
 	// 下滑进入搜索
 	require(['touchSwipe'], function() {
