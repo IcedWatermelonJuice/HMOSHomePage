@@ -1040,15 +1040,15 @@ require(['jquery'], function($) {
 					"img": "github",
 					"url": "github.com"
 				}, {
-					"hl": "Fastgit",
-					"shl": "Github国内镜像网站",
-					"img": "github",
-					"url": "https://hub.fastgit.org"
-				}, {
 					"hl": "Gitee",
 					"shl": "国内最大代码网页托管平台",
 					"img": "gitee",
-					"url": "club.huawei.com"
+					"url": "gitee.com"
+				}, {
+					"hl": "CSDN",
+					"shl": "中文IT技术交流平台",
+					"img": "csdn",
+					"url": "csdn.net"
 				}, {
 					"hl": "吾爱破解",
 					"shl": "破解软件分享",
