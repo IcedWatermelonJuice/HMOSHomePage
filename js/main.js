@@ -1484,19 +1484,11 @@ require(['jquery'], function($) {
 				"v": "white"
 			}]
 		}, {
-			"type": "hr"
-		}, {
 			"title": "设置壁纸",
 			"value": "wallpaper"
 		}, {
 			"title": "设置LOGO",
 			"value": "logo"
-		}, {
-			"title": "恢复默认壁纸和LOGO",
-			"value": "delLogo"
-		}, {
-			"title": "恢复默认书签和设置",
-			"value": "intibookMark"
 		}, {
 			"type": "hr"
 		}, {
@@ -1520,11 +1512,19 @@ require(['jquery'], function($) {
 		}, {
 			"title": "备份数据",
 			"value": "export",
-			"description": "备份书签与设置"
+			"description": "备份主页数据到剪贴板"
 		}, {
 			"title": "恢复数据",
 			"value": "import",
-			"description": "恢复书签与设置"
+			"description": "从剪贴板恢复主页数据"
+		}, {
+			"title": "恢复默认壁纸和LOGO",
+			"value": "delLogo",
+			"description": "恢复默认壁纸、LOGO"
+		}, {
+			"title": "恢复默认书签和设置",
+			"value": "intibookMark",
+			"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
 		}, {
 			"type": "hr"
 		}, {
@@ -1619,7 +1619,6 @@ require(['jquery'], function($) {
 			} else if (value === "delLogo") {
 				settings.set('wallpaper', '');
 				settings.set('logo', '');
-				settings.set('bookcolor', 'black');
 				alert('壁纸和LOGO初始化成功!');
 				location.reload();
 			} else if (value === "intibookMark") {
@@ -1636,9 +1635,9 @@ require(['jquery'], function($) {
 			} else if (value === "openGitee") {
 				open($this.find('.set-description').text());
 			} else if (value === "aboutVersion") {
-				alert('当前版本:' + app.version + '\n' +
-					'作者:(Github)IcedWatermelonJuice\n         (Gitee)gem_xl\n原作者: liumingye'
-					);
+				alert('当前版本: ' + app.version + '\n' +
+					'本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com'
+				);
 			} else if (value === "export") {
 				var oInput = $('<input>');
 				// oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
@@ -1648,18 +1647,18 @@ require(['jquery'], function($) {
 				console.log(store.get('bookMark'));
 				oInput.select();
 				document.execCommand("Copy");
-				alert('数据已备份到剪贴板!');
+				alert('主页数据已备份到剪贴板!');
 				oInput.remove();
 			} else if (value === "import") {
-				var data = prompt("在这粘贴备份的数据:");
+				var data = prompt("在这粘贴备份的主页数据:");
 				try {
 					data = JSON.parse(data);
 					store.set("bookMark", data.bookMark);
 					store.set("setData", data.setData);
-					alert("数据恢复入成功!");
+					alert("主页数据恢复入成功!");
 					location.reload();
 				} catch (e) {
-					alert("数据恢复失败!");
+					alert("主页数据恢复失败!");
 				}
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
