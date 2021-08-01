@@ -1637,7 +1637,7 @@ require(['jquery'], function($) {
 				open($this.find('.set-description').text());
 			} else if (value === "aboutVersion") {
 				alert('当前版本:' + app.version + '\n' +
-					'作者:(Github)IcedWatermelonJuice\n(Gitee)         gem_xl\n原作者: liumingye'
+					'作者:(Github)IcedWatermelonJuice\n         (Gitee)gem_xl\n原作者: liumingye'
 					);
 			} else if (value === "export") {
 				var oInput = $('<input>');
