@@ -9,14 +9,14 @@
 # 感谢
 * liumingye/quarkhomepage 原地址：https://gitee.com/liumingye/quarkHomePage/
 # 更改
-<version 1.0>
+  <version 1.0>
 * 更改初始化默认设置：搜索引擎默认为“百度”，搜索栏样式默认为“细圆”，历史记录默认为“不记录”
 * 首页LOGO修改，采用华为“HarmonyOS”官方LOGO图标
-<version 1.1>
+  <version 1.1>
 * 首页默认书签更换
 * 精选页调整删改
-<version 1.2>
+  <version 1.2>
 * 书签、网址栏支持“File:///”类型本地文件URL(本地主页时可用)
-<version 1.3>
+  <version 1.3>
 * 新增“自动夜间模式”（默认开启），支持pc端edge浏览器、手机端kiwi浏览器与x浏览器，手机端via浏览器、华为浏览器、alook浏览器暂无法使用，其他浏览器效果未知
 （ps：为什么addListener在pc的edge上好好的，在手机kiwi上就不起作用了QAQ）
