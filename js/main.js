@@ -270,6 +270,7 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/tencentvideo.png"
 			}],
 		};
+		this.intiOptions = this.options;
 		this.options = $.extend({}, this.options, options);
 		this.init();
 	}
@@ -287,6 +288,9 @@ require(['jquery'], function($) {
 		},
 		getJson: function() {
 			return this.options.data;
+		},
+		getinitbookMarks: function() {
+			return this.intiOptions.data;
 		},
 		bind: function() {
 			var that = this;
@@ -1435,6 +1439,8 @@ require(['jquery'], function($) {
 		}
 	}).longPress(() => {
 		var data = [{
+			"type": "hr"
+		}, {
 			"title": "搜索引擎",
 			"type": "select",
 			"value": "engines",
@@ -1467,15 +1473,6 @@ require(['jquery'], function($) {
 				"v": "diy"
 			}]
 		}, {
-			"title": "设置壁纸",
-			"value": "wallpaper"
-		}, {
-			"title": "设置LOGO",
-			"value": "logo"
-		}, {
-			"title": "恢复默认壁纸和LOGO",
-			"value": "delLogo"
-		}, {
 			"title": "图标颜色",
 			"type": "select",
 			"value": "bookcolor",
@@ -1487,6 +1484,22 @@ require(['jquery'], function($) {
 				"v": "white"
 			}]
 		}, {
+			"type": "hr"
+		}, {
+			"title": "设置壁纸",
+			"value": "wallpaper"
+		}, {
+			"title": "设置LOGO",
+			"value": "logo"
+		}, {
+			"title": "恢复默认壁纸和LOGO",
+			"value": "delLogo"
+		}, {
+			"title": "恢复默认书签和设置",
+			"value": "intibookMark"
+		}, {
+			"type": "hr"
+		}, {
 			"title": "主页样式细圆",
 			"type": "checkbox",
 			"value": "styleThin"
@@ -1495,7 +1508,7 @@ require(['jquery'], function($) {
 			"type": "checkbox",
 			"value": "nightMode"
 		}, {
-			"title": "自动夜间模式",
+			"title": "自动夜间模式(跟随浏览器)",
 			"type": "checkbox",
 			"value": "autonightMode"
 		}, {
@@ -1505,23 +1518,32 @@ require(['jquery'], function($) {
 		}, {
 			"type": "hr"
 		}, {
-			"title": "导出主页数据",
-			"value": "export"
+			"title": "备份数据",
+			"value": "export",
+			"description": "备份书签与设置"
 		}, {
-			"title": "导入主页数据",
-			"value": "import"
+			"title": "恢复数据",
+			"value": "import",
+			"description": "恢复书签与设置"
 		}, {
 			"type": "hr"
 		}, {
-			"title": "Github",
-			"value": "openurl",
-			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
-		}, {
 			"title": "关于",
-			"description": "当前版本：" + app.version
+			"value": "aboutVersion",
+			"description": "当前版本:" + app.version
+		}, {
+			"title": "Github",
+			"value": "openGithub",
+			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
+
+		}, {
+			"title": "Gitee(可能不是最新版本)",
+			"value": "openGitee",
+			"description": "https://gitee.com/gem_xl/HMOSHomePage"
+
 		}];
 		var html =
-			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">主页设置</p></div><ul class="set-option-from">';
+			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">设置</p></div><ul class="set-option-from">';
 		for (var json of data) {
 			if (json.type === 'hr') {
 				html += `<li class="set-hr"></li>`;
@@ -1598,29 +1620,46 @@ require(['jquery'], function($) {
 				settings.set('wallpaper', '');
 				settings.set('logo', '');
 				settings.set('bookcolor', 'black');
+				alert('壁纸和LOGO初始化成功!');
 				location.reload();
-			} else if (value === "openurl") {
+			} else if (value === "intibookMark") {
+				store.set("bookMark", bookMark.getinitbookMarks());
+				settings.set('engines', 'baidu');
+				settings.set('bookcolor', 'black');
+				settings.set('styleThin', true);
+				settings.set('nightMode', false);
+				settings.set('autonightMode', true);
+				alert('书签和设置初始化成功!');
+				location.reload();
+			} else if (value === "openGithub") {
 				open($this.find('.set-description').text());
+			} else if (value === "openGitee") {
+				open($this.find('.set-description').text());
+			} else if (value === "aboutVersion") {
+				alert('当前版本:' + app.version + '\n' +
+					'作者:(Github)IcedWatermelonJuice\n(Gitee)         gem_xl\n原作者: liumingye'
+					);
 			} else if (value === "export") {
 				var oInput = $('<input>');
-				oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
-				//oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + ',"setData":' + JSON.stringify(settings.getJson()) + '}');
+				// oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
+				oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + ',"setData":' +
+					JSON.stringify(settings.getJson()) + '}');
 				document.body.appendChild(oInput[0]);
 				console.log(store.get('bookMark'));
 				oInput.select();
 				document.execCommand("Copy");
-				alert('已复制到剪贴板，请粘贴保存文件。');
+				alert('数据已备份到剪贴板!');
 				oInput.remove();
 			} else if (value === "import") {
-				var data = prompt("在这粘贴主页数据");
+				var data = prompt("在这粘贴备份的数据:");
 				try {
 					data = JSON.parse(data);
 					store.set("bookMark", data.bookMark);
 					store.set("setData", data.setData);
-					alert("导入成功!");
+					alert("数据恢复入成功!");
 					location.reload();
 				} catch (e) {
-					alert("导入失败!");
+					alert("数据恢复失败!");
 				}
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
