@@ -8,6 +8,8 @@
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 感谢
 * liumingye/quarkHomePage 原地址：https://gitee.com/liumingye/quarkHomePage/
+# 联系
+* Email：gem_xl@petalmail.com
 # 更新
 <版本 1.0>
 * 修改默认设置：搜索引擎默认为“百度”，搜索栏样式默认为“细圆”，历史记录默认为“不记录”
