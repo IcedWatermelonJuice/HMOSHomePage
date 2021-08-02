@@ -7,7 +7,8 @@
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage/
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 感谢
-* liumingye/quarkHomePage 原地址：https://gitee.com/liumingye/quarkHomePage/
+* liumingye/quarkHomePage 
+* 原地址：https://gitee.com/liumingye/quarkHomePage/
 # 联系
 * Email：gem_xl@petalmail.com
 # 更新
@@ -17,7 +18,7 @@
 
 <版本 1.1>
 * 修改首页默认书签
-* 精选页修改调整
+* 精选页面调整修改
 
 <版本 1.2>
 * 书签、搜索栏支持“file:///”类型本地URL(本地主页时可用)
@@ -27,9 +28,9 @@
 * 新增“自动夜间模式”功能，可跟随浏览器夜间模式（默认开启）。支持PC端Edge浏览器，移动端Kiwi浏览器、X浏览器。暂不支持移动端Via浏览器、华为浏览器、Alook浏览器。其他浏览器效果未知。
 
 <版本 1.4>
-* 修改设置页（Github与Gitee跳转仅支持非本地主页）
+* 修改设置页（Github与Gitee跳转暂仅支持非本地主页，正在抓紧修复中）
 * 新增“恢复默认书签和设置”功能
-* “导入/导出主页数据”功能支持“设置”数据
+* “导入/导出主页数据”功能在原本正常“书签”数据基础上，额外支持“设置”数据
 
 <版本 1.5>
 * 修复了本地主页时，设置页无法通过点击Github/Gitee转跳网页的BUG
