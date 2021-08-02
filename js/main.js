@@ -2,7 +2,7 @@ require.config({
 	urlArgs: `v=${app.version}`,
 	baseUrl: "js/lib"
 });
-var autonightModeTimer;
+
 require(['jquery'], function($) {
 	/**
 	 * 存储获取数据函数
@@ -1440,10 +1440,13 @@ require(['jquery'], function($) {
 			location.href = "folder://";
 		} else if (browser === 'x') {
 			location.href = "x:bm?sort=default";
+		} else {
+			openSettingPage();
 		}
 	}).longPress(() => {
 		openSettingPage();
 	});
+	
 	//设置页面
 	function openSettingPage() {
 		//构建设置HTML
@@ -1640,9 +1643,13 @@ require(['jquery'], function($) {
 				alert('书签和设置初始化成功!');
 				location.reload();
 			} else if (value === "openGithub") {
-				open($this.find('.set-description').text());
+				// open($this.find('.set-description').text());
+				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
+				location.href = $this.find('.set-description').text();
 			} else if (value === "openGitee") {
-				open($this.find('.set-description').text());
+				// open($this.find('.set-description').text());
+				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
+				location.href = $this.find('.set-description').text();
 			} else if (value === "aboutVersion") {
 				alert('当前版本: ' + app.version + '\n' +
 					'本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com'
