@@ -8,7 +8,7 @@
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 感谢
 * liumingye/quarkHomePage 原地址：https://gitee.com/liumingye/quarkHomePage/
-# 更改
+# 更新
 <版本 1.0>
 * 修改默认设置：搜索引擎默认为“百度”，搜索栏样式默认为“细圆”，历史记录默认为“不记录”
 * 修改首页LOGO，采用华为“HarmonyOS”官方LOGO图标
