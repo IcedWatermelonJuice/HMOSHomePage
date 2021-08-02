@@ -49,19 +49,48 @@ require(['jquery'], function($) {
 		}
 	};
 
-	var settingsFn = function(storage) {
-		this.storage = {
-			engines: "baidu",
-			bookcolor: "black",
-			styleThin: true,
-			nightMode: false,
-			autonightMode: true
-		};
+	// 识别浏览器
+	var browserInfo = function() {
+		if (window.via) {
+			return 'via';
+		} else if (window.mbrowser) {
+			return 'x';
+		}
+	};
+
+	var settingsFn = function(storage, browser) {
+		if ((browser === 'via') || browser === 'x') {
+			this.storage = {
+				engines: "baidu",
+				bookcolor: "black",
+				styleThin: true,
+				nightMode: false,
+				autonightMode: true,
+				searchHistory: false,
+				LOGOclickFn: "bookmarkList",
+				LOGOlongpressFn: "settingsPage"
+			};
+		} else {
+			this.storage = {
+				engines: "baidu",
+				bookcolor: "black",
+				styleThin: true,
+				nightMode: false,
+				autonightMode: true,
+				searchHistory: false,
+				LOGOclickFn: "choicePage",
+				LOGOlongpressFn: "settingsPage"
+			};
+		}
+		this.initStorage = this.storage;
 		this.storage = $.extend({}, this.storage, storage);
 	}
 	settingsFn.prototype = {
 		getJson: function() {
 			return this.storage;
+		},
+		getinitSettings: function() {
+			return this.initStorage;
 		},
 		// 读取设置项
 		get: function(key) {
@@ -137,7 +166,7 @@ require(['jquery'], function($) {
 			}
 		}
 	}
-	var settings = new settingsFn(store.get("setData"));
+	var settings = new settingsFn(store.get("setData"), browserInfo());
 	settings.apply();
 	/**
 	 * DOM长按事件
@@ -291,6 +320,16 @@ require(['jquery'], function($) {
 		},
 		getinitbookMarks: function() {
 			return this.intiOptions.data;
+		},
+		searchURL: function(url) {
+			var data = this.options.data;
+			for (let i = 0; i < data.length; i++) {
+				if (data[i].url === url) {
+					return true;
+					break;
+				}
+			}
+			return false;
 		},
 		bind: function() {
 			var that = this;
@@ -548,7 +587,7 @@ require(['jquery'], function($) {
 			autoNightModeFn();
 		}
 	}
-	setInterval(autoNightModeOn, 3000);
+
 	/**
 	 * 搜索历史构建函数
 	 * @function init 初始化
@@ -894,15 +933,6 @@ require(['jquery'], function($) {
 		// 使用回车键进行搜索
 		evt.keyCode === 13 && $(".search-btn").click();
 	});
-
-	// 识别浏览器
-	var browserInfo = function() {
-		if (window.via) {
-			return 'via';
-		} else if (window.mbrowser) {
-			return 'x';
-		}
-	};
 
 	// 搜索函数
 	function searchText(text) {
@@ -1433,127 +1463,181 @@ require(['jquery'], function($) {
 		})
 	}
 
-
 	$(".logo").click(() => {
+		setLOGOclickFn();
+	}).longPress(() => {
+		setLOGOlongpressFn();
+	});
+	//via x 打开书签页
+	function openbookmarksList() {
 		var browser = browserInfo();
 		if (browser === 'via') {
 			location.href = "folder://";
 		} else if (browser === 'x') {
 			location.href = "x:bm?sort=default";
-		} else {
-			openSettingPage();
 		}
-	}).longPress(() => {
-		openSettingPage();
-	});
-	
+	}
+	//设置LOGOclickFn
+	function setLOGOclickFn() {
+		if (settings.get("LOGOclickFn") === "bookmarkList") {
+			openbookmarksList();
+		} else if (settings.get("LOGOclickFn") === "settingsPage") {
+			openSettingPage();
+		} else if (settings.get("LOGOclickFn") === "choicePage") {
+			choice();
+		} else {
+			alert('单击LOGO功能错误！');
+		}
+	}
+	//设置LOGOlongpressFn
+	function setLOGOlongpressFn() {
+		if (settings.get("LOGOlongpressFn") === "bookmarkList") {
+			openbookmarksList();
+		} else if (settings.get("LOGOlongpressFn") === "settingsPage") {
+			openSettingPage();
+		} else if (settings.get("LOGOlongpressFn") === "choicePage") {
+			choice();
+		} else {
+			alert('长按LOGO功能错误！');
+		}
+	}
 	//设置页面
 	function openSettingPage() {
 		//构建设置HTML
 		var data = [{
-			"type": "hr"
-		}, {
-			"title": "搜索引擎",
-			"type": "select",
-			"value": "engines",
-			"data": [{
-				"t": "夸克搜索",
-				"v": "quark"
+				"type": "hr"
 			}, {
-				"t": "跟随Via浏览器",
-				"v": "via"
+				"title": "搜索引擎",
+				"type": "select",
+				"value": "engines",
+				"data": [{
+					"t": "夸克搜索",
+					"v": "quark"
+				}, {
+					"t": "跟随Via浏览器",
+					"v": "via"
+				}, {
+					"t": "百度搜索",
+					"v": "baidu"
+				}, {
+					"t": "谷歌搜索",
+					"v": "google"
+				}, {
+					"t": "必应搜索",
+					"v": "bing"
+				}, {
+					"t": "神马搜索",
+					"v": "sm"
+				}, {
+					"t": "好搜搜索",
+					"v": "haosou"
+				}, {
+					"t": "搜狗搜索",
+					"v": "sogou"
+				}, {
+					"t": "自定义",
+					"v": "diy"
+				}]
 			}, {
-				"t": "百度搜索",
-				"v": "baidu"
+				"title": "图标颜色",
+				"type": "select",
+				"value": "bookcolor",
+				"data": [{
+					"t": "深色图标",
+					"v": "black"
+				}, {
+					"t": "浅色图标",
+					"v": "white"
+				}]
 			}, {
-				"t": "谷歌搜索",
-				"v": "google"
+				"title": "点击LOGO",
+				"type": "select",
+				"value": "LOGOclickFn",
+				"data": [{
+					"t": "打开书签",
+					"v": "bookmarkList"
+				}, {
+					"t": "打开设置",
+					"v": "settingsPage"
+				}, {
+					"t": "打开精选",
+					"v": "choicePage"
+				}]
+			},
+			{
+				"title": "长按LOGO",
+				"type": "select",
+				"value": "LOGOlongpressFn",
+				"data": [{
+					"t": "打开书签",
+					"v": "bookmarkList"
+				}, {
+					"t": "打开设置",
+					"v": "settingsPage"
+				}, {
+					"t": "打开精选",
+					"v": "choicePage"
+				}]
 			}, {
-				"t": "必应搜索",
-				"v": "bing"
+				"title": "设置壁纸",
+				"value": "wallpaper"
 			}, {
-				"t": "神马搜索",
-				"v": "sm"
+				"title": "设置LOGO",
+				"value": "logo"
 			}, {
-				"t": "好搜搜索",
-				"v": "haosou"
+				"type": "hr"
 			}, {
-				"t": "搜狗搜索",
-				"v": "sogou"
+				"title": "主页样式细圆",
+				"type": "checkbox",
+				"value": "styleThin"
 			}, {
-				"t": "自定义",
-				"v": "diy"
-			}]
-		}, {
-			"title": "图标颜色",
-			"type": "select",
-			"value": "bookcolor",
-			"data": [{
-				"t": "深色图标",
-				"v": "black"
+				"title": "夜间模式",
+				"type": "checkbox",
+				"value": "nightMode"
 			}, {
-				"t": "浅色图标",
-				"v": "white"
-			}]
-		}, {
-			"title": "设置壁纸",
-			"value": "wallpaper"
-		}, {
-			"title": "设置LOGO",
-			"value": "logo"
-		}, {
-			"type": "hr"
-		}, {
-			"title": "主页样式细圆",
-			"type": "checkbox",
-			"value": "styleThin"
-		}, {
-			"title": "夜间模式",
-			"type": "checkbox",
-			"value": "nightMode"
-		}, {
-			"title": "夜间模式跟随浏览器",
-			"type": "checkbox",
-			"value": "autonightMode"
-		}, {
-			"title": "保存搜索栏历史",
-			"type": "checkbox",
-			"value": "searchHistory"
-		}, {
-			"type": "hr"
-		}, {
-			"title": "备份数据",
-			"value": "export",
-			"description": "备份主页数据到剪贴板"
-		}, {
-			"title": "恢复数据",
-			"value": "import",
-			"description": "从剪贴板恢复主页数据"
-		}, {
-			"title": "恢复默认壁纸和LOGO",
-			"value": "delLogo",
-			"description": "恢复默认壁纸、LOGO"
-		}, {
-			"title": "恢复默认书签和设置",
-			"value": "intibookMark",
-			"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
-		}, {
-			"type": "hr"
-		}, {
-			"title": "关于",
-			"value": "aboutVersion",
-			"description": "当前版本:" + app.version
-		}, {
-			"title": "Github",
-			"value": "openGithub",
-			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
+				"title": "夜间模式跟随浏览器",
+				"type": "checkbox",
+				"value": "autonightMode"
+			}, {
+				"title": "保存搜索栏历史",
+				"type": "checkbox",
+				"value": "searchHistory"
+			}, {
+				"type": "hr"
+			}, {
+				"title": "备份数据",
+				"value": "export",
+				"description": "备份主页数据到剪贴板"
+			}, {
+				"title": "恢复数据",
+				"value": "import",
+				"description": "从剪贴板恢复主页数据"
+			}, {
+				"title": "初始化壁纸和LOGO",
+				"value": "delLogo",
+				"description": "恢复默认壁纸和LOGO"
+			}, {
+				"title": "初始化书签和设置",
+				"value": "intibookMark",
+				"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
+			}, {
+				"type": "hr"
+			}, {
+				"title": "关于",
+				"value": "aboutVersion",
+				"description": "当前版本:" + app.version
+			}, {
+				"title": "Github",
+				"value": "openGithub",
+				"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
 
-		}, {
-			"title": "Gitee(可能不是最新版本)",
-			"value": "openGitee",
-			"description": "https://gitee.com/gem_xl/HMOSHomePage"
+			}, {
+				"title": "Gitee(可能不是最新版本)",
+				"value": "openGitee",
+				"description": "https://gitee.com/gem_xl/HMOSHomePage"
 
-		}];
+			}
+		];
 		var html =
 			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">自     定     义     设     置</p></div><ul class="set-option-from">';
 		for (var json of data) {
@@ -1583,11 +1667,16 @@ require(['jquery'], function($) {
 
 		$(".page-settings").show();
 		$(".page-settings").addClass('animation');
-
+		// 只有via浏览器才在搜索引擎设置里显示跟随via选项
 		var browser = browserInfo();
-		if (browser !== 'via') { // 只有VIA浏览器才能显示
+		if (browser !== 'via') {
 			$('option[value=via]').hide();
 		}
+		// 只有via或x浏览器才在点击/长按LOGO设置里显示打开书签选项
+		if ((browser !== 'via') || (browser !== 'x')) {
+			$('option[value=bookmarkList]').hide();
+		}
+
 
 		$(".set-option .set-select").map(function() {
 			$(this).val(settings.get($(this).parent().data('value')));
@@ -1632,16 +1721,12 @@ require(['jquery'], function($) {
 				settings.set('wallpaper', '');
 				settings.set('logo', '');
 				alert('壁纸和LOGO初始化成功!');
-				location.reload();
+				location.reload(false);
 			} else if (value === "intibookMark") {
 				store.set("bookMark", bookMark.getinitbookMarks());
-				settings.set('engines', 'baidu');
-				settings.set('bookcolor', 'black');
-				settings.set('styleThin', true);
-				settings.set('nightMode', false);
-				settings.set('autonightMode', true);
+				store.set("setData", settings.getinitSettings());
 				alert('书签和设置初始化成功!');
-				location.reload();
+				location.reload(false);
 			} else if (value === "openGithub") {
 				// open($this.find('.set-description').text());
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
@@ -1712,6 +1797,7 @@ require(['jquery'], function($) {
 					return false;
 				}
 			}
+
 			// 保存设置
 			settings.set(item, value);
 		});
@@ -1731,6 +1817,30 @@ require(['jquery'], function($) {
 		});
 
 	}
+	//设置点击/长按LOGO功能冲突检测
+	function DetectLogoFnConflicts() {
+		//settingsPage
+		if ((settings.get("LOGOclickFn") !== "settingsPage")&&(settings.get("LOGOlongpressFn") !== "settingsPage")) {
+			if (!bookMark.searchURL("openSettingPage()")) {
+				setTimeout(function() {
+					if ((settings.get("LOGOclickFn") !== "settingsPage")&&(settings.get("LOGOlongpressFn") !== "settingsPage")) {
+						if (!bookMark.searchURL("openSettingPage()")) {
+							settings.set("LOGOclickFn", settings.initStorage["LOGOclickFn"]);
+							settings.set("LOGOlongpressFn", settings.initStorage["LOGOlongpressFn"]);
+							alert('检测到LOGO功能与主页书签中均无设置，已重置LOGO功能');
+							location.reload(false);
+						};
+					}
+				}, 5000);
+			}
+		}
+	}
+	//2s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
+	function IntervalFnSet() {
+		autoNightModeOn();
+		DetectLogoFnConflicts();
+	}
+	setInterval(IntervalFnSet, 3000);
 
 	// 下滑进入搜索
 	require(['touchSwipe'], function() {
