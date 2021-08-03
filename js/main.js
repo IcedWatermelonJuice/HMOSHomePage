@@ -1826,7 +1826,7 @@ require(['jquery'], function($) {
 			async: false,
 			success: function(result) {
 				newVersion = result.slice(result.search("version:") + "version:"
-					.length, result.length - 2);
+					.length, result.length - 1);
 			},
 		});
 		return newVersion;
