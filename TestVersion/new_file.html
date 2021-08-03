@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="js/lib/jquery.js"></script>
+		<script>
+		function changecheckbox(){
+			var a=$("li[value=1]");
+			a.hide();
+		}
+		</script>
+	</head>
+	<body>
+		<li value="1">1:<input type="checkbox"/></li>
+		<li value="2">2:<input type="checkbox"/></li>
+		
+		<button type="button" onclick="changecheckbox()">change checkbox</button>
+	</body>
+</html>

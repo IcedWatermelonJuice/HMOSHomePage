@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
+		<meta name="referrer" content="never" />
+		<meta name="description" content="HomePage version1.8">
+		<meta name="keywords" content="homepage,home page,主页,起始页,手机主页">
+		<meta name="author" content="IcedWatermelonJuice(Github)">
+		<title>主页</title>
+		<link rel="icon" type="image/x-icon" href="logo/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="css/main.css?v=1.8" />
+		<link rel="stylesheet" id="nightCss" type="text/css" href="css/night.css?v=1.8" disabled />
+	</head>
+
+	<body>
+		<div id="app">
+			<div class="page-home">
+				<div class="logo"></div>
+				<div class="ornament-input-group" style="display: none;"></div>
+				<div class="bookmark"></div>
+			</div>
+			<div class="page-search">
+				<div class="history">
+					<div class="emptyHistory"></div>
+					<ul class="content"></ul>
+				</div>
+				<ul class="suggestion"></ul>
+				<div class="bottom-row">
+					<div class="search-from">
+						<div class="input-bg">
+							<input type="text" class="search-input" placeholder="搜索或输入网址" />
+							<div class="empty-input"></div>
+							<div class="search-btn">取消</div>
+						</div>
+					</div>
+					<div class="shortcut">
+						<div class="content">
+							<ul class="shortcut1">
+								<li>www.</li>
+								<li>m.</li>
+								<li>wap.</li>
+								<li>.org</li>
+							</ul>
+							<ul class="shortcut2">
+								<li>.</li>
+								<li>/</li>
+								<li>.cn</li>
+								<li>.com</li>
+								<li>.org</li>
+							</ul>
+							<ul class="shortcut3">
+								<li>快搜:</li>
+								<li>百科</li>
+								<li>视频</li>
+								<li>图片</li>
+								<li>贴吧</li>
+								<li>Github</li>
+								<li>Gitee</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<input type="text" class="s-temp" />
+		</div>
+		<script>
+			var app = window.app || {};
+			app.version = "1.8";
+		</script>
+		<script src="js/lib/require.js?v=1.8"></script>
+		<script src="js/main.js?v=1.8"></script>
+		<!-- 不重要的CSS最后加载 -->
+		<link rel="stylesheet" type="text/css" href="css/lazy.css?v=1.8" />
+	</body>
+
+</html>
+</body>
+
+</html>version:1.8
