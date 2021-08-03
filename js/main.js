@@ -1625,7 +1625,7 @@ require(['jquery'], function($) {
 			}, {
 				"title": "关于",
 				"value": "aboutVersion",
-				"description": "当前版本:" + app.version
+				"description": "当前版本:" + app.version+" (点击检查更新)"
 			}, {
 				"title": "Github",
 				"value": "openGithub",
@@ -1736,9 +1736,10 @@ require(['jquery'], function($) {
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
 				location.href = $this.find('.set-description').text();
 			} else if (value === "aboutVersion") {
-				alert('当前版本: ' + app.version + '\n' +
-					'本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com'
-				);
+				getnewVersion();
+				let alertMessage = '当前版本: ' + app.version + '\n最新版本: ' + getnewVersion() +
+					'\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com';
+				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
 				// oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
@@ -1817,13 +1818,29 @@ require(['jquery'], function($) {
 		});
 
 	}
+
+	function getnewVersion() {
+		var newVersion = "fail to get newVersion";
+		$.ajax({
+			url: "https://bird.ioliu.cn/v2?url=https://icedwatermelonjuice.github.io/HMOSHomePage/",
+			async: false,
+			success: function(result) {
+				newVersion = result.slice(result.search("version:") + "version:"
+					.length, result.length - 2);
+			},
+		});
+		return newVersion;
+	}
+
 	//设置点击/长按LOGO功能冲突检测
 	function DetectLogoFnConflicts() {
 		//settingsPage
-		if ((settings.get("LOGOclickFn") !== "settingsPage")&&(settings.get("LOGOlongpressFn") !== "settingsPage")) {
+		if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
+				"settingsPage")) {
 			if (!bookMark.searchURL("openSettingPage()")) {
 				setTimeout(function() {
-					if ((settings.get("LOGOclickFn") !== "settingsPage")&&(settings.get("LOGOlongpressFn") !== "settingsPage")) {
+					if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get(
+							"LOGOlongpressFn") !== "settingsPage")) {
 						if (!bookMark.searchURL("openSettingPage()")) {
 							settings.set("LOGOclickFn", settings.initStorage["LOGOclickFn"]);
 							settings.set("LOGOlongpressFn", settings.initStorage["LOGOlongpressFn"]);
