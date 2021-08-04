@@ -57,9 +57,7 @@ require(['jquery'], function($) {
 			return 'x';
 		}
 	};
-var browser=browserInfo();
 	var settingsFn = function(storage, browser) {
-		// let browser=browserInfo();
 		if (browser === 'via') {
 			this.storage = {
 				engines: "baidu",
