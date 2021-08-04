@@ -66,6 +66,8 @@ require(['jquery'], function($) {
 				styleThin: true,
 				nightMode: false,
 				autonightMode: false,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
 				LOGOlongpressFn: "settingsPage"
@@ -77,6 +79,8 @@ require(['jquery'], function($) {
 				styleThin: true,
 				nightMode: false,
 				autonightMode: true,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
 				LOGOlongpressFn: "settingsPage"
@@ -88,6 +92,8 @@ require(['jquery'], function($) {
 				styleThin: true,
 				nightMode: false,
 				autonightMode: true,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "choicePage",
 				LOGOlongpressFn: "settingsPage"
@@ -168,7 +174,7 @@ require(['jquery'], function($) {
 	var settings = new settingsFn(store.get("setData"), browserInfo());
 	settings.apply();
 
-	// 自动夜间模式1(非Via浏览器)
+	// 自动夜间模式(非Via浏览器)
 	function autoNightModeFn() {
 		if ((window.matchMedia('(prefers-color-scheme: dark)').matches) && (settings.get('nightMode') ===
 				false)) {
@@ -178,27 +184,113 @@ require(['jquery'], function($) {
 			settings.set('nightMode', false);
 		}
 	}
-	// 自动夜间模式2(非ia浏览器) 删除掉VIA浏览器夜间模式的暗色支持
-	function autoNightModeFn2() {
-		$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
-			if (evt.target.id === "via_inject_css_night") {
-				if (evt.type === "DOMNodeInserted") {
-					$("#via_inject_css_night").html("");
-					settings.set('nightMode', true);
-				} else if (evt.type === "DOMNodeRemoved") {
-					settings.set('nightMode', false);
+	// 自动夜间模式(via浏览器) 删除掉VIA浏览器夜间模式的暗色支持
+	// function autoNightModeFn2() {
+	// 	$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
+	// 		if (evt.target.id === "via_inject_css_night") {
+	// 			if (evt.type === "DOMNodeInserted") {
+	// 				$("#via_inject_css_night").html("");
+	// 				settings.set('nightMode', true);
+	// 			} else if (evt.type === "DOMNodeRemoved") {
+	// 				settings.set('nightMode', false);
+	// 			}
+	// 		}
+	// 	});
+	// 	if ($("#via_inject_css_night").html("").length > 0) {
+	// 		settings.set('nightMode', true);
+	// 	}
+	// }
+	var autoNightMode2Fn = {
+		getSetTime: function() {
+			let setTime = prompt("请输入开启时间,格式为:hh:mm-hh:mm,例如:20:00-8:00");
+			try {
+				let setTimeFlag0 = setTime.search("-");
+				let setTimeFlag1=setTime.search(":");
+				let setTimeFlag2=setTime.slice(setTimeFlag0).search(":");
+				let alertMessage="输入时间格式错误:";
+				if (setTimeFlag0 === -1) {
+					alertMessage+="\n区间间隔'-'丢失!";
+				} 
+				if(setTimeFlag1 === -1){
+					alertMessage+="\n开始时间':'丢失!";
 				}
+				if(setTimeFlag2 === -1){
+					alertMessage+="\n结束时间':'丢失!";
+				}
+				if((setTimeFlag0!==-1)&&(setTimeFlag1!==-1)&&(setTimeFlag2!==-1)){
+					settings.set('autonightMode2Array', setTime);
+					alert("时间设定成功!");
+				}else{
+					alert(alertMessage);
+				}
+			} catch (e) {
+				alert("时间设定失败!");
 			}
-		});
-		if ($("#via_inject_css_night").html("").length > 0) {
-			settings.set('nightMode', true);
-		}
-	}
+		},
+		changeSetTime: function() {
+			let returnArray = new Array;
+			let setTime = settings.get('autonightMode2Array');
+
+			let setTimeFlag0 = setTime.search("-");
+			let setTimeFlag1;
+			let setTime0 = setTime.slice(0, setTimeFlag0);
+			let setTime1 = setTime.slice(setTimeFlag0 + 1);
+			
+			setTimeFlag0 = setTime0.search(":");
+			setTimeFlag1 = setTime1.search(":");
+			let setTime0Hour = parseInt(setTime0.slice(0, setTimeFlag0));
+			let setTime0Minute = parseInt(setTime0.slice(setTimeFlag0 + 1));
+			let setTime1Hour = parseInt(setTime1.slice(0, setTimeFlag1));
+			let setTime1Minute = parseInt(setTime1.slice(setTimeFlag1 + 1));
+			
+			returnArray[0] = setTime0Hour * 60 + setTime0Minute;
+			returnArray[1] = setTime1Hour * 60 + setTime1Minute;
+			return returnArray;
+		},
+		getNowTime: function() {
+			var nowTime = new Date();
+			var nowHour = nowTime.getHours();
+			var nowMinute = nowTime.getMinutes();
+			var nowTimeSum = nowHour * 60 + nowMinute;
+			return nowTimeSum;
+		},
+		on:function(){
+			if(settings.get('nightMode') ===false){
+				settings.set('nightMode', true);
+			}
+		},
+		off:function(){
+			if(settings.get('nightMode') ===true){
+				settings.set('nightMode', false);
+			}
+		},
+	};
 
 	function autoNightModeOn() {
-		if (settings.get('autonightMode', true)) {
+		if (settings.get('autonightMode') === true) {
 			autoNightModeFn();
-			autoNightModeFn2();
+			// autoNightModeFn2();
+		}
+		if (settings.get('autonightMode2') === true) {
+			let setTimeArray=autoNightMode2Fn.changeSetTime();
+			let setTime0Sum = setTimeArray[0];
+			let setTime1Sum = setTimeArray[1];
+			if (setTime0Sum !== -1 || setTime1Sum !== -1) {
+				let nowTimeSum = autoNightMode2Fn.getNowTime();
+				if (setTime0Sum <= setTime1Sum) {
+					if ((nowTimeSum >= setTime0Sum) && (nowTimeSum <= setTime1Sum)) {
+						autoNightMode2Fn.on();
+					} else {
+						autoNightMode2Fn.off();
+					}
+				} else {
+					if ((nowTimeSum > setTime1Sum) && (nowTimeSum < setTime0Sum)) {
+						autoNightMode2Fn.off();
+					} else {
+						autoNightMode2Fn.on();
+					}
+				}
+			}
 		}
 	}
 
@@ -1526,6 +1618,7 @@ require(['jquery'], function($) {
 	}
 	//设置页面
 	function openSettingPage() {
+		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -1614,17 +1707,25 @@ require(['jquery'], function($) {
 				"type": "checkbox",
 				"value": "styleThin"
 			}, {
+				"title": "保存搜索栏历史",
+				"type": "checkbox",
+				"value": "searchHistory"
+			}, {
 				"title": "夜间模式",
 				"type": "checkbox",
 				"value": "nightMode"
 			}, {
-				"title": "夜间模式跟随浏览器",
+				"title": "自动夜间模式(跟随浏览器)",
 				"type": "checkbox",
 				"value": "autonightMode"
 			}, {
-				"title": "保存搜索栏历史",
+				"title": "自动夜间模式(用户定时)",
 				"type": "checkbox",
-				"value": "searchHistory"
+				"value": "autonightMode2"
+			}, {
+				"title": "夜间模式定时区间",
+				"value": "autonightMode2Array",
+				"description": "" + autonightMode2AyDes
 			}, {
 				"type": "hr"
 			}, {
@@ -1699,13 +1800,27 @@ require(['jquery'], function($) {
 			$('option[value=bookmarkList]').hide();
 		}
 		//屏蔽via浏览器的自动夜间模式
-		if(browser === 'via'){
+		if (browser === 'via') {
 			$("li[data-value=autonightMode]").hide();
 		}
-		//开启自动夜间模式==>屏蔽夜间模式选项
-		if (settings.get('autonightMode', true)) {
+		//开启自动夜间模式==>屏蔽夜间模式选项+自动夜间模式2
+		if (settings.get('autonightMode') === true) {
 			$("li[data-value=nightMode]").hide();
+			$("li[data-value=autonightMode2]").hide();
 		} else {
+			$("li[data-value=autonightMode2]").show();
+		}
+		//开启自动夜间模式2==>屏蔽夜间模式选项+自动夜间模式
+		if (settings.get('autonightMode2') === true) {
+			$("li[data-value=nightMode]").hide();
+			$("li[data-value=autonightMode]").hide();
+			$("li[data-value=autonightMode2Array]").show();
+		} else {
+			$("li[data-value=autonightMode]").show();
+			$("li[data-value=autonightMode2Array]").hide();
+		}
+		//只有自动夜间模式1、2均关闭才显示夜间模式
+		if ((settings.get('autonightMode') === false) && (settings.get('autonightMode2') === false)) {
 			$("li[data-value=nightMode]").show();
 		}
 
@@ -1806,6 +1921,9 @@ require(['jquery'], function($) {
 				} catch (e) {
 					alert("主页数据恢复失败!");
 				}
+			} else if (value === "autonightMode2Array") {
+				autoNightMode2Fn.getSetTime();
+				location.reload(false);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
 				$.fn.openSelect = function() {
@@ -1854,13 +1972,28 @@ require(['jquery'], function($) {
 			// 应用设置
 			if (item === 'styleThin' && value === true) {
 				$("body").addClass('styleThin');
-			} else {
+			} else if (item === 'styleThin' && value === false){
 				$("body").removeClass('styleThin');
 			}
 			if (item === 'autonightMode' && value === true) {
 				$("li[data-value=nightMode]").hide();
-			} else {
-				$("li[data-value=nightMode]").show();
+				$("li[data-value=autonightMode2]").hide();
+			} else if (item === 'autonightMode' && value === false){
+				$("li[data-value=autonightMode2]").show();
+				if (settings.get('autonightMode2') === false) {
+					$("li[data-value=nightMode]").show();
+				}
+			}
+			if (item === 'autonightMode2' && value === true) {
+				$("li[data-value=nightMode]").hide();
+				$("li[data-value=autonightMode]").hide();
+				$("li[data-value=autonightMode2Array]").show();
+			} else if (item === 'autonightMode2' && value === false){
+				$("li[data-value=autonightMode]").show();
+				if (settings.get('autonightMode') === false) {
+					$("li[data-value=nightMode]").show();
+				}
+				$("li[data-value=autonightMode2Array]").hide();
 			}
 			// 保存设置
 			settings.set(item, value);
