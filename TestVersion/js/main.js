@@ -59,7 +59,18 @@ require(['jquery'], function($) {
 	};
 
 	var settingsFn = function(storage, browser) {
-		if ((browser === 'via') || browser === 'x') {
+		if (browser === 'via') {
+			this.storage = {
+				engines: "baidu",
+				bookcolor: "black",
+				styleThin: true,
+				nightMode: false,
+				autonightMode: false,
+				searchHistory: false,
+				LOGOclickFn: "bookmarkList",
+				LOGOlongpressFn: "settingsPage"
+			};
+		} else if (browser === 'x') {
 			this.storage = {
 				engines: "baidu",
 				bookcolor: "black",
@@ -182,7 +193,8 @@ require(['jquery'], function($) {
 		if ($("#via_inject_css_night").html("").length > 0) {
 			settings.set('nightMode', true);
 		}
-	}	
+	}
+
 	function autoNightModeOn() {
 		if (settings.get('autonightMode', true)) {
 			autoNightModeFn();
@@ -1686,6 +1698,11 @@ require(['jquery'], function($) {
 		if ((browser !== 'via') && (browser !== 'x')) {
 			$('option[value=bookmarkList]').hide();
 		}
+		//屏蔽via浏览器的自动夜间模式
+		if(browser === 'via'){
+			$("li[data-value=autonightMode]").hide();
+		}
+		//开启自动夜间模式==>屏蔽夜间模式选项
 		if (settings.get('autonightMode', true)) {
 			$("li[data-value=nightMode]").hide();
 		} else {
