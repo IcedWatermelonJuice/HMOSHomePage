@@ -59,6 +59,7 @@ require(['jquery'], function($) {
 	};
 
 	var settingsFn = function(storage, browser) {
+		let browser=browserInfo();
 		if (browser === 'via') {
 			this.storage = {
 				engines: "baidu",
@@ -1808,7 +1809,7 @@ require(['jquery'], function($) {
 			$("li[data-value=nightMode]").hide();
 			$("li[data-value=autonightMode2]").hide();
 		} else {
-			$("li[data-value=autonightMode2]").show();
+				$("li[data-value=autonightMode2]").show();
 		}
 		//开启自动夜间模式2==>屏蔽夜间模式选项+自动夜间模式
 		if (settings.get('autonightMode2') === true) {
@@ -1816,7 +1817,10 @@ require(['jquery'], function($) {
 			$("li[data-value=autonightMode]").hide();
 			$("li[data-value=autonightMode2Array]").show();
 		} else {
-			$("li[data-value=autonightMode]").show();
+			if(browser !== 'via'){
+				$("li[data-value=autonightMode]").show();
+			}
+			
 			$("li[data-value=autonightMode2Array]").hide();
 		}
 		//只有自动夜间模式1、2均关闭才显示夜间模式
@@ -1989,7 +1993,9 @@ require(['jquery'], function($) {
 				$("li[data-value=autonightMode]").hide();
 				$("li[data-value=autonightMode2Array]").show();
 			} else if (item === 'autonightMode2' && value === false){
-				$("li[data-value=autonightMode]").show();
+				if(browser !== 'via'){
+					$("li[data-value=autonightMode]").show();
+				}
 				if (settings.get('autonightMode') === false) {
 					$("li[data-value=nightMode]").show();
 				}
