@@ -57,15 +57,29 @@ require(['jquery'], function($) {
 			return 'x';
 		}
 	};
-
 	var settingsFn = function(storage, browser) {
-		if ((browser === 'via') || browser === 'x') {
+		if (browser === 'via') {
+			this.storage = {
+				engines: "baidu",
+				bookcolor: "black",
+				styleThin: true,
+				nightMode: false,
+				autonightMode: false,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
+				searchHistory: false,
+				LOGOclickFn: "bookmarkList",
+				LOGOlongpressFn: "settingsPage"
+			};
+		} else if (browser === 'x') {
 			this.storage = {
 				engines: "baidu",
 				bookcolor: "black",
 				styleThin: true,
 				nightMode: false,
 				autonightMode: true,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
 				LOGOlongpressFn: "settingsPage"
@@ -77,6 +91,8 @@ require(['jquery'], function($) {
 				styleThin: true,
 				nightMode: false,
 				autonightMode: true,
+				autonightMode2: false,
+				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "choicePage",
 				LOGOlongpressFn: "settingsPage"
@@ -150,24 +166,133 @@ require(['jquery'], function($) {
 				}
 			}
 
-			// 删除掉VIA浏览器夜间模式的暗色支持
-			$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
-				if (evt.target.id === "via_inject_css_night") {
-					if (evt.type === "DOMNodeInserted") {
-						$("#via_inject_css_night").html("");
-						nightMode.on();
-					} else if (evt.type === "DOMNodeRemoved") {
-						nightMode.off();
-					}
-				}
-			});
-			if ($("#via_inject_css_night").html("").length > 0) {
-				nightMode.on();
-			}
+
+
 		}
 	}
 	var settings = new settingsFn(store.get("setData"), browserInfo());
 	settings.apply();
+
+	// 自动夜间模式(非Via浏览器)
+	function autoNightModeFn() {
+		if ((window.matchMedia('(prefers-color-scheme: dark)').matches) && (settings.get('nightMode') ===
+				false)) {
+			settings.set('nightMode', true);
+		} else if ((window.matchMedia('(prefers-color-scheme: light)').matches) && (settings.get(
+				'nightMode') === true)) {
+			settings.set('nightMode', false);
+		}
+	}
+	// 自动夜间模式(via浏览器) 删除掉VIA浏览器夜间模式的暗色支持
+	// function autoNightModeFn2() {
+	// 	$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
+	// 		if (evt.target.id === "via_inject_css_night") {
+	// 			if (evt.type === "DOMNodeInserted") {
+	// 				$("#via_inject_css_night").html("");
+	// 				settings.set('nightMode', true);
+	// 			} else if (evt.type === "DOMNodeRemoved") {
+	// 				settings.set('nightMode', false);
+	// 			}
+	// 		}
+	// 	});
+	// 	if ($("#via_inject_css_night").html("").length > 0) {
+	// 		settings.set('nightMode', true);
+	// 	}
+	// }
+	var autoNightMode2Fn = {
+		getSetTime: function() {
+			let setTime = prompt("请输入开启时间,格式为:hh:mm-hh:mm,例如:20:00-8:00");
+			try {
+				let setTimeFlag0 = setTime.search("-");
+				let setTimeFlag1=setTime.search(":");
+				let setTimeFlag2=setTime.slice(setTimeFlag0).search(":");
+				let alertMessage="输入时间格式错误:";
+				if (setTimeFlag0 === -1) {
+					alertMessage+="\n区间间隔'-'丢失!";
+				} 
+				if(setTimeFlag1 === -1){
+					alertMessage+="\n开始时间':'丢失!";
+				}
+				if(setTimeFlag2 === -1){
+					alertMessage+="\n结束时间':'丢失!";
+				}
+				if((setTimeFlag0!==-1)&&(setTimeFlag1!==-1)&&(setTimeFlag2!==-1)){
+					settings.set('autonightMode2Array', setTime);
+					alert("时间设定成功!");
+				}else{
+					alert(alertMessage);
+				}
+			} catch (e) {
+				alert("时间设定失败!");
+			}
+		},
+		changeSetTime: function() {
+			let returnArray = new Array;
+			let setTime = settings.get('autonightMode2Array');
+
+			let setTimeFlag0 = setTime.search("-");
+			let setTimeFlag1;
+			let setTime0 = setTime.slice(0, setTimeFlag0);
+			let setTime1 = setTime.slice(setTimeFlag0 + 1);
+			
+			setTimeFlag0 = setTime0.search(":");
+			setTimeFlag1 = setTime1.search(":");
+			let setTime0Hour = parseInt(setTime0.slice(0, setTimeFlag0));
+			let setTime0Minute = parseInt(setTime0.slice(setTimeFlag0 + 1));
+			let setTime1Hour = parseInt(setTime1.slice(0, setTimeFlag1));
+			let setTime1Minute = parseInt(setTime1.slice(setTimeFlag1 + 1));
+			
+			returnArray[0] = setTime0Hour * 60 + setTime0Minute;
+			returnArray[1] = setTime1Hour * 60 + setTime1Minute;
+			return returnArray;
+		},
+		getNowTime: function() {
+			var nowTime = new Date();
+			var nowHour = nowTime.getHours();
+			var nowMinute = nowTime.getMinutes();
+			var nowTimeSum = nowHour * 60 + nowMinute;
+			return nowTimeSum;
+		},
+		on:function(){
+			if(settings.get('nightMode') ===false){
+				settings.set('nightMode', true);
+			}
+		},
+		off:function(){
+			if(settings.get('nightMode') ===true){
+				settings.set('nightMode', false);
+			}
+		},
+	};
+
+	function autoNightModeOn() {
+		if (settings.get('autonightMode') === true) {
+			autoNightModeFn();
+			// autoNightModeFn2();
+		}
+		if (settings.get('autonightMode2') === true) {
+			let setTimeArray=autoNightMode2Fn.changeSetTime();
+			let setTime0Sum = setTimeArray[0];
+			let setTime1Sum = setTimeArray[1];
+			if (setTime0Sum !== -1 || setTime1Sum !== -1) {
+				let nowTimeSum = autoNightMode2Fn.getNowTime();
+				if (setTime0Sum <= setTime1Sum) {
+					if ((nowTimeSum >= setTime0Sum) && (nowTimeSum <= setTime1Sum)) {
+						autoNightMode2Fn.on();
+					} else {
+						autoNightMode2Fn.off();
+					}
+				} else {
+					if ((nowTimeSum > setTime1Sum) && (nowTimeSum < setTime0Sum)) {
+						autoNightMode2Fn.off();
+					} else {
+						autoNightMode2Fn.on();
+					}
+				}
+			}
+		}
+	}
+
 	/**
 	 * DOM长按事件
 	 */
@@ -571,22 +696,7 @@ require(['jquery'], function($) {
 			store.set("bookMark", data);
 		}
 	}
-	// 自动夜间模式
-	function autoNightModeFn() {
-		if ((window.matchMedia('(prefers-color-scheme: dark)').matches) && (settings.get('nightMode') ===
-				false)) {
-			settings.set('nightMode', true);
-		} else if ((window.matchMedia('(prefers-color-scheme: light)').matches) && (settings.get(
-				'nightMode') === true)) {
-			settings.set('nightMode', false);
-		}
-	}
 
-	function autoNightModeOn() {
-		if (settings.get('autonightMode', true)) {
-			autoNightModeFn();
-		}
-	}
 
 	/**
 	 * 搜索历史构建函数
@@ -1308,11 +1418,11 @@ require(['jquery'], function($) {
 			</div>
 
 			<div class="list h3">
-				<a class="flex-1 content" href="https://quark.sm.cn/s?q=热搜&tab=quark" style="background-image:linear-gradient(135deg, rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">热搜榜</div><div class="news-list"></div></a>
+				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
 			</div>
 
 			<div class="list h2">
-				<a class="flex-1 content" href="https://quark.sm.cn/s?q=热搜&tab=zhihu" style="background-image:linear-gradient(135deg, rgb(52, 55, 60) 0%, rgb(77, 78, 86) 100%)"><p class="hl relative">知乎热榜</p><div class="audio-list"><div class="audio-swipe"><div class="swiper-wrapper"></div></div></div><div class="cmp-icon" style="width: 146px;height: 99px;right: 10px;bottom: 0;background-image: url(img/shortcut/rebang.png);"></div></a>
+				<a class="flex-1 content" href="https://www.zhihu.com/billboard" style="background-image:linear-gradient(135deg, rgb(52, 55, 60) 0%, rgb(77, 78, 86) 100%)"><p class="hl relative">知乎热搜榜</p><div class="audio-list"><div class="audio-swipe"><div class="swiper-wrapper"></div></div></div><div class="cmp-icon" style="width: 146px;height: 99px;right: 10px;bottom: 0;background-image: url(img/shortcut/rebang.png);"></div></a>
 			</div>
 
 			<div class="list">
@@ -1414,52 +1524,56 @@ require(['jquery'], function($) {
 				}
 			})
 
-			// 热搜榜知乎热榜
+			//微博热搜榜
 			$.ajax({
-				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=newchosen",
+				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=weibo",
 				type: "get",
 				dataType: "json",
 				success: function(res) {
 					var data = res.data;
+					var html = '';
 					for (var i = 0, l = data.length; i < l; i++) {
-						if (data[i].name === "热搜榜") {
-							var html = '';
-							for (var ii = 0, ll = data[i].value.length; ii < ll; ii++) {
-								html +=
-									'<div class="news-item"><div class="news-item-count">' +
-									(ii + 1) + '</div><div class="news-item-title">' + data[
-										i].value[ii].title +
-									'</div><div class="news-item-hot">' + data[i].value[ii]
-									.hot + '</div></div>';
-							}
-							$('.news-list').html(html);
-						} else if (data[i].name === "知乎热榜") {
-							var html = '';
-							for (var ii = 0, ll = data[i].value.length; ii < ll; ii++) {
-								html +=
-									'<div class="audio-item swiper-slide"><div class="audio-item-icon"></div><div class="audio-item-title">' +
-									data[i].value[ii].title + '</div></div>';
-							}
-							$('.audio-list').find('.swiper-wrapper').html(html);
-							require(['Swiper'], function(Swiper) {
-								var swiper = new Swiper('.audio-swipe', {
-									allowTouchMove: false,
-									height: 54,
-									direction: 'vertical',
-									slidesPerView: 2,
-									slidesPerGroup: 2,
-									loop: true,
-									autoplay: {
-										delay: 5000,
-										disableOnInteraction: false,
-									},
-								});
-							})
-						}
+						html +=
+							'<div class="news-item"><div class="news-item-count">' +
+							(i + 1) + '</div><div class="news-item-title">' + data[i]
+							.title +
+							'</div><div class="news-item-hot">' + data[i].hot +
+							'</div></div>';
 					}
-
+					$('.news-list').html(html);
 				}
 			});
+			//知乎热搜榜
+			$.ajax({
+				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=zhihu",
+				type: "get",
+				dataType: "json",
+				success: function(res) {
+					var data = res.data;
+					var html = '';
+					for (var i = 0, l = data.length; i < l; i++) {
+						html +=
+							'<div class="audio-item swiper-slide"><div class="audio-item-icon"></div><div class="audio-item-title">' +
+							data[i].title + '</div></div>';
+					}
+					$('.audio-list').find('.swiper-wrapper').html(html);
+					require(['Swiper'], function(Swiper) {
+						var swiper = new Swiper('.audio-swipe', {
+							allowTouchMove: false,
+							height: 54,
+							direction: 'vertical',
+							slidesPerView: 2,
+							slidesPerGroup: 2,
+							loop: true,
+							autoplay: {
+								delay: 5000,
+								disableOnInteraction: false,
+							},
+						});
+					})
+				}
+			}); //知乎热榜
+
 		})
 	}
 
@@ -1503,6 +1617,7 @@ require(['jquery'], function($) {
 	}
 	//设置页面
 	function openSettingPage() {
+		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -1514,7 +1629,7 @@ require(['jquery'], function($) {
 					"t": "夸克搜索",
 					"v": "quark"
 				}, {
-					"t": "跟随Via浏览器",
+					"t": "跟随Via",
 					"v": "via"
 				}, {
 					"t": "百度搜索",
@@ -1591,17 +1706,25 @@ require(['jquery'], function($) {
 				"type": "checkbox",
 				"value": "styleThin"
 			}, {
+				"title": "保存搜索栏历史",
+				"type": "checkbox",
+				"value": "searchHistory"
+			}, {
 				"title": "夜间模式",
 				"type": "checkbox",
 				"value": "nightMode"
 			}, {
-				"title": "夜间模式跟随浏览器",
+				"title": "自动夜间模式(跟随浏览器)",
 				"type": "checkbox",
 				"value": "autonightMode"
 			}, {
-				"title": "保存搜索栏历史",
+				"title": "自动夜间模式(用户定时)",
 				"type": "checkbox",
-				"value": "searchHistory"
+				"value": "autonightMode2"
+			}, {
+				"title": "夜间模式定时区间",
+				"value": "autonightMode2Array",
+				"description": "" + autonightMode2AyDes
 			}, {
 				"type": "hr"
 			}, {
@@ -1625,7 +1748,7 @@ require(['jquery'], function($) {
 			}, {
 				"title": "关于",
 				"value": "aboutVersion",
-				"description": "当前版本:" + app.version+" (点击检查更新)"
+				"description": "当前版本:" + app.version + " (点击检查更新)"
 			}, {
 				"title": "Github",
 				"value": "openGithub",
@@ -1664,7 +1787,6 @@ require(['jquery'], function($) {
 		}
 		html += '</ul></div>';
 		$('#app').append(html);
-
 		$(".page-settings").show();
 		$(".page-settings").addClass('animation');
 		// 只有via浏览器才在搜索引擎设置里显示跟随via选项
@@ -1673,8 +1795,35 @@ require(['jquery'], function($) {
 			$('option[value=via]').hide();
 		}
 		// 只有via或x浏览器才在点击/长按LOGO设置里显示打开书签选项
-		if ((browser !== 'via') || (browser !== 'x')) {
+		if ((browser !== 'via') && (browser !== 'x')) {
 			$('option[value=bookmarkList]').hide();
+		}
+		//屏蔽via浏览器的自动夜间模式
+		if (browser === 'via') {
+			$("li[data-value=autonightMode]").hide();
+		}
+		//开启自动夜间模式==>屏蔽夜间模式选项+自动夜间模式2
+		if (settings.get('autonightMode') === true) {
+			$("li[data-value=nightMode]").hide();
+			$("li[data-value=autonightMode2]").hide();
+		} else {
+				$("li[data-value=autonightMode2]").show();
+		}
+		//开启自动夜间模式2==>屏蔽夜间模式选项+自动夜间模式
+		if (settings.get('autonightMode2') === true) {
+			$("li[data-value=nightMode]").hide();
+			$("li[data-value=autonightMode]").hide();
+			$("li[data-value=autonightMode2Array]").show();
+		} else {
+			if(browser !== 'via'){
+				$("li[data-value=autonightMode]").show();
+			}
+			
+			$("li[data-value=autonightMode2Array]").hide();
+		}
+		//只有自动夜间模式1、2均关闭才显示夜间模式
+		if ((settings.get('autonightMode') === false) && (settings.get('autonightMode2') === false)) {
+			$("li[data-value=nightMode]").show();
 		}
 
 
@@ -1718,15 +1867,27 @@ require(['jquery'], function($) {
 					reader.readAsDataURL(file);
 				});
 			} else if (value === "delLogo") {
-				settings.set('wallpaper', '');
-				settings.set('logo', '');
-				alert('壁纸和LOGO初始化成功!');
-				location.reload(false);
+				let delLogoConfirm = confirm("将删除自定义壁纸和LOGO,恢复默认壁纸和LOGO!");
+				if (delLogoConfirm === true) {
+					settings.set('wallpaper', '');
+					settings.set('logo', '');
+					alert('壁纸和LOGO初始化成功!');
+					location.reload(false);
+				} else {
+					alert('已取消初始化!');
+				}
+
 			} else if (value === "intibookMark") {
-				store.set("bookMark", bookMark.getinitbookMarks());
-				store.set("setData", settings.getinitSettings());
-				alert('书签和设置初始化成功!');
-				location.reload(false);
+				let intibookMarkConfirm = confirm("将恢复默认书签、默认设置(自定义LOGO与壁纸设置除外的设置)!");
+				if (intibookMarkConfirm === true) {
+					store.set("bookMark", bookMark.getinitbookMarks());
+					store.set("setData", settings.getinitSettings());
+					alert('书签和设置初始化成功!');
+					location.reload(false);
+				} else {
+					alert('已取消初始化!');
+				}
+
 			} else if (value === "openGithub") {
 				// open($this.find('.set-description').text());
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
@@ -1762,6 +1923,9 @@ require(['jquery'], function($) {
 				} catch (e) {
 					alert("主页数据恢复失败!");
 				}
+			} else if (value === "autonightMode2Array") {
+				autoNightMode2Fn.getSetTime();
+				location.reload(false);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
 				$.fn.openSelect = function() {
@@ -1810,15 +1974,37 @@ require(['jquery'], function($) {
 			// 应用设置
 			if (item === 'styleThin' && value === true) {
 				$("body").addClass('styleThin');
-			} else {
+			} else if (item === 'styleThin' && value === false){
 				$("body").removeClass('styleThin');
+			}
+			if (item === 'autonightMode' && value === true) {
+				$("li[data-value=nightMode]").hide();
+				$("li[data-value=autonightMode2]").hide();
+			} else if (item === 'autonightMode' && value === false){
+				$("li[data-value=autonightMode2]").show();
+				if (settings.get('autonightMode2') === false) {
+					$("li[data-value=nightMode]").show();
+				}
+			}
+			if (item === 'autonightMode2' && value === true) {
+				$("li[data-value=nightMode]").hide();
+				$("li[data-value=autonightMode]").hide();
+				$("li[data-value=autonightMode2Array]").show();
+			} else if (item === 'autonightMode2' && value === false){
+				if(browser !== 'via'){
+					$("li[data-value=autonightMode]").show();
+				}
+				if (settings.get('autonightMode') === false) {
+					$("li[data-value=nightMode]").show();
+				}
+				$("li[data-value=autonightMode2Array]").hide();
 			}
 			// 保存设置
 			settings.set(item, value);
 		});
 
 	}
-
+	//检测新版本(版号来源Github)
 	function getnewVersion() {
 		var newVersion = "fail to get newVersion";
 		$.ajax({
