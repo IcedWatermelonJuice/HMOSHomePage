@@ -69,7 +69,9 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
 			};
 		} else if (browser === 'x') {
 			this.storage = {
@@ -82,7 +84,9 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
 			};
 		} else {
 			this.storage = {
@@ -95,7 +99,9 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "choicePage",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
 			};
 		}
 		this.initStorage = this.storage;
@@ -167,7 +173,6 @@ require(['jquery'], function($) {
 			}
 
 
-
 		}
 	}
 	var settings = new settingsFn(store.get("setData"), browserInfo());
@@ -204,22 +209,22 @@ require(['jquery'], function($) {
 			let setTime = prompt("请输入开启时间,格式为:hh:mm-hh:mm,例如:20:00-8:00");
 			try {
 				let setTimeFlag0 = setTime.search("-");
-				let setTimeFlag1=setTime.search(":");
-				let setTimeFlag2=setTime.slice(setTimeFlag0).search(":");
-				let alertMessage="输入时间格式错误:";
+				let setTimeFlag1 = setTime.search(":");
+				let setTimeFlag2 = setTime.slice(setTimeFlag0).search(":");
+				let alertMessage = "输入时间格式错误:";
 				if (setTimeFlag0 === -1) {
-					alertMessage+="\n区间间隔'-'丢失!";
-				} 
-				if(setTimeFlag1 === -1){
-					alertMessage+="\n开始时间':'丢失!";
+					alertMessage += "\n区间间隔'-'丢失!";
 				}
-				if(setTimeFlag2 === -1){
-					alertMessage+="\n结束时间':'丢失!";
+				if (setTimeFlag1 === -1) {
+					alertMessage += "\n开始时间':'丢失!";
 				}
-				if((setTimeFlag0!==-1)&&(setTimeFlag1!==-1)&&(setTimeFlag2!==-1)){
+				if (setTimeFlag2 === -1) {
+					alertMessage += "\n结束时间':'丢失!";
+				}
+				if ((setTimeFlag0 !== -1) && (setTimeFlag1 !== -1) && (setTimeFlag2 !== -1)) {
 					settings.set('autonightMode2Array', setTime);
 					alert("时间设定成功!");
-				}else{
+				} else {
 					alert(alertMessage);
 				}
 			} catch (e) {
@@ -234,14 +239,14 @@ require(['jquery'], function($) {
 			let setTimeFlag1;
 			let setTime0 = setTime.slice(0, setTimeFlag0);
 			let setTime1 = setTime.slice(setTimeFlag0 + 1);
-			
+
 			setTimeFlag0 = setTime0.search(":");
 			setTimeFlag1 = setTime1.search(":");
 			let setTime0Hour = parseInt(setTime0.slice(0, setTimeFlag0));
 			let setTime0Minute = parseInt(setTime0.slice(setTimeFlag0 + 1));
 			let setTime1Hour = parseInt(setTime1.slice(0, setTimeFlag1));
 			let setTime1Minute = parseInt(setTime1.slice(setTimeFlag1 + 1));
-			
+
 			returnArray[0] = setTime0Hour * 60 + setTime0Minute;
 			returnArray[1] = setTime1Hour * 60 + setTime1Minute;
 			return returnArray;
@@ -253,13 +258,13 @@ require(['jquery'], function($) {
 			var nowTimeSum = nowHour * 60 + nowMinute;
 			return nowTimeSum;
 		},
-		on:function(){
-			if(settings.get('nightMode') ===false){
+		on: function() {
+			if (settings.get('nightMode') === false) {
 				settings.set('nightMode', true);
 			}
 		},
-		off:function(){
-			if(settings.get('nightMode') ===true){
+		off: function() {
+			if (settings.get('nightMode') === true) {
 				settings.set('nightMode', false);
 			}
 		},
@@ -271,7 +276,7 @@ require(['jquery'], function($) {
 			// autoNightModeFn2();
 		}
 		if (settings.get('autonightMode2') === true) {
-			let setTimeArray=autoNightMode2Fn.changeSetTime();
+			let setTimeArray = autoNightMode2Fn.changeSetTime();
 			let setTime0Sum = setTimeArray[0];
 			let setTime1Sum = setTimeArray[1];
 			if (setTime0Sum !== -1 || setTime1Sum !== -1) {
@@ -292,6 +297,56 @@ require(['jquery'], function($) {
 			}
 		}
 	}
+	//每行图标数量设置
+	function getbooknumber() {
+		if (settings.get("booknumber") === "Num4") {
+			return "";
+		} else if (settings.get("booknumber") === "Num5") {
+			return "20%";
+		} else if (settings.get("booknumber") === "Num6") {
+			return "16.66%";
+		} else if (settings.get("booknumber") === "Num7") {
+			return "14.28%";
+		} else if (settings.get("booknumber") === "Num8") {
+			return "12.5%";
+		} else {
+			return "";
+			alert("booknumber error");
+		}
+	}
+
+	function setbookmarkNum() {
+		let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+		if (settings.get("booknumber") === "Num4") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].removeAttribute("style");
+			}
+		} else if (settings.get("booknumber") === "Num5") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 20%";
+			}
+		} else if (settings.get("booknumber") === "Num6") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 16.66%";
+			}
+		} else if (settings.get("booknumber") === "Num7") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 14.28%";
+			}
+		} else if (settings.get("booknumber") === "Num8") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 12.5%";
+			}
+		}
+	}
+
+	function bookmarkNumSet() {
+		let bookmarkStyleNum = document.getElementsByClassName("bookmark")[0].children[0].style.flex;
+		if (bookmarkStyleNum !== getbooknumber()) {
+			setbookmarkNum();
+		}
+	}
+
 
 	/**
 	 * DOM长按事件
@@ -438,6 +493,7 @@ require(['jquery'], function($) {
 					')"></div><div class="text">' + data[i].name + "</div></div>";
 			}
 			this.$ele.html(html);
+			bookmarkNumSet();
 			this.bind();
 		},
 		getJson: function() {
@@ -510,124 +566,132 @@ require(['jquery'], function($) {
 						'animation') || data.length >= 20) {
 					return;
 				}
-				if ($('.addbook').length === 0) {
-					that.$ele.append(
-						'<div class="list addbook"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
-					);
-					$('.addbook').click(function() {
-						$('.addbook').remove();
-						// 取消书签编辑状态
-						$(document).click();
-						// 插入html
-						$('#app').append(`<div class="page-bg"></div>
-						<div class="page-addbook">
-							<ul class="addbook-choice">
-								<li class="current">站点</li>
-								<!-- <li>书签</li>
-								<li>历史</li> -->
-								<span class="active-span"></span>
-							</ul>
-							<div class="addbook-content">
-								<div class="addbook-sites">
-								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
-								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
-									<div id="addbook-upload">点击选择图标</div>
-									<div class="addbook-ok">确认添加</div>
+				if (settings.get("SetbookMarksADD") === true) {
+					if ($('.addbook').length === 0) {
+						that.$ele.append(
+							'<div class="list addbook"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
+						);
+						$('.addbook').click(function() {
+							$('.addbook').remove();
+							// 取消书签编辑状态
+							$(document).click();
+							// 插入html
+							$('#app').append(`<div class="page-bg"></div>
+							<div class="page-addbook">
+								<ul class="addbook-choice">
+									<li class="current">站点</li>
+									<!-- <li>书签</li>
+									<li>历史</li> -->
+									<span class="active-span"></span>
+								</ul>
+								<div class="addbook-content">
+									<div class="addbook-sites">
+									<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
+									<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
+										<div id="addbook-upload">点击选择图标</div>
+										<div class="addbook-ok">确认添加</div>
+									</div>
+									<div class="bottom-close"></div>
 								</div>
-								<div class="bottom-close"></div>
-							</div>
-						</div>`);
+							</div>`);
 
-						setTimeout(function() {
-							$(".page-bg").addClass("animation");
-							$(".addbook-choice").addClass("animation");
-							$(".addbook-content").addClass("animation");
-						}, 50);
-
-						//绑定事件
-						$("#addbook-upload").click(function() {
-							openFile(function() {
-								var file = this.files[0];
-								var reader = new FileReader();
-								reader.onload = function() {
-									$("#addbook-upload").html(
-										'<img src="' + this
-										.result +
-										'"></img><p>' + file
-										.name + '</p>');
-								};
-								$("#addbook-upload").css(
-									"pointer-events", "");
-								$(".addbook-ok").css("pointer-events",
-									"");
-								reader.readAsDataURL(file);
-								/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
-								$(".addbook-ok").css("pointer-events", "none");
-								uploadFile(file, {
-									success: function (url) {
-										$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
-									},
-									error: function (msg) {
-										$("#addbook-upload").html('上传图标失败！' + msg);
-									},
-									complete: function () {
-										$("#addbook-upload").css("pointer-events", "");
-										$(".addbook-ok").css("pointer-events", "");
-									}
-								})*/
-							});
-						});
-						$(".addbook-ok").click(function() {
-							var name = $(".addbook-name").val(),
-								url = $(".addbook-url").val(),
-								icon = $("#addbook-upload img").attr("src");
-							if (name.length && url.length) {
-								if (!icon) {
-									// 绘制文字图标
-									var canvas = document.createElement(
-										"canvas");
-									canvas.height = 100;
-									canvas.width = 100;
-									var ctx = canvas.getContext("2d");
-									ctx.fillStyle = "#f5f5f5";
-									ctx.fillRect(0, 0, 100, 100);
-									ctx.fill();
-									ctx.fillStyle = "#222";
-									ctx.font = "40px Arial";
-									ctx.textAlign = "center";
-									ctx.textBaseline = "middle";
-									ctx.fillText(name.substr(0, 1), 50, 52);
-									icon = canvas.toDataURL("image/png");
-								}
-								$(".bottom-close").click();
-								bookMark.add(name, url, icon);
-							}
-						});
-						$(".bottom-close").click(function() {
-							$(".page-addbook").css({
-								"pointer-events": "none"
-							});
-							$(".page-bg").removeClass("animation");
-							$(".addbook-choice").removeClass("animation");
-							$(".addbook-content").removeClass("animation");
 							setTimeout(function() {
-								$(".page-addbook").remove();
-								$(".page-bg").remove();
-							}, 300);
-						});
-						$(".page-addbook").click(function(evt) {
-							if (evt.target === evt.currentTarget) {
-								$(".bottom-close").click();
-							}
-						});
+								$(".page-bg").addClass("animation");
+								$(".addbook-choice").addClass("animation");
+								$(".addbook-content").addClass("animation");
+							}, 50);
 
-					})
+							//绑定事件
+							$("#addbook-upload").click(function() {
+								openFile(function() {
+									var file = this.files[0];
+									var reader = new FileReader();
+									reader.onload = function() {
+										$("#addbook-upload").html(
+											'<img src="' + this
+											.result +
+											'"></img><p>' + file
+											.name + '</p>');
+									};
+									$("#addbook-upload").css(
+										"pointer-events", "");
+									$(".addbook-ok").css(
+										"pointer-events",
+										"");
+									reader.readAsDataURL(file);
+									/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
+									$(".addbook-ok").css("pointer-events", "none");
+									uploadFile(file, {
+										success: function (url) {
+											$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
+										},
+										error: function (msg) {
+											$("#addbook-upload").html('上传图标失败！' + msg);
+										},
+										complete: function () {
+											$("#addbook-upload").css("pointer-events", "");
+											$(".addbook-ok").css("pointer-events", "");
+										}
+									})*/
+								});
+							});
+							$(".addbook-ok").click(function() {
+								var name = $(".addbook-name").val(),
+									url = $(".addbook-url").val(),
+									icon = $("#addbook-upload img").attr("src");
+								if (name.length && url.length) {
+									if (!icon) {
+										// 绘制文字图标
+										var canvas = document.createElement(
+											"canvas");
+										canvas.height = 100;
+										canvas.width = 100;
+										var ctx = canvas.getContext("2d");
+										ctx.fillStyle = "#f5f5f5";
+										ctx.fillRect(0, 0, 100, 100);
+										ctx.fill();
+										ctx.fillStyle = "#222";
+										ctx.font = "40px Arial";
+										ctx.textAlign = "center";
+										ctx.textBaseline = "middle";
+										ctx.fillText(name.substr(0, 1), 50, 52);
+										icon = canvas.toDataURL("image/png");
+									}
+									$(".bottom-close").click();
+									bookMark.add(name, url, icon);
+								}
+							});
+							$(".bottom-close").click(function() {
+								$(".page-addbook").css({
+									"pointer-events": "none"
+								});
+								$(".page-bg").removeClass("animation");
+								$(".addbook-choice").removeClass("animation");
+								$(".addbook-content").removeClass("animation");
+								setTimeout(function() {
+									$(".page-addbook").remove();
+									$(".page-bg").remove();
+								}, 300);
+							});
+							$(".page-addbook").click(function(evt) {
+								if (evt.target === evt.currentTarget) {
+									$(".bottom-close").click();
+								}
+							});
+
+						})
+					} else {
+						$(".addbook").addClass("animation");
+						setTimeout(function() {
+							$(".addbook").remove();
+						}, 400);
+					}
 				} else {
-					$(".addbook").addClass("animation");
-					setTimeout(function() {
+					if ($('.addbook').length !== 0) {
 						$(".addbook").remove();
-					}, 400);
+					}
 				}
+
 			});
 			this.$ele.on('click', '.list', function(evt) {
 				evt.stopPropagation();
@@ -1665,6 +1729,26 @@ require(['jquery'], function($) {
 					"v": "white"
 				}]
 			}, {
+				"title": "图标数量",
+				"type": "select",
+				"value": "booknumber",
+				"data": [{
+					"t": "每行四个",
+					"v": "Num4"
+				}, {
+					"t": "每行五个",
+					"v": "Num5"
+				}, {
+					"t": "每行六个",
+					"v": "Num6"
+				}, {
+					"t": "每行七个",
+					"v": "Num7"
+				}, {
+					"t": "每行八个",
+					"v": "Num8"
+				}]
+			}, {
 				"title": "点击LOGO",
 				"type": "select",
 				"value": "LOGOclickFn",
@@ -1709,6 +1793,10 @@ require(['jquery'], function($) {
 				"title": "保存搜索栏历史",
 				"type": "checkbox",
 				"value": "searchHistory"
+			}, {
+				"title": "添加主页书签",
+				"type": "checkbox",
+				"value": "SetbookMarksADD"
 			}, {
 				"title": "夜间模式",
 				"type": "checkbox",
@@ -1807,7 +1895,7 @@ require(['jquery'], function($) {
 			$("li[data-value=nightMode]").hide();
 			$("li[data-value=autonightMode2]").hide();
 		} else {
-				$("li[data-value=autonightMode2]").show();
+			$("li[data-value=autonightMode2]").show();
 		}
 		//开启自动夜间模式2==>屏蔽夜间模式选项+自动夜间模式
 		if (settings.get('autonightMode2') === true) {
@@ -1815,16 +1903,19 @@ require(['jquery'], function($) {
 			$("li[data-value=autonightMode]").hide();
 			$("li[data-value=autonightMode2Array]").show();
 		} else {
-			if(browser !== 'via'){
+			if (browser !== 'via') {
 				$("li[data-value=autonightMode]").show();
 			}
-			
+
 			$("li[data-value=autonightMode2Array]").hide();
 		}
 		//只有自动夜间模式1、2均关闭才显示夜间模式
 		if ((settings.get('autonightMode') === false) && (settings.get('autonightMode2') === false)) {
 			$("li[data-value=nightMode]").show();
 		}
+
+
+
 
 
 		$(".set-option .set-select").map(function() {
@@ -1962,7 +2053,33 @@ require(['jquery'], function($) {
 					return false;
 				}
 			}
-
+			//每行图标数量设置
+			if (item === "booknumber" && value === "Num4") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].removeAttribute("style");
+				}
+			} else if (item === "booknumber" && value === "Num5") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 20%";
+				}
+			} else if (item === "booknumber" && value === "Num6") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 16.66%";
+				}
+			} else if (item === "booknumber" && value === "Num7") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 14.28%";
+				}
+			} else if (item === "booknumber" && value === "Num8") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 12.5%";
+				}
+			}
 			// 保存设置
 			settings.set(item, value);
 		});
@@ -1974,13 +2091,13 @@ require(['jquery'], function($) {
 			// 应用设置
 			if (item === 'styleThin' && value === true) {
 				$("body").addClass('styleThin');
-			} else if (item === 'styleThin' && value === false){
+			} else if (item === 'styleThin' && value === false) {
 				$("body").removeClass('styleThin');
 			}
 			if (item === 'autonightMode' && value === true) {
 				$("li[data-value=nightMode]").hide();
 				$("li[data-value=autonightMode2]").hide();
-			} else if (item === 'autonightMode' && value === false){
+			} else if (item === 'autonightMode' && value === false) {
 				$("li[data-value=autonightMode2]").show();
 				if (settings.get('autonightMode2') === false) {
 					$("li[data-value=nightMode]").show();
@@ -1990,8 +2107,8 @@ require(['jquery'], function($) {
 				$("li[data-value=nightMode]").hide();
 				$("li[data-value=autonightMode]").hide();
 				$("li[data-value=autonightMode2Array]").show();
-			} else if (item === 'autonightMode2' && value === false){
-				if(browser !== 'via'){
+			} else if (item === 'autonightMode2' && value === false) {
+				if (browser !== 'via') {
 					$("li[data-value=autonightMode]").show();
 				}
 				if (settings.get('autonightMode') === false) {
@@ -2043,7 +2160,7 @@ require(['jquery'], function($) {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
 	}
-	setInterval(IntervalFnSet, 3000);
+	setInterval(IntervalFnSet, 2000);
 
 	// 下滑进入搜索
 	require(['touchSwipe'], function() {
