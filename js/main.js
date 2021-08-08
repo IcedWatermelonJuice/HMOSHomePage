@@ -1178,15 +1178,25 @@ require(['jquery'], function($) {
 					"img": "kiwi",
 					"url": "github.com/kiwibrowser/src.next/releases"
 				}, {
-					"hl": "轻插件",
-					"shl": "Via或Alook脚本网站",
-					"img": "viaapp",
-					"url": "via-app.cn"
+					"hl": "SF脚本",
+					"shl": "老司机专用油猴脚本网站",
+					"img": "greasyfork",
+					"url": "sleazyfork.org/zh-CN"
 				}, {
 					"hl": "油猴脚本",
 					"shl": "安全实用的用户脚本大全",
 					"img": "greasyfork",
 					"url": "greasyfork.org/zh-CN"
+				}, {
+					"hl": "轻插件",
+					"shl": "Via或Alook脚本网站",
+					"img": "viaapp",
+					"url": "via-app.cn"
+				}, {
+					"hl": "极简插件",
+					"shl": "第三方crx扩展商店",
+					"img": "chajian",
+					"url": "chrome.zzzmh.cn"
 				}, {
 					"hl": "谷歌扩展",
 					"shl": "Chrome官方扩展商店",
@@ -1198,25 +1208,25 @@ require(['jquery'], function($) {
 					"img": "microsoft",
 					"url": "microsoftedge.microsoft.com/addons"
 				}, {
-					"hl": "极简插件",
-					"shl": "第三方crx扩展商店",
-					"img": "chajian",
-					"url": "chrome.zzzmh.cn"
-				}, {
 					"hl": "Crx4中",
 					"shl": "Crx4Chrome中文版",
 					"img": "chajian",
 					"url": "crx4.com"
+				}, {
+					"hl": "Crx4",
+					"shl": "全球最大第三方crx商店",
+					"img": "chajian",
+					"url": "crx4chrome.com"
 				}, {
 					"hl": "Crx下载",
 					"shl": "用于下载CRX文件",
 					"img": "crxdownload",
 					"url": "chrome-extension-downloader.com"
 				}, {
-					"hl": "Crx4",
-					"shl": "全球最大第三方crx商店",
-					"img": "chajian",
-					"url": "crx4chrome.com"
+					"hl": "Crx搜搜",
+					"shl": "用于下载CRX文件",
+					"img": "crxsoso",
+					"url": "www.crxsoso.com"
 				}],
 				"社区": [{
 					"hl": "知乎",
@@ -1482,7 +1492,10 @@ require(['jquery'], function($) {
 			</div>
 
 			<div class="list h3">
-				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
+				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(60, 68, 110) 0%, rgb(105, 121, 148) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
+			</div>
+			<div class="list h3">
+				<a class="flex-1 content" href="https://www.iesdouyin.com/share/billboard/?id=0" style="background-image:linear-gradient(135deg,  rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">抖音热搜榜</div><div class="douyin-list"></div></a>
 			</div>
 
 			<div class="list h2">
@@ -1607,6 +1620,25 @@ require(['jquery'], function($) {
 					$('.news-list').html(html);
 				}
 			});
+			//抖音热搜榜
+			$.ajax({
+				url: "https://bird.ioliu.cn/v1?url=https://creator.douyin.com/aweme/v1/creator/data/billboard/?billboard_type=1",
+				type: "get",
+				dataType: "json",
+				success: function(res) {
+					var data = res.billboard_data;
+					var html = '';
+					for (var i = 0; i < 4; i++) {
+						html +=
+							'<div class="douyin-item"><div class="douyin-item-count">' +
+							(i + 1) + '</div><div class="douyin-item-title">' + data[i]
+							.title +
+							'</div><div class="douyin-item-hot">' + data[i].value +
+							'</div></div>';
+					}
+					$('.douyin-list').html(html);
+				}
+			});
 			//知乎热搜榜
 			$.ajax({
 				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=zhihu",
@@ -1636,7 +1668,7 @@ require(['jquery'], function($) {
 						});
 					})
 				}
-			}); //知乎热榜
+			});
 
 		})
 	}
