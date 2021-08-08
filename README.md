@@ -16,7 +16,7 @@
 * 在线使用地址：https://icedwatermelonjuice.github.io/HMOSHomePage/
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage/
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
-# 感谢项目
+# 开源致谢
 * liumingye/quarkHomePage 
 * 原仓库地址：https://gitee.com/liumingye/quarkHomePage/
 # 联系方式
