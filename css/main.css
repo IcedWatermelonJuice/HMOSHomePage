@@ -746,8 +746,8 @@ body,html {
 
 /* 精选 - 天气 */
 .choice-cut .cmp-icon{
-	width: 150px;
-	height: 140px;
+	width: 135px;
+	height: 126px;
 	background-size: cover;
 	position: absolute;
 	right: 0;
