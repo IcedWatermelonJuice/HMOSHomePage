@@ -2187,12 +2187,12 @@ require(['jquery'], function($) {
 			}
 		}
 	}
-	//2s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
+	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
 	function IntervalFnSet() {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
 	}
-	setInterval(IntervalFnSet, 2000);
+	setInterval(IntervalFnSet, 1000);
 
 	// 下滑进入搜索
 	require(['touchSwipe'], function() {
