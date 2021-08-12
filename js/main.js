@@ -94,7 +94,7 @@ require(['jquery'], function($) {
 				bookcolor: "black",
 				styleThin: true,
 				nightMode: false,
-				autonightMode: true,
+				autonightMode:false,
 				autonightMode2: false,
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
