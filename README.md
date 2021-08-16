@@ -12,6 +12,7 @@
 * 支持备份数据、检查更新。
 * 搜索栏、书签支持http、https、ftp、file类URL转跳（file类型URL仅支持本地主页）
 # 🌐相关地址
+* CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * 在线使用地址：https://icedwatermelonjuice.github.io/HMOSHomePage/
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage/
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
