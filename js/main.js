@@ -177,8 +177,6 @@ require(['jquery'], function($) {
 					$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
 				}
 			}
-
-
 		}
 	}
 	var settings = new settingsFn(store.get("setData"), browserInfo());
@@ -345,7 +343,6 @@ require(['jquery'], function($) {
 			let LogoOBJ = document.getElementsByClassName("logo")[0];
 			let logoHeight = LogoOBJ.clientHeight.toString();
 			if (logoHeight !== settingHeight) {
-				console.log(settingHeight);
 				if (settingHeight === "40") {
 					LogoOBJ.style.height = "";
 				} else {
@@ -2256,6 +2253,7 @@ require(['jquery'], function($) {
 					});
 				} else if (phase === 'end' || phase === 'cancel') {
 					$('.logo').removeAttr("disabled style");
+					$('.logo').css("height",settings.get('LogoHeightSet')+"px");
 					$('.bookmark').removeAttr("disabled style");
 					if (distance >= 100 && direction === "down") {
 						$('.ornament-input-group').css("transform", "").click();
