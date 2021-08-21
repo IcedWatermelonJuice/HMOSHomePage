@@ -136,8 +136,8 @@ require(['jquery'], function($) {
 			}
 			$('.ornament-input-group').removeAttr('style');
 			// 加载LOGO
-			if (that.get('LogoHeightSet')){
-				$(".logo").css("height",that.get('LogoHeightSet')+"px");
+			if (that.get('LogoHeightSet')) {
+				$(".logo").css("height", that.get('LogoHeightSet') + "px");
 			}
 			if (that.get('logo')) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
@@ -286,7 +286,7 @@ require(['jquery'], function($) {
 			}
 		}
 	}
-	
+
 	//每行图标数量设置
 	function getbooknumber() {
 		if (settings.get("booknumber") === "Num4") {
@@ -338,8 +338,8 @@ require(['jquery'], function($) {
 	}
 
 	//LOGO高度设置:
-	var LogoHeightFn={
-		set:function(){
+	var LogoHeightFn = {
+		set: function() {
 			let settingHeight = settings.get("LogoHeightSet");
 			let LogoOBJ = document.getElementsByClassName("logo")[0];
 			let logoHeight = LogoOBJ.clientHeight.toString();
@@ -351,22 +351,21 @@ require(['jquery'], function($) {
 				}
 			}
 		},
-		get:function(){
+		get: function() {
 			let setHeight = prompt("设置LOGO高度(非负数,单位px,像素),例如:40\n备注:40为默认高度,当为高度=0时,LOGO不显示");
 			try {
-				HeightNum=parseFloat(setHeight);
-				if(HeightNum>=0){
+				HeightNum = parseFloat(setHeight);
+				if (HeightNum >= 0) {
 					settings.set("LogoHeightSet", setHeight);
 					alert("修改高度成功");
-				}else{
+				} else {
 					alert("请输入非负的高度值");
 				}
-			} 
-			catch (e) {
+			} catch (e) {
 				alert("高度设定失败!");
 			}
 		}
-		
+
 	}
 
 	/**
@@ -1840,7 +1839,7 @@ require(['jquery'], function($) {
 			}, {
 				"title": "LOGO高度",
 				"value": "logoHeight",
-				"description": "当前高度(单位px,像素): " + logoHeightDes+"px"
+				"description": "当前高度(单位px,像素): " + logoHeightDes + "px"
 			}, {
 				"type": "hr"
 			}, {
@@ -2020,7 +2019,7 @@ require(['jquery'], function($) {
 				if (delLogoConfirm === true) {
 					settings.set('wallpaper', '');
 					settings.set('logo', '');
-					settings.set('LogoHeightSet','40');
+					settings.set('LogoHeightSet', '40');
 					alert('壁纸和LOGO初始化成功!');
 					location.reload(false);
 				} else {
@@ -2200,9 +2199,10 @@ require(['jquery'], function($) {
 	//设置点击/长按LOGO功能冲突检测
 	function DetectLogoFnConflicts() {
 		//settingsPage
-		if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
-				"settingsPage")) {
-			if (!bookMark.searchURL("openSettingPage()")) {
+		if (!bookMark.searchURL("openSettingPage()")) {
+			if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
+					"settingsPage")) {
+
 				setTimeout(function() {
 					if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get(
 							"LOGOlongpressFn") !== "settingsPage")) {
@@ -2214,6 +2214,12 @@ require(['jquery'], function($) {
 						};
 					}
 				}, 5000);
+			}else{
+				if(settings.get("LogoHeightSet")==="0"){
+					bookMark.add("设置","openSettingPage()","img/bookmarks/settings.png")
+					alert('LOGO已隐藏,已自动添加主页书签-设置');
+					location.reload(false);
+				}
 			}
 		}
 	}
@@ -2254,7 +2260,7 @@ require(['jquery'], function($) {
 					});
 				} else if (phase === 'end' || phase === 'cancel') {
 					$('.logo').removeAttr("disabled style");
-					$('.logo').css("height",settings.get('LogoHeightSet')+"px");
+					$('.logo').css("height", settings.get('LogoHeightSet') + "px");
 					$('.bookmark').removeAttr("disabled style");
 					if (distance >= 100 && direction === "down") {
 						$('.ornament-input-group').css("transform", "").click();
