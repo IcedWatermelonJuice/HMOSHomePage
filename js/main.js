@@ -759,7 +759,9 @@ require(['jquery'], function($) {
 		},
 		add: function(name, url, icon) {
 			var data = this.options.data;
-			url = url.match(/:\/\//) ? url : "http://" + url;
+			if((url!=="choice()")&&(url!=="openSettingPage()")){
+				url = url.match(/:\/\//) ? url : "http://" + url;
+			}
 			var i = data.length - 1;
 			var dom = $('<div class="list" data-url="' + url +
 				'"><div class="img" style="background-image:url(' + icon +
