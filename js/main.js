@@ -72,6 +72,7 @@ require(['jquery'], function($) {
 				LOGOlongpressFn: "settingsPage",
 				SetbookMarksADD: true,
 				booknumber: "Num4",
+				LogoHeightSet: "40",
 			};
 		} else if (browser === 'x') {
 			this.storage = {
@@ -87,6 +88,7 @@ require(['jquery'], function($) {
 				LOGOlongpressFn: "settingsPage",
 				SetbookMarksADD: true,
 				booknumber: "Num4",
+				LogoHeightSet: "40",
 			};
 		} else {
 			this.storage = {
@@ -94,7 +96,7 @@ require(['jquery'], function($) {
 				bookcolor: "black",
 				styleThin: true,
 				nightMode: false,
-				autonightMode:false,
+				autonightMode: true,
 				autonightMode2: false,
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
@@ -102,6 +104,7 @@ require(['jquery'], function($) {
 				LOGOlongpressFn: "settingsPage",
 				SetbookMarksADD: true,
 				booknumber: "Num4",
+				LogoHeightSet: "40",
 			};
 		}
 		this.initStorage = this.storage;
@@ -133,6 +136,9 @@ require(['jquery'], function($) {
 			}
 			$('.ornament-input-group').removeAttr('style');
 			// 加载LOGO
+			if (that.get('LogoHeightSet')){
+				$(".logo").css("height",that.get('LogoHeightSet')+"px");
+			}
 			if (that.get('logo')) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
 			} else {
@@ -188,22 +194,7 @@ require(['jquery'], function($) {
 			settings.set('nightMode', false);
 		}
 	}
-	// 自动夜间模式(via浏览器) 删除掉VIA浏览器夜间模式的暗色支持
-	// function autoNightModeFn2() {
-	// 	$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
-	// 		if (evt.target.id === "via_inject_css_night") {
-	// 			if (evt.type === "DOMNodeInserted") {
-	// 				$("#via_inject_css_night").html("");
-	// 				settings.set('nightMode', true);
-	// 			} else if (evt.type === "DOMNodeRemoved") {
-	// 				settings.set('nightMode', false);
-	// 			}
-	// 		}
-	// 	});
-	// 	if ($("#via_inject_css_night").html("").length > 0) {
-	// 		settings.set('nightMode', true);
-	// 	}
-	// }
+
 	var autoNightMode2Fn = {
 		getSetTime: function() {
 			let setTime = prompt("请输入开启时间,格式为:hh:mm-hh:mm,例如:20:00-8:00");
@@ -347,6 +338,38 @@ require(['jquery'], function($) {
 		}
 	}
 
+	//LOGO高度设置:
+	var LogoHeightFn={
+		set:function(){
+			let settingHeight = settings.get("LogoHeightSet");
+			let LogoOBJ = document.getElementsByClassName("logo")[0];
+			let logoHeight = LogoOBJ.clientHeight.toString();
+			if (logoHeight !== settingHeight) {
+				console.log(settingHeight);
+				if (settingHeight === "40") {
+					LogoOBJ.style.height = "";
+				} else {
+					LogoOBJ.style.height = settingHeight + "px";
+				}
+			}
+		},
+		get:function(){
+			let setHeight = prompt("设置LOGO高度(非负数,单位px,像素),例如:40\n备注:40为默认高度,当为高度=0时,LOGO不显示");
+			try {
+				HeightNum=parseFloat(setHeight);
+				if(HeightNum>=0){
+					settings.set("LogoHeightSet", setHeight);
+					alert("修改高度成功");
+				}else{
+					alert("请输入非负的高度值");
+				}
+			} 
+			catch (e) {
+				alert("高度设定失败!");
+			}
+		}
+		
+	}
 
 	/**
 	 * DOM长按事件
@@ -1714,6 +1737,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
+		var logoHeightDes = settings.get('LogoHeightSet');
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -1810,11 +1834,15 @@ require(['jquery'], function($) {
 					"v": "choicePage"
 				}]
 			}, {
-				"title": "设置壁纸",
+				"title": "主页壁纸",
 				"value": "wallpaper"
 			}, {
-				"title": "设置LOGO",
+				"title": "主页LOGO",
 				"value": "logo"
+			}, {
+				"title": "LOGO高度",
+				"value": "logoHeight",
+				"description": "当前高度(单位px,像素): " + logoHeightDes+"px"
 			}, {
 				"type": "hr"
 			}, {
@@ -1994,6 +2022,7 @@ require(['jquery'], function($) {
 				if (delLogoConfirm === true) {
 					settings.set('wallpaper', '');
 					settings.set('logo', '');
+					settings.set('LogoHeightSet','40');
 					alert('壁纸和LOGO初始化成功!');
 					location.reload(false);
 				} else {
@@ -2048,6 +2077,9 @@ require(['jquery'], function($) {
 				}
 			} else if (value === "autonightMode2Array") {
 				autoNightMode2Fn.getSetTime();
+				location.reload(false);
+			} else if (value === "logoHeight") {
+				LogoHeightFn.get();
 				location.reload(false);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
@@ -2191,6 +2223,7 @@ require(['jquery'], function($) {
 	function IntervalFnSet() {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
+		LogoHeightFn.set();
 	}
 	setInterval(IntervalFnSet, 1000);
 
