@@ -286,6 +286,7 @@ require(['jquery'], function($) {
 			}
 		}
 	}
+	
 	//每行图标数量设置
 	function getbooknumber() {
 		if (settings.get("booknumber") === "Num4") {
