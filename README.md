@@ -19,7 +19,7 @@
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 🌹开源致谢
-* 原项目名称：quarkHomePage 
+* 原项目名称：quarkHomePage(H5仿夸克浏览器主页)
 * 原项目作者：liumingye(刘明野)
 * 原仓库地址：https://gitee.com/liumingye/quarkHomePage
 # 📪联系方式
