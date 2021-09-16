@@ -73,6 +73,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
+				position:"0"
 			};
 		} else if (browser === 'x') {
 			this.storage = {
@@ -89,6 +90,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
+				position:"0"
 			};
 		} else {
 			this.storage = {
@@ -105,6 +107,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
+				position:"0"
 			};
 		}
 		this.initStorage = this.storage;
@@ -138,6 +141,9 @@ require(['jquery'], function($) {
 			// 加载LOGO
 			if (that.get('LogoHeightSet')) {
 				$(".logo").css("height", that.get('LogoHeightSet') + "px");
+			}
+			if (that.get('position')) {
+				$("#empty_box").css("marginTop", that.get('position') + "px");
 			}
 			if (that.get('logo')) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
@@ -357,15 +363,49 @@ require(['jquery'], function($) {
 				HeightNum = parseFloat(setHeight);
 				if (HeightNum >= 0) {
 					settings.set("LogoHeightSet", setHeight);
-					alert("修改高度成功");
+					alert("高度设置成功!");
 				} else {
-					alert("请输入非负的高度值");
+					alert("高度设定失败:\n请输入非负的高度值!");
 				}
 			} catch (e) {
 				alert("高度设定失败!");
 			}
 		}
 
+	}
+	
+	//整体偏离默认位置设置(通过设置empty_box这个空容器的margin-top来改变偏移)
+	var PositionFn = {
+		set: function() {
+			let settingsPosition = settings.get('position');
+			settingsPosition=settingsPosition+"px";
+			let boxOBJ = document.getElementById("empty_box");
+			let currentPosition = boxOBJ.style.marginTop;
+			if (currentPosition===""){
+				currentPosition="0px";
+			}
+			if (currentPosition !== settingsPosition) {
+				if (settingsPosition === "0px") {
+					boxOBJ.style.marginTop = "0px";
+				} else {
+					boxOBJ.style.marginTop = settingsPosition;
+				}
+			}
+		},
+		get: function() {
+			let setPosition = prompt("设置相对位置,负数:向上偏移,正数:向下偏移(单位px,像素),例如:+10\n备注:0为默认值,表示不偏移");
+			try {
+				if((setPosition!=="")&&(!isNaN(setPosition))){
+					settings.set("position", setPosition);
+					alert("位置设置成功!");
+				}else {
+					alert("位置设定失败:\n请输入一个数值!");
+				}
+			} catch (e) {
+				alert("位置设定失败!");
+			}
+		}
+	
 	}
 
 	/**
@@ -471,20 +511,36 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/discover.png"
 			}, {
 				"name": "AirPortal",
-				"url": "https://airportal.cn/",
+				"url": "https://airportal.cn",
 				"icon": "img/bookmarks/airportal.png"
 			}, {
+				"name": "扫一扫",
+				"url": "https://www.the-qrcode-generator.com/scan",
+				"icon": "img/bookmarks/qrscan.png"
+			}, {
+				"name": "设置",
+				"url": "openSettingPage()",
+				"icon": "img/bookmarks/settings.png"
+			}, {
+				"name": "翻译",
+				"url": "https://translate.google.cn",
+				"icon": "img/bookmarks/translate.png"
+			}, {
+				"name": "CSDN",
+				"url": "https://csdn.net",
+				"icon": "img/bookmarks/csdn.png"
+			}, {
 				"name": "Github",
-				"url": "https://github.com/",
+				"url": "https://github.com",
 				"icon": "img/bookmarks/github.png"
 			}, {
 				"name": "Gitee",
 				"url": "https://gitee.com",
 				"icon": "img/bookmarks/gitee.png"
 			}, {
-				"name": "设置",
-				"url": "openSettingPage()",
-				"icon": "img/bookmarks/settings.png"
+				"name": "抖音",
+				"url": "https://douyin.com/recommend",
+				"icon": "img/bookmarks/douyin.png"
 			}, {
 				"name": "B站",
 				"url": "https://bilibili.com/",
@@ -1737,6 +1793,14 @@ require(['jquery'], function($) {
 	function openSettingPage() {
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
+		var positionDes = settings.get('position');
+		if(positionDes==="0"){
+			positionDes="默认";
+		}else if(positionDes<"0"){
+			positionDes="向上偏移"+positionDes.slice(1)+"px";
+		}else{
+			positionDes="向下偏移"+positionDes+"px";
+		}
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -1842,6 +1906,10 @@ require(['jquery'], function($) {
 				"title": "LOGO高度",
 				"value": "logoHeight",
 				"description": "当前高度(单位px,像素): " + logoHeightDes + "px"
+			}, {
+				"title": "整体位置",
+				"value": "position",
+				"description": "当前位置: " + positionDes
 			}, {
 				"type": "hr"
 			}, {
@@ -2080,6 +2148,9 @@ require(['jquery'], function($) {
 			} else if (value === "logoHeight") {
 				LogoHeightFn.get();
 				location.reload(false);
+			} else if (value === "position") {
+				PositionFn.get();
+				location.reload(false);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
 				$.fn.openSelect = function() {
@@ -2230,6 +2301,7 @@ require(['jquery'], function($) {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
 		LogoHeightFn.set();
+		PositionFn.set();
 	}
 	setInterval(IntervalFnSet, 1000);
 
