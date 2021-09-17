@@ -73,7 +73,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
-				position:"0"
+				position: "0"
 			};
 		} else if (browser === 'x') {
 			this.storage = {
@@ -90,7 +90,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
-				position:"0"
+				position: "0"
 			};
 		} else {
 			this.storage = {
@@ -107,7 +107,7 @@ require(['jquery'], function($) {
 				SetbookMarksADD: true,
 				booknumber: "Num4",
 				LogoHeightSet: "40",
-				position:"0"
+				position: "0"
 			};
 		}
 		this.initStorage = this.storage;
@@ -373,16 +373,16 @@ require(['jquery'], function($) {
 		}
 
 	}
-	
+
 	//整体偏离默认位置设置(通过设置empty_box这个空容器的margin-top来改变偏移)
 	var PositionFn = {
 		set: function() {
 			let settingsPosition = settings.get('position');
-			settingsPosition=settingsPosition+"px";
+			settingsPosition = settingsPosition + "px";
 			let boxOBJ = document.getElementById("empty_box");
 			let currentPosition = boxOBJ.style.marginTop;
-			if (currentPosition===""){
-				currentPosition="0px";
+			if (currentPosition === "") {
+				currentPosition = "0px";
 			}
 			if (currentPosition !== settingsPosition) {
 				if (settingsPosition === "0px") {
@@ -393,19 +393,20 @@ require(['jquery'], function($) {
 			}
 		},
 		get: function() {
-			let setPosition = prompt("设置相对位置,负数:向上偏移,正数:向下偏移(单位px,像素),例如:+10\n备注:0为默认值,表示不偏移");
+			let setPosition = prompt("设置相对位置(偏移度单位为px,像素),负数:向上偏移,正数:向下偏移,例如:输入+100,表示向下偏移100px\n备注:0为默认值,表示不偏移");
 			try {
-				if((setPosition!=="")&&(!isNaN(setPosition))){
+				setPosition=setPosition.trim();
+				if (!isNaN(Number(setPosition))&&setPosition!=="") {
 					settings.set("position", setPosition);
 					alert("位置设置成功!");
-				}else {
+				} else {
 					alert("位置设定失败:\n请输入一个数值!");
 				}
 			} catch (e) {
 				alert("位置设定失败!");
 			}
 		}
-	
+
 	}
 
 	/**
@@ -622,6 +623,7 @@ require(['jquery'], function($) {
 						$(document).unbind("click");
 						$('.logo,.ornament-input-group').css('pointer-events', '');
 						$(".delbook").addClass("animation");
+						$(".editbook").addClass("animation");
 						$(".delbook").on('transitionend', function(evt) {
 							if (evt.target !== this) {
 								return;
@@ -634,6 +636,7 @@ require(['jquery'], function($) {
 					var $list = that.$ele.find(".list");
 					for (var i = $list.length; i > -1; i--) {
 						$list.eq(i).find(".img").prepend('<div class="delbook"></div>');
+						$list.eq(i).find(".img").prepend('<div class="editbook"></div>');
 					}
 				}
 			});
@@ -789,6 +792,91 @@ require(['jquery'], function($) {
 				} else {
 					if (evt.target.className === "delbook") {
 						that.del(dom.index());
+					} else if (evt.target.className === "editbook") {
+						var targetBook = $(".bookmark").find(".list").eq(dom.index());
+						//var turl=targetBook.attr("data-url");
+						var turl = dom.data("url");
+						var tname = dom.find(".text").text();
+						// 取消书签编辑状态
+						$(document).click();
+						// 插入html
+						$('#app').append(`<div class="page-bg"></div>
+						<div class="page-addbook">
+							<ul class="addbook-choice">
+								<li class="current">修改书签</li>
+								<span class="active-span"></span>
+							</ul>
+							<div class="addbook-content">
+								<div class="addbook-sites">
+								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value=` + turl + ` />
+								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名"  value=` + tname + ` />
+									<div id="addbook-upload">点击选择图标</div>
+									<div class="addbook-ok">确认修改</div>
+								</div>
+								<div class="bottom-close"></div>
+							</div>
+						</div>`);
+
+						setTimeout(function() {
+							$(".page-bg").addClass("animation");
+							$(".addbook-choice").addClass("animation");
+							$(".addbook-content").addClass("animation");
+						}, 50);
+
+						//绑定事件
+						$("#addbook-upload").click(function() {
+							openFile(function() {
+								var file = this.files[0];
+								var reader = new FileReader();
+								reader.onload = function() {
+									$("#addbook-upload").html(
+										'<img src="' + this
+										.result +
+										'"></img><p>' + file
+										.name + '</p>');
+								};
+								$("#addbook-upload").css(
+									"pointer-events", "");
+								$(".addbook-ok").css(
+									"pointer-events",
+									"");
+								reader.readAsDataURL(file);
+							});
+						});
+						$(".addbook-ok").click(function() {
+							var index = dom.index(),
+								name = $(".addbook-name").val(),
+								url = $(".addbook-url").val(),
+								icon = $("#addbook-upload img").attr("src");
+							console.log(name + ' ' + tname + ' ' + url + ' ' + turl +
+								' ' + icon);
+							if (name !== tname || url !== turl || !!icon) {
+								if (!icon) {
+									icon = "";
+								}
+								bookMark.edit(index, name, url, icon);
+								//location.reload(true);
+							}
+							$(".bottom-close").click();
+						});
+						$(".bottom-close").click(function() {
+							$(".page-addbook").css({
+								"pointer-events": "none"
+							});
+							$(".page-bg").removeClass("animation");
+							$(".addbook-choice").removeClass("animation");
+							$(".addbook-content").removeClass("animation");
+							setTimeout(function() {
+								$(".page-addbook").remove();
+								$(".page-bg").remove();
+							}, 300);
+						});
+						$(".page-addbook").click(function(evt) {
+							if (evt.target === evt.currentTarget) {
+								$(".bottom-close").click();
+							}
+						});
+
 					}
 				}
 			});
@@ -815,7 +903,7 @@ require(['jquery'], function($) {
 		},
 		add: function(name, url, icon) {
 			var data = this.options.data;
-			if((url!=="choice()")&&(url!=="openSettingPage()")){
+			if ((url !== "choice()") && (url !== "openSettingPage()")) {
 				url = url.match(/:\/\//) ? url : "http://" + url;
 			}
 			var i = data.length - 1;
@@ -835,6 +923,25 @@ require(['jquery'], function($) {
 				url: url,
 				icon: icon
 			});
+			store.set("bookMark", data);
+		},
+		edit: function(index, name, url, icon) {
+			var data = this.options.data;
+			if ((url !== "choice()") && (url !== "openSettingPage()")) {
+				url = url.match(/:\/\//) ? url : "http://" + url;
+			}
+			if (icon === "") {
+				icon = data[index].icon;
+			}
+			var book = $(".bookmark").find('.list').eq(index);
+			book.find('.text').text(name);
+			book.data("url", url);
+			book.find('.img').css("background-image", "url(" + icon + ")");
+			data[index] = {
+				name: name,
+				url: url,
+				icon: icon
+			};
 			store.set("bookMark", data);
 		}
 	}
@@ -1791,15 +1898,17 @@ require(['jquery'], function($) {
 	}
 	//设置页面
 	function openSettingPage() {
+		var app={};
+		app.version=1.14;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
-		if(positionDes==="0"){
-			positionDes="默认";
-		}else if(positionDes<"0"){
-			positionDes="向上偏移"+positionDes.slice(1)+"px";
-		}else{
-			positionDes="向下偏移"+positionDes+"px";
+		if (positionDes === "0") {
+			positionDes = "默认";
+		} else if (positionDes < "0") {
+			positionDes = "向上偏移" + positionDes.slice(1) + "px";
+		} else {
+			positionDes = "向下偏移" + positionDes + "px";
 		}
 		//构建设置HTML
 		var data = [{
@@ -2134,11 +2243,25 @@ require(['jquery'], function($) {
 			} else if (value === "import") {
 				var data = prompt("在这粘贴备份的主页数据:");
 				try {
-					data = JSON.parse(data);
-					store.set("bookMark", data.bookMark);
-					store.set("setData", data.setData);
-					alert("主页数据恢复入成功!");
-					location.reload();
+					if(data!==null&&data!==""){
+						data = JSON.parse(data);
+						var r = confirm("是否覆盖原书签数据?\n(点击确定将覆盖原书签数据,点击取消将保留原书签数据)");
+						var newbookMarkData;
+						if (r) {
+							newbookMarkData =data.bookMark;
+						}else{
+							var storeBook=JSON.stringify(store.get("bookMark"));
+							var dataBook=JSON.stringify(data.bookMark);
+							newbookMarkData =storeBook.replace("]","")+","+dataBook.replace("[","");
+							newbookMarkData=JSON.parse(newbookMarkData);
+						}
+						store.set("bookMark", newbookMarkData);
+						store.set("setData", data.setData);
+						alert("主页数据恢复成功!");
+						location.reload();
+					}else{
+						alert("主页数据恢复失败!");
+					}
 				} catch (e) {
 					alert("主页数据恢复失败!");
 				}
@@ -2287,9 +2410,9 @@ require(['jquery'], function($) {
 						};
 					}
 				}, 5000);
-			}else{
-				if(settings.get("LogoHeightSet")==="0"){
-					bookMark.add("设置","openSettingPage()","img/bookmarks/settings.png")
+			} else {
+				if (settings.get("LogoHeightSet") === "0") {
+					bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png")
 					alert('LOGO已隐藏,已自动添加主页书签-设置');
 					location.reload(false);
 				}
