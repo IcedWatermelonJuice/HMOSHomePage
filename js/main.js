@@ -393,10 +393,11 @@ require(['jquery'], function($) {
 			}
 		},
 		get: function() {
-			let setPosition = prompt("设置相对位置(偏移度单位为px,像素),负数:向上偏移,正数:向下偏移,例如:输入+100,表示向下偏移100px\n备注:0为默认值,表示不偏移");
+			let setPosition = prompt(
+				"设置相对位置(偏移度单位为px,像素),负数:向上偏移,正数:向下偏移,例如:输入+100,表示向下偏移100px\n备注:0为默认值,表示不偏移");
 			try {
-				setPosition=setPosition.trim();
-				if (!isNaN(Number(setPosition))&&setPosition!=="") {
+				setPosition = setPosition.trim();
+				if (!isNaN(Number(setPosition)) && setPosition !== "") {
 					settings.set("position", setPosition);
 					alert("位置设置成功!");
 				} else {
@@ -668,6 +669,7 @@ require(['jquery'], function($) {
 									<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
 									<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
 										<div id="addbook-upload">点击选择图标</div>
+										<div id="addbook-autofetch">点击自动获取图标</div>
 										<div class="addbook-ok">确认添加</div>
 									</div>
 									<div class="bottom-close"></div>
@@ -713,6 +715,36 @@ require(['jquery'], function($) {
 										}
 									})*/
 								});
+							});
+							$("#addbook-autofetch").click(function() {
+								var autofetchFlag = false,
+									url = $(".addbook-url").val(),
+									ImgObj = new Image();
+								if (url.search("http") === -1) {
+									url = "https://" + url;
+								}
+								var urlArr = url.split("/");
+								ImgUrl = urlArr[2];
+								if (ImgUrl) {
+									ImgUrl = "https://" + ImgUrl +
+										"/favicon.ico";
+									ImgObj.src = ImgUrl;
+									if (ImgObj.fileSize > 0 || (ImgObj.width >
+											0 &&
+											ImgObj.height > 0)) {
+										autofetchFlag = true;
+									}
+								}
+								if (autofetchFlag) {
+									alert("图标获取成功");
+									$("#addbook-upload").html('<img src="' +
+										ImgUrl +
+										'"></img><p>自动获取favicon</p>');
+								} else {
+									alert(
+										"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+										);
+								}
 							});
 							$(".addbook-ok").click(function() {
 								var name = $(".addbook-name").val(),
@@ -1898,8 +1930,8 @@ require(['jquery'], function($) {
 	}
 	//设置页面
 	function openSettingPage() {
-		var app={};
-		app.version=1.14;
+		var app = {};
+		app.version = 1.15;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2243,23 +2275,24 @@ require(['jquery'], function($) {
 			} else if (value === "import") {
 				var data = prompt("在这粘贴备份的主页数据:");
 				try {
-					if(data!==null&&data!==""){
+					if (data !== null && data !== "") {
 						data = JSON.parse(data);
 						var r = confirm("是否覆盖原书签数据?\n(点击确定将覆盖原书签数据,点击取消将保留原书签数据)");
 						var newbookMarkData;
 						if (r) {
-							newbookMarkData =data.bookMark;
-						}else{
-							var storeBook=JSON.stringify(store.get("bookMark"));
-							var dataBook=JSON.stringify(data.bookMark);
-							newbookMarkData =storeBook.replace("]","")+","+dataBook.replace("[","");
-							newbookMarkData=JSON.parse(newbookMarkData);
+							newbookMarkData = data.bookMark;
+						} else {
+							var storeBook = JSON.stringify(store.get("bookMark"));
+							var dataBook = JSON.stringify(data.bookMark);
+							newbookMarkData = storeBook.replace("]", "") + "," + dataBook.replace("[",
+								"");
+							newbookMarkData = JSON.parse(newbookMarkData);
 						}
 						store.set("bookMark", newbookMarkData);
 						store.set("setData", data.setData);
 						alert("主页数据恢复成功!");
 						location.reload();
-					}else{
+					} else {
 						alert("主页数据恢复失败!");
 					}
 				} catch (e) {
