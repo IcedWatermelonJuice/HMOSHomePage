@@ -15,8 +15,8 @@
 * 设置页支持检查版本更新(以github版本为标准)
 * 搜索栏/书签支持http、https、ftp、file类URL转跳（file类型URL仅支持本地主页）
 # 🌐相关地址
-* 在线使用地址：https://gem-hp.rth.app
-* 备用地址(github page访问不稳定)：https://icedwatermelonjuice.github.io/HMOSHomePage
+* 在线使用地址(GithubPage可能会被墙)：https://icedwatermelonjuice.github.io/HMOSHomePage
+* 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app
 * CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
