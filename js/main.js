@@ -843,6 +843,7 @@ require(['jquery'], function($) {
 								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value=` + turl + ` />
 								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名"  value=` + tname + ` />
 									<div id="addbook-upload">点击选择图标</div>
+									<div id="addbook-autofetch">点击自动获取图标</div>
 									<div class="addbook-ok">确认修改</div>
 								</div>
 								<div class="bottom-close"></div>
@@ -874,6 +875,36 @@ require(['jquery'], function($) {
 									"");
 								reader.readAsDataURL(file);
 							});
+						});
+						$("#addbook-autofetch").click(function() {
+							var autofetchFlag = false,
+								url = $(".addbook-url").val(),
+								ImgObj = new Image();
+							if (url.search("http") === -1) {
+								url = "https://" + url;
+							}
+							var urlArr = url.split("/");
+							ImgUrl = urlArr[2];
+							if (ImgUrl) {
+								ImgUrl = "https://" + ImgUrl +
+									"/favicon.ico";
+								ImgObj.src = ImgUrl;
+								if (ImgObj.fileSize > 0 || (ImgObj.width >
+										0 &&
+										ImgObj.height > 0)) {
+									autofetchFlag = true;
+								}
+							}
+							if (autofetchFlag) {
+								alert("图标获取成功");
+								$("#addbook-upload").html('<img src="' +
+									ImgUrl +
+									'"></img><p>自动获取favicon</p>');
+							} else {
+								alert(
+									"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+									);
+							}
 						});
 						$(".addbook-ok").click(function() {
 							var index = dom.index(),
@@ -1931,7 +1962,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = 1.15;
+		app.version = 1.16;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
