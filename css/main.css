@@ -267,12 +267,20 @@ body,html {
 	padding: 16px 10px;
 	margin-bottom: 10px;
 }
+#addbook-autofetch{
+	background: #f9f9f9;
+    border-radius: 10px;
+	text-align: center;
+	height: 48px;
+    line-height: 48px;
+}
 #addbook-upload{
 	background: #f9f9f9;
     border-radius: 10px;
 	text-align: center;
 	height: 48px;
     line-height: 48px;
+	margin-bottom: 10px;
 }
 #addbook-upload img{height: 100%;float: left;}
 #addbook-upload p{text-overflow: ellipsis;text-align: right;}
