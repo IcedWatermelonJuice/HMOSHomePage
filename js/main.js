@@ -648,14 +648,15 @@ require(['jquery'], function($) {
 				}
 				if (settings.get("SetbookMarksADD") === true) {
 					if ($('.addbook').length === 0) {
-						var flexStyle=that.$ele[0].children[0].style.flex;
-						if(flexStyle){
-							flexStyle="flex:"+flexStyle+";";
-						}else{
-							flexStyle="";
+						var flexStyle = that.$ele[0].children[0].style.flex;
+						if (flexStyle) {
+							flexStyle = "flex:" + flexStyle + ";";
+						} else {
+							flexStyle = "";
 						}
 						that.$ele.append(
-							'<div class="list addbook" style="'+flexStyle+'"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
+							'<div class="list addbook" style="' + flexStyle +
+							'"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
 						);
 						$('.addbook').click(function() {
 							$('.addbook').remove();
@@ -1390,28 +1391,35 @@ require(['jquery'], function($) {
 			}
 		}
 	});
-	$(document).ready(function() {
+	function initquickchange(){
 		var quickchangeObj = document.querySelector(".quick-change .content");
 		var browser = browserInfo();
+		var successflag = false;
 		if (quickchangeObj) {
 			var searchOpt = quickchangeObj.querySelectorAll("li");
 			if (searchOpt.length > 0) {
 				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
 				for (let i = 0; i < searchOpt.length; i++) {
 					var type = searchOpt[i].getAttribute("name");
-					if (type === "via" && browser === "via") {
+					if (type === "via" && browser === "via"&&earchOpt[i].style.display==="none") {
 						searchOpt[i].style.display = "";
 					}
 					if (settings.get("engines") === type) {
 						searchOpt[i].setAttribute("class", "choose-opt");
 						ce.innerHTML = searchOpt[i].innerHTML;
-						break;
-					} else if ((i + 1) === searchOpt.length) {
+						successflag = true;
+					}else{
+						searchOpt[i].setAttribute("class", "");
+					}
+					if ((i + 1) === searchOpt.length && !successflag) {
 						console.log("搜索引擎快切栏初始化失败");
 					}
 				}
 			}
 		}
+	}
+	$(document).ready(function() {
+		initquickchange();
 	});
 
 	// 搜索函数
@@ -2039,14 +2047,14 @@ require(['jquery'], function($) {
 				"type": "select",
 				"value": "engines",
 				"data": [{
-					"t": "夸克搜索",
-					"v": "quark"
+					"t": "百度搜索",
+					"v": "baidu"
 				}, {
 					"t": "跟随Via",
 					"v": "via"
 				}, {
-					"t": "百度搜索",
-					"v": "baidu"
+					"t": "夸克搜索",
+					"v": "quark"
 				}, {
 					"t": "谷歌搜索",
 					"v": "google"
@@ -2545,12 +2553,13 @@ require(['jquery'], function($) {
 			}
 		}
 	}
-	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
+	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突 搜索引擎快切初始化
 	function IntervalFnSet() {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
 		LogoHeightFn.set();
 		PositionFn.set();
+		initquickchange();
 	}
 	setInterval(IntervalFnSet, 1000);
 
