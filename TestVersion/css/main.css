@@ -166,6 +166,16 @@ body,html {
 .delbook.animation{
 	transform:scale(0);
 }
+.editbook{
+	top: -5px;
+	right: 13px;
+	position:absolute;width:18px;height:18px;background:url(../img/edit.png) no-repeat center;background-size:18px;
+	animation:scale .3s;
+	transition: transform .3s;
+}
+.editbook.animation{
+	transform:scale(0);
+}
 .addbook{
 	animation:fadeIn .4s;
 	transition: opacity .4s;
@@ -257,12 +267,20 @@ body,html {
 	padding: 16px 10px;
 	margin-bottom: 10px;
 }
+#addbook-autofetch{
+	background: #f9f9f9;
+    border-radius: 10px;
+	text-align: center;
+	height: 48px;
+    line-height: 48px;
+}
 #addbook-upload{
 	background: #f9f9f9;
     border-radius: 10px;
 	text-align: center;
 	height: 48px;
     line-height: 48px;
+	margin-bottom: 10px;
 }
 #addbook-upload img{height: 100%;float: left;}
 #addbook-upload p{text-overflow: ellipsis;text-align: right;}
@@ -423,7 +441,9 @@ body,html {
 	animation: down .35s;
 }
 .shortcut{
-	padding:0 10px;background:#efefef;line-height:25px;
+	padding:0 10px;
+	background:#efefef;
+	line-height:25px;
 	height: 44px;
 	line-height: 44px;
 	font-size:14px;
@@ -472,6 +492,41 @@ body,html {
 .shortcut3 li:not(:first-child){
 	background-color: #fff;
 	border-radius: 4px;
+}
+.quick-change{
+	padding: 0 10px;
+	background:#f5f5f5;
+}
+.quick-change .tittle-box{
+	height: 44px;
+	line-height: 44px;
+	margin: 0 10px;
+	font-weight: bold;
+}
+.quick-change ul{
+	display: flex;
+	align-items: center;
+	overflow-x: scroll;
+}
+.quick-change .choose-opt{
+	color: rgb(44, 123, 246);
+}
+.quick-change *>li{
+	text-align:center;
+	flex: 1;
+}
+.quick-change li{
+	padding: 0 10px;
+	margin: 0 4px;
+	flex: auto;
+	flex-shrink: 0;
+	height: 26px;
+	line-height: 26px;
+	font-size:14px;
+}
+.quick-change li{
+	background-color: #fff;
+	border-radius: 999px;
 }
 
 /* 设置页面 */
@@ -746,8 +801,8 @@ body,html {
 
 /* 精选 - 天气 */
 .choice-cut .cmp-icon{
-	width: 150px;
-	height: 140px;
+	width: 135px;
+	height: 126px;
 	background-size: cover;
 	position: absolute;
 	right: 0;
@@ -788,7 +843,6 @@ body,html {
 	left: 20px;
 	position: absolute;
 }
-
 /* 精选 - 热搜 */
 .news-list{
 	margin-top: 20px;
@@ -837,6 +891,61 @@ body,html {
 	white-space: nowrap;
 }
 .news-item-hot {
+	opacity: 0.5;
+	font-size: 8px;
+	color: #fff;
+	text-align: right;
+	margin-left: 12px;
+	letter-spacing: -0.5px;
+}
+/* 精选 - 抖音*/
+.douyin-list{
+	margin-top: 20px;
+}
+.douyin-item{
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow: hidden;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	margin-bottom: 11px;
+}
+
+.douyin-item-count {
+	font-size: 15px;
+	color: #fff;
+	margin-right: 5px;
+	position: relative;
+	padding-left: 2px;
+	height: 20px;
+	width: 11px;
+	line-height: 17px;
+
+}
+.douyin-item-count:after {
+	display: inline-block;
+	content: "";
+	background: rgba(0,0,0,0.4);
+	width: 12px;
+	height: 12px;
+	border-radius: 12px;
+	position: absolute;
+	top: 8px;
+	left: 0;
+}
+.douyin-item-title {
+	font-size: 12px;
+	color: #fff;
+	-webkit-box-flex: 1;
+	-ms-flex: 1;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.douyin-item-hot {
 	opacity: 0.5;
 	font-size: 8px;
 	color: #fff;

@@ -42,6 +42,14 @@ body {
 .shortcut .shortcut2 li:active {
 	background: #171717;
 }
+.quick-change{
+	background: #282828;
+	color: #666;
+}
+.quick-change li{
+	background: #fff;
+	filter: brightness(60%);
+}
 .history li {
 	background: #1f1f1f;
 }
@@ -69,6 +77,9 @@ body {
 	color: #444;
 }
 .addbook-input,#addbook-upload {
+	background: #212121;
+}
+.addbook-input,#addbook-autofetch {
 	background: #212121;
 }
 .set-option .set-checkbox:checked + label:before {
