@@ -5,18 +5,19 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no" />
 		<meta name="referrer" content="never" />
-		<meta name="description" content="HomePage version test2-v1.8">
+		<meta name="description" content="HomePage version1.17">
 		<meta name="keywords" content="homepage,home page,主页,起始页,手机主页">
 		<meta name="author" content="IcedWatermelonJuice(Github)">
 		<title>主页</title>
 		<link rel="icon" type="image/x-icon" href="logo/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="css/main.css?v=test2-vtest2-v1.8" />
-		<link rel="stylesheet" id="nightCss" type="text/css" href="css/night.css?v=test2-v1.8" disabled />
+		<link rel="stylesheet" type="text/css" href="css/main.css?v=1.17" />
+		<link rel="stylesheet" id="nightCss" type="text/css" href="css/night.css?v=1.17" disabled />
 	</head>
 
 	<body>
 		<div id="app">
 			<div class="page-home">
+				<div id="empty_box" style="margin-top: 0px;width: 100%;height: 0px;"></div>
 				<div class="logo"></div>
 				<div class="ornament-input-group" style="display: none;"></div>
 				<div class="bookmark"></div>
@@ -28,6 +29,24 @@
 				</div>
 				<ul class="suggestion"></ul>
 				<div class="bottom-row">
+					<div class="quick-change">
+						<div class="tittle-box">
+							<span>搜索引擎(当前:</span>
+							<span class="current-engine">未初始化</span>
+							<span>)</span>
+						</div>
+						<ul class="content">
+							<li name="baidu">夸克搜索</li>
+							<li name="via" style="display: none;">跟随Via</li>
+							<li name="quark">百度搜索</li>
+							<li name="google">谷歌搜索</li>
+							<li name="bing">必应搜索</li>
+							<li name="sm">神马搜索</li>
+							<li name="haosou">好搜搜索</li>
+							<li name="sougou">搜狗搜索</li>
+							<li name="diy">自定义</li>
+						</ul>
+					</div>
 					<div class="search-from">
 						<div class="input-bg">
 							<input type="text" class="search-input" placeholder="搜索或输入网址" />
@@ -67,15 +86,15 @@
 		</div>
 		<script>
 			var app = window.app || {};
-			app.version = "test2-v1.8";
+			app.version = "1.17";
 		</script>
-		<script src="js/lib/require.js?v=test2-v1.8"></script>
-		<script src="js/main.js?v=test2-v1.8"></script>
-		<!-- 不重要的CSS最后加载 --。
-		<link rel="stylesheet" type="text/css" href="css/lazy.css?v=test2-v1.8" />
+		<script src="js/lib/require.js?v=1.17"></script>
+		<script src="js/main.js?v=1.17"></script>
+		<!-- 不重要的CSS最后加载 -->
+		<link rel="stylesheet" type="text/css" href="css/lazy.css?v=1.17" />
 	</body>
 
 </html>
 </body>
 
-</html>version:test2-v1.8
+</html>version:1.17
