@@ -69,7 +69,11 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
+				LogoHeightSet: "40",
+				position: "0"
 			};
 		} else if (browser === 'x') {
 			this.storage = {
@@ -82,7 +86,11 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
+				LogoHeightSet: "40",
+				position: "0"
 			};
 		} else {
 			this.storage = {
@@ -95,7 +103,11 @@ require(['jquery'], function($) {
 				autonightMode2Array: "20:00-8:00",
 				searchHistory: false,
 				LOGOclickFn: "choicePage",
-				LOGOlongpressFn: "settingsPage"
+				LOGOlongpressFn: "settingsPage",
+				SetbookMarksADD: true,
+				booknumber: "Num4",
+				LogoHeightSet: "40",
+				position: "0"
 			};
 		}
 		this.initStorage = this.storage;
@@ -127,6 +139,12 @@ require(['jquery'], function($) {
 			}
 			$('.ornament-input-group').removeAttr('style');
 			// 加载LOGO
+			if (that.get('LogoHeightSet')) {
+				$(".logo").css("height", that.get('LogoHeightSet') + "px");
+			}
+			if (that.get('position')) {
+				$("#empty_box").css("marginTop", that.get('position') + "px");
+			}
 			if (that.get('logo')) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
 			} else {
@@ -165,9 +183,6 @@ require(['jquery'], function($) {
 					$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
 				}
 			}
-
-
-
 		}
 	}
 	var settings = new settingsFn(store.get("setData"), browserInfo());
@@ -183,43 +198,28 @@ require(['jquery'], function($) {
 			settings.set('nightMode', false);
 		}
 	}
-	// 自动夜间模式(via浏览器) 删除掉VIA浏览器夜间模式的暗色支持
-	// function autoNightModeFn2() {
-	// 	$("head").on("DOMNodeInserted DOMNodeRemoved", function(evt) {
-	// 		if (evt.target.id === "via_inject_css_night") {
-	// 			if (evt.type === "DOMNodeInserted") {
-	// 				$("#via_inject_css_night").html("");
-	// 				settings.set('nightMode', true);
-	// 			} else if (evt.type === "DOMNodeRemoved") {
-	// 				settings.set('nightMode', false);
-	// 			}
-	// 		}
-	// 	});
-	// 	if ($("#via_inject_css_night").html("").length > 0) {
-	// 		settings.set('nightMode', true);
-	// 	}
-	// }
+
 	var autoNightMode2Fn = {
 		getSetTime: function() {
 			let setTime = prompt("请输入开启时间,格式为:hh:mm-hh:mm,例如:20:00-8:00");
 			try {
 				let setTimeFlag0 = setTime.search("-");
-				let setTimeFlag1=setTime.search(":");
-				let setTimeFlag2=setTime.slice(setTimeFlag0).search(":");
-				let alertMessage="输入时间格式错误:";
+				let setTimeFlag1 = setTime.search(":");
+				let setTimeFlag2 = setTime.slice(setTimeFlag0).search(":");
+				let alertMessage = "输入时间格式错误:";
 				if (setTimeFlag0 === -1) {
-					alertMessage+="\n区间间隔'-'丢失!";
-				} 
-				if(setTimeFlag1 === -1){
-					alertMessage+="\n开始时间':'丢失!";
+					alertMessage += "\n区间间隔'-'丢失!";
 				}
-				if(setTimeFlag2 === -1){
-					alertMessage+="\n结束时间':'丢失!";
+				if (setTimeFlag1 === -1) {
+					alertMessage += "\n开始时间':'丢失!";
 				}
-				if((setTimeFlag0!==-1)&&(setTimeFlag1!==-1)&&(setTimeFlag2!==-1)){
+				if (setTimeFlag2 === -1) {
+					alertMessage += "\n结束时间':'丢失!";
+				}
+				if ((setTimeFlag0 !== -1) && (setTimeFlag1 !== -1) && (setTimeFlag2 !== -1)) {
 					settings.set('autonightMode2Array', setTime);
 					alert("时间设定成功!");
-				}else{
+				} else {
 					alert(alertMessage);
 				}
 			} catch (e) {
@@ -234,14 +234,14 @@ require(['jquery'], function($) {
 			let setTimeFlag1;
 			let setTime0 = setTime.slice(0, setTimeFlag0);
 			let setTime1 = setTime.slice(setTimeFlag0 + 1);
-			
+
 			setTimeFlag0 = setTime0.search(":");
 			setTimeFlag1 = setTime1.search(":");
 			let setTime0Hour = parseInt(setTime0.slice(0, setTimeFlag0));
 			let setTime0Minute = parseInt(setTime0.slice(setTimeFlag0 + 1));
 			let setTime1Hour = parseInt(setTime1.slice(0, setTimeFlag1));
 			let setTime1Minute = parseInt(setTime1.slice(setTimeFlag1 + 1));
-			
+
 			returnArray[0] = setTime0Hour * 60 + setTime0Minute;
 			returnArray[1] = setTime1Hour * 60 + setTime1Minute;
 			return returnArray;
@@ -253,13 +253,13 @@ require(['jquery'], function($) {
 			var nowTimeSum = nowHour * 60 + nowMinute;
 			return nowTimeSum;
 		},
-		on:function(){
-			if(settings.get('nightMode') ===false){
+		on: function() {
+			if (settings.get('nightMode') === false) {
 				settings.set('nightMode', true);
 			}
 		},
-		off:function(){
-			if(settings.get('nightMode') ===true){
+		off: function() {
+			if (settings.get('nightMode') === true) {
 				settings.set('nightMode', false);
 			}
 		},
@@ -271,7 +271,7 @@ require(['jquery'], function($) {
 			// autoNightModeFn2();
 		}
 		if (settings.get('autonightMode2') === true) {
-			let setTimeArray=autoNightMode2Fn.changeSetTime();
+			let setTimeArray = autoNightMode2Fn.changeSetTime();
 			let setTime0Sum = setTimeArray[0];
 			let setTime1Sum = setTimeArray[1];
 			if (setTime0Sum !== -1 || setTime1Sum !== -1) {
@@ -291,6 +291,123 @@ require(['jquery'], function($) {
 				}
 			}
 		}
+	}
+
+	//每行图标数量设置
+	function getbooknumber() {
+		if (settings.get("booknumber") === "Num4") {
+			return "";
+		} else if (settings.get("booknumber") === "Num5") {
+			return "20%";
+		} else if (settings.get("booknumber") === "Num6") {
+			return "16.66%";
+		} else if (settings.get("booknumber") === "Num7") {
+			return "14.28%";
+		} else if (settings.get("booknumber") === "Num8") {
+			return "12.5%";
+		} else {
+			return "";
+			alert("booknumber error");
+		}
+	}
+
+	function setbookmarkNum() {
+		let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+		if (settings.get("booknumber") === "Num4") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].removeAttribute("style");
+			}
+		} else if (settings.get("booknumber") === "Num5") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 20%";
+			}
+		} else if (settings.get("booknumber") === "Num6") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 16.66%";
+			}
+		} else if (settings.get("booknumber") === "Num7") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 14.28%";
+			}
+		} else if (settings.get("booknumber") === "Num8") {
+			for (let i = 0; i < bookmarkListOBJ.length; i++) {
+				bookmarkListOBJ[i].style.flex = "0 0 12.5%";
+			}
+		}
+	}
+
+	function bookmarkNumSet() {
+		let bookmarkStyleNum = document.getElementsByClassName("bookmark")[0].children[0].style.flex;
+		if (bookmarkStyleNum !== getbooknumber()) {
+			setbookmarkNum();
+		}
+	}
+
+	//LOGO高度设置:
+	var LogoHeightFn = {
+		set: function() {
+			let settingHeight = settings.get("LogoHeightSet");
+			let LogoOBJ = document.getElementsByClassName("logo")[0];
+			let logoHeight = LogoOBJ.clientHeight.toString();
+			if (logoHeight !== settingHeight) {
+				if (settingHeight === "40") {
+					LogoOBJ.style.height = "";
+				} else {
+					LogoOBJ.style.height = settingHeight + "px";
+				}
+			}
+		},
+		get: function() {
+			let setHeight = prompt("设置LOGO高度(非负数,单位px,像素),例如:40\n备注:40为默认高度,当为高度=0时,LOGO不显示");
+			try {
+				HeightNum = parseFloat(setHeight);
+				if (HeightNum >= 0) {
+					settings.set("LogoHeightSet", setHeight);
+					alert("高度设置成功!");
+				} else {
+					alert("高度设定失败:\n请输入非负的高度值!");
+				}
+			} catch (e) {
+				alert("高度设定失败!");
+			}
+		}
+
+	}
+
+	//整体偏离默认位置设置(通过设置empty_box这个空容器的margin-top来改变偏移)
+	var PositionFn = {
+		set: function() {
+			let settingsPosition = settings.get('position');
+			settingsPosition = settingsPosition + "px";
+			let boxOBJ = document.getElementById("empty_box");
+			let currentPosition = boxOBJ.style.marginTop;
+			if (currentPosition === "") {
+				currentPosition = "0px";
+			}
+			if (currentPosition !== settingsPosition) {
+				if (settingsPosition === "0px") {
+					boxOBJ.style.marginTop = "0px";
+				} else {
+					boxOBJ.style.marginTop = settingsPosition;
+				}
+			}
+		},
+		get: function() {
+			let setPosition = prompt(
+				"设置相对位置(偏移度单位为px,像素),负数:向上偏移,正数:向下偏移,例如:输入+100,表示向下偏移100px\n备注:0为默认值,表示不偏移");
+			try {
+				setPosition = setPosition.trim();
+				if (!isNaN(Number(setPosition)) && setPosition !== "") {
+					settings.set("position", setPosition);
+					alert("位置设置成功!");
+				} else {
+					alert("位置设定失败:\n请输入一个数值!");
+				}
+			} catch (e) {
+				alert("位置设定失败!");
+			}
+		}
+
 	}
 
 	/**
@@ -396,20 +513,36 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/discover.png"
 			}, {
 				"name": "AirPortal",
-				"url": "https://airportal.cn/",
+				"url": "https://airportal.cn",
 				"icon": "img/bookmarks/airportal.png"
 			}, {
+				"name": "扫一扫",
+				"url": "https://www.the-qrcode-generator.com/scan",
+				"icon": "img/bookmarks/qrscan.png"
+			}, {
+				"name": "设置",
+				"url": "openSettingPage()",
+				"icon": "img/bookmarks/settings.png"
+			}, {
+				"name": "翻译",
+				"url": "https://translate.google.cn",
+				"icon": "img/bookmarks/translate.png"
+			}, {
+				"name": "CSDN",
+				"url": "https://csdn.net",
+				"icon": "img/bookmarks/csdn.png"
+			}, {
 				"name": "Github",
-				"url": "https://github.com/",
+				"url": "https://github.com",
 				"icon": "img/bookmarks/github.png"
 			}, {
 				"name": "Gitee",
 				"url": "https://gitee.com",
 				"icon": "img/bookmarks/gitee.png"
 			}, {
-				"name": "设置",
-				"url": "openSettingPage()",
-				"icon": "img/bookmarks/settings.png"
+				"name": "抖音",
+				"url": "https://douyin.com/recommend",
+				"icon": "img/bookmarks/douyin.png"
 			}, {
 				"name": "B站",
 				"url": "https://bilibili.com/",
@@ -438,6 +571,7 @@ require(['jquery'], function($) {
 					')"></div><div class="text">' + data[i].name + "</div></div>";
 			}
 			this.$ele.html(html);
+			bookmarkNumSet();
 			this.bind();
 		},
 		getJson: function() {
@@ -490,6 +624,7 @@ require(['jquery'], function($) {
 						$(document).unbind("click");
 						$('.logo,.ornament-input-group').css('pointer-events', '');
 						$(".delbook").addClass("animation");
+						$(".editbook").addClass("animation");
 						$(".delbook").on('transitionend', function(evt) {
 							if (evt.target !== this) {
 								return;
@@ -502,6 +637,7 @@ require(['jquery'], function($) {
 					var $list = that.$ele.find(".list");
 					for (var i = $list.length; i > -1; i--) {
 						$list.eq(i).find(".img").prepend('<div class="delbook"></div>');
+						$list.eq(i).find(".img").prepend('<div class="editbook"></div>');
 					}
 				}
 			});
@@ -510,29 +646,212 @@ require(['jquery'], function($) {
 						'animation') || data.length >= 20) {
 					return;
 				}
-				if ($('.addbook').length === 0) {
-					that.$ele.append(
-						'<div class="list addbook"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
-					);
-					$('.addbook').click(function() {
-						$('.addbook').remove();
+				if (settings.get("SetbookMarksADD") === true) {
+					if ($('.addbook').length === 0) {
+						var flexStyle = that.$ele[0].children[0].style.flex;
+						if (flexStyle) {
+							flexStyle = "flex:" + flexStyle + ";";
+						} else {
+							flexStyle = "";
+						}
+						that.$ele.append(
+							'<div class="list addbook" style="' + flexStyle +
+							'"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
+						);
+						$('.addbook').click(function() {
+							$('.addbook').remove();
+							// 取消书签编辑状态
+							$(document).click();
+							// 插入html
+							$('#app').append(`<div class="page-bg"></div>
+							<div class="page-addbook">
+								<ul class="addbook-choice">
+									<li class="current">站点</li>
+									<!-- <li>书签</li>
+									<li>历史</li> -->
+									<span class="active-span"></span>
+								</ul>
+								<div class="addbook-content">
+									<div class="addbook-sites">
+									<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
+									<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
+										<div id="addbook-upload">点击选择图标</div>
+										<div id="addbook-autofetch">点击自动获取图标</div>
+										<div class="addbook-ok">确认添加</div>
+									</div>
+									<div class="bottom-close"></div>
+								</div>
+							</div>`);
+
+							setTimeout(function() {
+								$(".page-bg").addClass("animation");
+								$(".addbook-choice").addClass("animation");
+								$(".addbook-content").addClass("animation");
+							}, 50);
+
+							//绑定事件
+							$("#addbook-upload").click(function() {
+								openFile(function() {
+									var file = this.files[0];
+									var reader = new FileReader();
+									reader.onload = function() {
+										$("#addbook-upload").html(
+											'<img src="' + this
+											.result +
+											'"></img><p>' + file
+											.name + '</p>');
+									};
+									$("#addbook-upload").css(
+										"pointer-events", "");
+									$(".addbook-ok").css(
+										"pointer-events",
+										"");
+									reader.readAsDataURL(file);
+									/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
+									$(".addbook-ok").css("pointer-events", "none");
+									uploadFile(file, {
+										success: function (url) {
+											$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
+										},
+										error: function (msg) {
+											$("#addbook-upload").html('上传图标失败！' + msg);
+										},
+										complete: function () {
+											$("#addbook-upload").css("pointer-events", "");
+											$(".addbook-ok").css("pointer-events", "");
+										}
+									})*/
+								});
+							});
+							$("#addbook-autofetch").click(function() {
+								var autofetchFlag = false,
+									url = $(".addbook-url").val(),
+									ImgObj = new Image();
+								if (url.search("http") === -1) {
+									url = "https://" + url;
+								}
+								var urlArr = url.split("/");
+								ImgUrl = urlArr[2];
+								if (ImgUrl) {
+									ImgUrl = "https://" + ImgUrl +
+										"/favicon.ico";
+									ImgObj.src = ImgUrl;
+									if (ImgObj.fileSize > 0 || (ImgObj.width >
+											0 &&
+											ImgObj.height > 0)) {
+										autofetchFlag = true;
+									}
+								}
+								if (autofetchFlag) {
+									alert("图标获取成功");
+									$("#addbook-upload").html('<img src="' +
+										ImgUrl +
+										'"></img><p>自动获取favicon</p>');
+								} else {
+									alert(
+										"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+									);
+								}
+							});
+							$(".addbook-ok").click(function() {
+								var name = $(".addbook-name").val(),
+									url = $(".addbook-url").val(),
+									icon = $("#addbook-upload img").attr("src");
+								if (name.length && url.length) {
+									if (!icon) {
+										// 绘制文字图标
+										var canvas = document.createElement(
+											"canvas");
+										canvas.height = 100;
+										canvas.width = 100;
+										var ctx = canvas.getContext("2d");
+										ctx.fillStyle = "#f5f5f5";
+										ctx.fillRect(0, 0, 100, 100);
+										ctx.fill();
+										ctx.fillStyle = "#222";
+										ctx.font = "40px Arial";
+										ctx.textAlign = "center";
+										ctx.textBaseline = "middle";
+										ctx.fillText(name.substr(0, 1), 50, 52);
+										icon = canvas.toDataURL("image/png");
+									}
+									$(".bottom-close").click();
+									bookMark.add(name, url, icon);
+								}
+							});
+							$(".bottom-close").click(function() {
+								$(".page-addbook").css({
+									"pointer-events": "none"
+								});
+								$(".page-bg").removeClass("animation");
+								$(".addbook-choice").removeClass("animation");
+								$(".addbook-content").removeClass("animation");
+								setTimeout(function() {
+									$(".page-addbook").remove();
+									$(".page-bg").remove();
+								}, 300);
+							});
+							$(".page-addbook").click(function(evt) {
+								if (evt.target === evt.currentTarget) {
+									$(".bottom-close").click();
+								}
+							});
+
+						})
+					} else {
+						$(".addbook").addClass("animation");
+						setTimeout(function() {
+							$(".addbook").remove();
+						}, 400);
+					}
+				} else {
+					if ($('.addbook').length !== 0) {
+						$(".addbook").remove();
+					}
+				}
+
+			});
+			this.$ele.on('click', '.list', function(evt) {
+				evt.stopPropagation();
+				var dom = $(evt.currentTarget);
+				if (that.status !== "editing") {
+					var url = dom.data("url");
+					if (url) {
+						switch (url) {
+							case "choice()":
+								choice();
+								break;
+							case "openSettingPage()":
+								openSettingPage();
+								break;
+							default:
+								location.href = url;
+						}
+					}
+				} else {
+					if (evt.target.className === "delbook") {
+						that.del(dom.index());
+					} else if (evt.target.className === "editbook") {
+						var targetBook = $(".bookmark").find(".list").eq(dom.index());
+						//var turl=targetBook.attr("data-url");
+						var turl = dom.data("url");
+						var tname = dom.find(".text").text();
 						// 取消书签编辑状态
 						$(document).click();
 						// 插入html
 						$('#app').append(`<div class="page-bg"></div>
 						<div class="page-addbook">
 							<ul class="addbook-choice">
-								<li class="current">站点</li>
-								<!-- <li>书签</li>
-								<li>历史</li> -->
+								<li class="current">修改书签</li>
 								<span class="active-span"></span>
 							</ul>
 							<div class="addbook-content">
 								<div class="addbook-sites">
-								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
-								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
+								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value=` + turl + ` />
+								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名"  value=` + tname + ` />
 									<div id="addbook-upload">点击选择图标</div>
-									<div class="addbook-ok">确认添加</div>
+									<div id="addbook-autofetch">点击自动获取图标</div>
+									<div class="addbook-ok">确认修改</div>
 								</div>
 								<div class="bottom-close"></div>
 							</div>
@@ -558,50 +877,57 @@ require(['jquery'], function($) {
 								};
 								$("#addbook-upload").css(
 									"pointer-events", "");
-								$(".addbook-ok").css("pointer-events",
+								$(".addbook-ok").css(
+									"pointer-events",
 									"");
 								reader.readAsDataURL(file);
-								/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
-								$(".addbook-ok").css("pointer-events", "none");
-								uploadFile(file, {
-									success: function (url) {
-										$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
-									},
-									error: function (msg) {
-										$("#addbook-upload").html('上传图标失败！' + msg);
-									},
-									complete: function () {
-										$("#addbook-upload").css("pointer-events", "");
-										$(".addbook-ok").css("pointer-events", "");
-									}
-								})*/
 							});
 						});
+						$("#addbook-autofetch").click(function() {
+							var autofetchFlag = false,
+								url = $(".addbook-url").val(),
+								ImgObj = new Image();
+							if (url.search("http") === -1) {
+								url = "https://" + url;
+							}
+							var urlArr = url.split("/");
+							ImgUrl = urlArr[2];
+							if (ImgUrl) {
+								ImgUrl = "https://" + ImgUrl +
+									"/favicon.ico";
+								ImgObj.src = ImgUrl;
+								if (ImgObj.fileSize > 0 || (ImgObj.width >
+										0 &&
+										ImgObj.height > 0)) {
+									autofetchFlag = true;
+								}
+							}
+							if (autofetchFlag) {
+								alert("图标获取成功");
+								$("#addbook-upload").html('<img src="' +
+									ImgUrl +
+									'"></img><p>自动获取favicon</p>');
+							} else {
+								alert(
+									"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+								);
+							}
+						});
 						$(".addbook-ok").click(function() {
-							var name = $(".addbook-name").val(),
+							var index = dom.index(),
+								name = $(".addbook-name").val(),
 								url = $(".addbook-url").val(),
 								icon = $("#addbook-upload img").attr("src");
-							if (name.length && url.length) {
+							console.log(name + ' ' + tname + ' ' + url + ' ' + turl +
+								' ' + icon);
+							if (name !== tname || url !== turl || !!icon) {
 								if (!icon) {
-									// 绘制文字图标
-									var canvas = document.createElement(
-										"canvas");
-									canvas.height = 100;
-									canvas.width = 100;
-									var ctx = canvas.getContext("2d");
-									ctx.fillStyle = "#f5f5f5";
-									ctx.fillRect(0, 0, 100, 100);
-									ctx.fill();
-									ctx.fillStyle = "#222";
-									ctx.font = "40px Arial";
-									ctx.textAlign = "center";
-									ctx.textBaseline = "middle";
-									ctx.fillText(name.substr(0, 1), 50, 52);
-									icon = canvas.toDataURL("image/png");
+									icon = "";
 								}
-								$(".bottom-close").click();
-								bookMark.add(name, url, icon);
+								bookMark.edit(index, name, url, icon);
+								//location.reload(true);
 							}
+							$(".bottom-close").click();
 						});
 						$(".bottom-close").click(function() {
 							$(".page-addbook").css({
@@ -621,34 +947,6 @@ require(['jquery'], function($) {
 							}
 						});
 
-					})
-				} else {
-					$(".addbook").addClass("animation");
-					setTimeout(function() {
-						$(".addbook").remove();
-					}, 400);
-				}
-			});
-			this.$ele.on('click', '.list', function(evt) {
-				evt.stopPropagation();
-				var dom = $(evt.currentTarget);
-				if (that.status !== "editing") {
-					var url = dom.data("url");
-					if (url) {
-						switch (url) {
-							case "choice()":
-								choice();
-								break;
-							case "openSettingPage()":
-								openSettingPage();
-								break;
-							default:
-								location.href = url;
-						}
-					}
-				} else {
-					if (evt.target.className === "delbook") {
-						that.del(dom.index());
 					}
 				}
 			});
@@ -675,7 +973,9 @@ require(['jquery'], function($) {
 		},
 		add: function(name, url, icon) {
 			var data = this.options.data;
-			url = url.match(/:\/\//) ? url : "http://" + url;
+			if ((url !== "choice()") && (url !== "openSettingPage()")) {
+				url = url.match(/:\/\//) ? url : "http://" + url;
+			}
 			var i = data.length - 1;
 			var dom = $('<div class="list" data-url="' + url +
 				'"><div class="img" style="background-image:url(' + icon +
@@ -693,6 +993,25 @@ require(['jquery'], function($) {
 				url: url,
 				icon: icon
 			});
+			store.set("bookMark", data);
+		},
+		edit: function(index, name, url, icon) {
+			var data = this.options.data;
+			if ((url !== "choice()") && (url !== "openSettingPage()")) {
+				url = url.match(/:\/\//) ? url : "http://" + url;
+			}
+			if (icon === "") {
+				icon = data[index].icon;
+			}
+			var book = $(".bookmark").find('.list').eq(index);
+			book.find('.text').text(name);
+			book.data("url", url);
+			book.find('.img').css("background-image", "url(" + icon + ")");
+			data[index] = {
+				name: name,
+				url: url,
+				icon: icon
+			};
 			store.set("bookMark", data);
 		}
 	}
@@ -1044,6 +1363,65 @@ require(['jquery'], function($) {
 		evt.keyCode === 13 && $(".search-btn").click();
 	});
 
+	$(".quick-change .content").click(function(evt) {
+		var tar = evt.target;
+		if (tar.nodeName === "LI") {
+			var type = tar.getAttribute("name");
+			if (settings.get("engines") !== type) {
+				if (type === "diy" && !settings.get('diyEngines')) {
+					var diyEngines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）");
+					console.log(diyEngines);
+					if (diyEngines) {
+						settings.set('diyEngines', diyEngines);
+					} else {
+						return false;
+					}
+				}
+				console.log("搜索引擎快切:" + type);
+				settings.set("engines", type);
+				var par = tar.parentElement;
+				if (par && par.childElementCount > 0) {
+					for (let i = 0; i < par.childElementCount; i++) {
+						par.children[i].setAttribute("class", "");
+					}
+				}
+				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
+				ce.innerHTML = tar.innerHTML;
+				tar.setAttribute("class", "choose-opt");
+			}
+		}
+	});
+	$(document).ready(function() {
+		var quickchangeObj = document.querySelector(".quick-change .content");
+		var browser = browserInfo();
+		var successflag = false;
+		if (quickchangeObj) {
+			var searchOpt = quickchangeObj.querySelectorAll("li");
+			console.log("searchOpt.length> 0:" + (searchOpt.length > 0));
+			if (searchOpt.length > 0) {
+				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
+				for (let i = 0; i < searchOpt.length; i++) {
+					var type = searchOpt[i].getAttribute("name");
+					console.log("type:" + type + " browser:" + browser);
+					if (type === "via" && browser === "via") {
+						console.log("via display");
+						searchOpt[i].style.display = "";
+					}
+					console.log("engines:" + settings.get("engines") + " type:" + type + " " + (settings
+						.get("engines") === type));
+					if (settings.get("engines") === type) {
+						searchOpt[i].setAttribute("class", "choose-opt");
+						ce.innerHTML = searchOpt[i].innerHTML;
+						successflag = true;
+					}
+					if ((i + 1) === searchOpt.length && !successflag) {
+						console.log("搜索引擎快切栏初始化失败");
+					}
+				}
+			}
+		}
+	});
+
 	// 搜索函数
 	function searchText(text) {
 		if (!text) {
@@ -1114,15 +1492,25 @@ require(['jquery'], function($) {
 					"img": "kiwi",
 					"url": "github.com/kiwibrowser/src.next/releases"
 				}, {
-					"hl": "轻插件",
-					"shl": "Via或Alook脚本网站",
-					"img": "viaapp",
-					"url": "via-app.cn"
+					"hl": "SF脚本",
+					"shl": "老司机专用油猴脚本网站",
+					"img": "greasyfork",
+					"url": "sleazyfork.org/zh-CN"
 				}, {
 					"hl": "油猴脚本",
 					"shl": "安全实用的用户脚本大全",
 					"img": "greasyfork",
 					"url": "greasyfork.org/zh-CN"
+				}, {
+					"hl": "轻插件",
+					"shl": "Via或Alook脚本网站",
+					"img": "viaapp",
+					"url": "via-app.cn"
+				}, {
+					"hl": "极简插件",
+					"shl": "第三方crx扩展商店",
+					"img": "chajian",
+					"url": "chrome.zzzmh.cn"
 				}, {
 					"hl": "谷歌扩展",
 					"shl": "Chrome官方扩展商店",
@@ -1134,25 +1522,25 @@ require(['jquery'], function($) {
 					"img": "microsoft",
 					"url": "microsoftedge.microsoft.com/addons"
 				}, {
-					"hl": "极简插件",
-					"shl": "第三方crx扩展商店",
-					"img": "chajian",
-					"url": "chrome.zzzmh.cn"
-				}, {
 					"hl": "Crx4中",
 					"shl": "Crx4Chrome中文版",
 					"img": "chajian",
 					"url": "crx4.com"
+				}, {
+					"hl": "Crx4",
+					"shl": "全球最大第三方crx商店",
+					"img": "chajian",
+					"url": "crx4chrome.com"
 				}, {
 					"hl": "Crx下载",
 					"shl": "用于下载CRX文件",
 					"img": "crxdownload",
 					"url": "chrome-extension-downloader.com"
 				}, {
-					"hl": "Crx4",
-					"shl": "全球最大第三方crx商店",
-					"img": "chajian",
-					"url": "crx4chrome.com"
+					"hl": "Crx搜搜",
+					"shl": "用于下载CRX文件",
+					"img": "crxsoso",
+					"url": "www.crxsoso.com"
 				}],
 				"社区": [{
 					"hl": "知乎",
@@ -1418,7 +1806,10 @@ require(['jquery'], function($) {
 			</div>
 
 			<div class="list h3">
-				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
+				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(60, 68, 110) 0%, rgb(105, 121, 148) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
+			</div>
+			<div class="list h3">
+				<a class="flex-1 content" href="https://www.iesdouyin.com/share/billboard/?id=0" style="background-image:linear-gradient(135deg,  rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">抖音热搜榜</div><div class="douyin-list"></div></a>
 			</div>
 
 			<div class="list h2">
@@ -1543,6 +1934,25 @@ require(['jquery'], function($) {
 					$('.news-list').html(html);
 				}
 			});
+			//抖音热搜榜
+			$.ajax({
+				url: "https://bird.ioliu.cn/v1?url=https://creator.douyin.com/aweme/v1/creator/data/billboard/?billboard_type=1",
+				type: "get",
+				dataType: "json",
+				success: function(res) {
+					var data = res.billboard_data;
+					var html = '';
+					for (var i = 0; i < 4; i++) {
+						html +=
+							'<div class="douyin-item"><div class="douyin-item-count">' +
+							(i + 1) + '</div><div class="douyin-item-title">' + data[i]
+							.title +
+							'</div><div class="douyin-item-hot">' + data[i].value +
+							'</div></div>';
+					}
+					$('.douyin-list').html(html);
+				}
+			});
 			//知乎热搜榜
 			$.ajax({
 				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=zhihu",
@@ -1572,7 +1982,7 @@ require(['jquery'], function($) {
 						});
 					})
 				}
-			}); //知乎热榜
+			});
 
 		})
 	}
@@ -1617,7 +2027,18 @@ require(['jquery'], function($) {
 	}
 	//设置页面
 	function openSettingPage() {
+		var app = {};
+		app.version = 1.17;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
+		var logoHeightDes = settings.get('LogoHeightSet');
+		var positionDes = settings.get('position');
+		if (positionDes === "0") {
+			positionDes = "默认";
+		} else if (positionDes < "0") {
+			positionDes = "向上偏移" + positionDes.slice(1) + "px";
+		} else {
+			positionDes = "向下偏移" + positionDes + "px";
+		}
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -1665,6 +2086,26 @@ require(['jquery'], function($) {
 					"v": "white"
 				}]
 			}, {
+				"title": "图标数量",
+				"type": "select",
+				"value": "booknumber",
+				"data": [{
+					"t": "每行四个",
+					"v": "Num4"
+				}, {
+					"t": "每行五个",
+					"v": "Num5"
+				}, {
+					"t": "每行六个",
+					"v": "Num6"
+				}, {
+					"t": "每行七个",
+					"v": "Num7"
+				}, {
+					"t": "每行八个",
+					"v": "Num8"
+				}]
+			}, {
 				"title": "点击LOGO",
 				"type": "select",
 				"value": "LOGOclickFn",
@@ -1694,11 +2135,19 @@ require(['jquery'], function($) {
 					"v": "choicePage"
 				}]
 			}, {
-				"title": "设置壁纸",
+				"title": "主页壁纸",
 				"value": "wallpaper"
 			}, {
-				"title": "设置LOGO",
+				"title": "主页LOGO",
 				"value": "logo"
+			}, {
+				"title": "LOGO高度",
+				"value": "logoHeight",
+				"description": "当前高度(单位px,像素): " + logoHeightDes + "px"
+			}, {
+				"title": "整体位置",
+				"value": "position",
+				"description": "当前位置: " + positionDes
 			}, {
 				"type": "hr"
 			}, {
@@ -1709,6 +2158,10 @@ require(['jquery'], function($) {
 				"title": "保存搜索栏历史",
 				"type": "checkbox",
 				"value": "searchHistory"
+			}, {
+				"title": "添加主页书签",
+				"type": "checkbox",
+				"value": "SetbookMarksADD"
 			}, {
 				"title": "夜间模式",
 				"type": "checkbox",
@@ -1807,7 +2260,7 @@ require(['jquery'], function($) {
 			$("li[data-value=nightMode]").hide();
 			$("li[data-value=autonightMode2]").hide();
 		} else {
-				$("li[data-value=autonightMode2]").show();
+			$("li[data-value=autonightMode2]").show();
 		}
 		//开启自动夜间模式2==>屏蔽夜间模式选项+自动夜间模式
 		if (settings.get('autonightMode2') === true) {
@@ -1815,16 +2268,19 @@ require(['jquery'], function($) {
 			$("li[data-value=autonightMode]").hide();
 			$("li[data-value=autonightMode2Array]").show();
 		} else {
-			if(browser !== 'via'){
+			if (browser !== 'via') {
 				$("li[data-value=autonightMode]").show();
 			}
-			
+
 			$("li[data-value=autonightMode2Array]").hide();
 		}
 		//只有自动夜间模式1、2均关闭才显示夜间模式
 		if ((settings.get('autonightMode') === false) && (settings.get('autonightMode2') === false)) {
 			$("li[data-value=nightMode]").show();
 		}
+
+
+
 
 
 		$(".set-option .set-select").map(function() {
@@ -1871,6 +2327,7 @@ require(['jquery'], function($) {
 				if (delLogoConfirm === true) {
 					settings.set('wallpaper', '');
 					settings.set('logo', '');
+					settings.set('LogoHeightSet', '40');
 					alert('壁纸和LOGO初始化成功!');
 					location.reload(false);
 				} else {
@@ -1915,16 +2372,37 @@ require(['jquery'], function($) {
 			} else if (value === "import") {
 				var data = prompt("在这粘贴备份的主页数据:");
 				try {
-					data = JSON.parse(data);
-					store.set("bookMark", data.bookMark);
-					store.set("setData", data.setData);
-					alert("主页数据恢复入成功!");
-					location.reload();
+					if (data !== null && data !== "") {
+						data = JSON.parse(data);
+						var r = confirm("是否覆盖原书签数据?\n(点击确定将覆盖原书签数据,点击取消将保留原书签数据)");
+						var newbookMarkData;
+						if (r) {
+							newbookMarkData = data.bookMark;
+						} else {
+							var storeBook = JSON.stringify(store.get("bookMark"));
+							var dataBook = JSON.stringify(data.bookMark);
+							newbookMarkData = storeBook.replace("]", "") + "," + dataBook.replace("[",
+								"");
+							newbookMarkData = JSON.parse(newbookMarkData);
+						}
+						store.set("bookMark", newbookMarkData);
+						store.set("setData", data.setData);
+						alert("主页数据恢复成功!");
+						location.reload();
+					} else {
+						alert("主页数据恢复失败!");
+					}
 				} catch (e) {
 					alert("主页数据恢复失败!");
 				}
 			} else if (value === "autonightMode2Array") {
 				autoNightMode2Fn.getSetTime();
+				location.reload(false);
+			} else if (value === "logoHeight") {
+				LogoHeightFn.get();
+				location.reload(false);
+			} else if (value === "position") {
+				PositionFn.get();
 				location.reload(false);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
@@ -1953,7 +2431,11 @@ require(['jquery'], function($) {
 				item = dom.parent().data("value"),
 				value = dom.val();
 			if (item === "engines" && value === "diy") {
-				var engines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）");
+				var protext = ""
+				if (settings.get('diyEngines')) {
+					protext = settings.get('diyEngines');
+				}
+				var engines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）", protext);
 				console.log(engines);
 				if (engines) {
 					settings.set('diyEngines', engines);
@@ -1962,7 +2444,33 @@ require(['jquery'], function($) {
 					return false;
 				}
 			}
-
+			//每行图标数量设置
+			if (item === "booknumber" && value === "Num4") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].removeAttribute("style");
+				}
+			} else if (item === "booknumber" && value === "Num5") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 20%";
+				}
+			} else if (item === "booknumber" && value === "Num6") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 16.66%";
+				}
+			} else if (item === "booknumber" && value === "Num7") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 14.28%";
+				}
+			} else if (item === "booknumber" && value === "Num8") {
+				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
+				for (let i = 0; i < bookmarkListOBJ.length; i++) {
+					bookmarkListOBJ[i].style.flex = "0 0 12.5%";
+				}
+			}
 			// 保存设置
 			settings.set(item, value);
 		});
@@ -1974,13 +2482,13 @@ require(['jquery'], function($) {
 			// 应用设置
 			if (item === 'styleThin' && value === true) {
 				$("body").addClass('styleThin');
-			} else if (item === 'styleThin' && value === false){
+			} else if (item === 'styleThin' && value === false) {
 				$("body").removeClass('styleThin');
 			}
 			if (item === 'autonightMode' && value === true) {
 				$("li[data-value=nightMode]").hide();
 				$("li[data-value=autonightMode2]").hide();
-			} else if (item === 'autonightMode' && value === false){
+			} else if (item === 'autonightMode' && value === false) {
 				$("li[data-value=autonightMode2]").show();
 				if (settings.get('autonightMode2') === false) {
 					$("li[data-value=nightMode]").show();
@@ -1990,8 +2498,8 @@ require(['jquery'], function($) {
 				$("li[data-value=nightMode]").hide();
 				$("li[data-value=autonightMode]").hide();
 				$("li[data-value=autonightMode2Array]").show();
-			} else if (item === 'autonightMode2' && value === false){
-				if(browser !== 'via'){
+			} else if (item === 'autonightMode2' && value === false) {
+				if (browser !== 'via') {
 					$("li[data-value=autonightMode]").show();
 				}
 				if (settings.get('autonightMode') === false) {
@@ -2021,9 +2529,10 @@ require(['jquery'], function($) {
 	//设置点击/长按LOGO功能冲突检测
 	function DetectLogoFnConflicts() {
 		//settingsPage
-		if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
-				"settingsPage")) {
-			if (!bookMark.searchURL("openSettingPage()")) {
+		if (!bookMark.searchURL("openSettingPage()")) {
+			if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
+					"settingsPage")) {
+
 				setTimeout(function() {
 					if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get(
 							"LOGOlongpressFn") !== "settingsPage")) {
@@ -2035,15 +2544,23 @@ require(['jquery'], function($) {
 						};
 					}
 				}, 5000);
+			} else {
+				if (settings.get("LogoHeightSet") === "0") {
+					bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png")
+					alert('LOGO已隐藏,已自动添加主页书签-设置');
+					location.reload(false);
+				}
 			}
 		}
 	}
-	//2s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
+	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突
 	function IntervalFnSet() {
 		autoNightModeOn();
 		DetectLogoFnConflicts();
+		LogoHeightFn.set();
+		PositionFn.set();
 	}
-	setInterval(IntervalFnSet, 3000);
+	setInterval(IntervalFnSet, 1000);
 
 	// 下滑进入搜索
 	require(['touchSwipe'], function() {
@@ -2074,6 +2591,7 @@ require(['jquery'], function($) {
 					});
 				} else if (phase === 'end' || phase === 'cancel') {
 					$('.logo').removeAttr("disabled style");
+					$('.logo').css("height", settings.get('LogoHeightSet') + "px");
 					$('.bookmark').removeAttr("disabled style");
 					if (distance >= 100 && direction === "down") {
 						$('.ornament-input-group').css("transform", "").click();
