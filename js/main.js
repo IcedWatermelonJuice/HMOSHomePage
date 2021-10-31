@@ -648,8 +648,14 @@ require(['jquery'], function($) {
 				}
 				if (settings.get("SetbookMarksADD") === true) {
 					if ($('.addbook').length === 0) {
+						var flexStyle=that.$ele[0].children[0].style.flex;
+						if(flexStyle){
+							flexStyle="flex:"+flexStyle+";";
+						}else{
+							flexStyle="";
+						}
 						that.$ele.append(
-							'<div class="list addbook"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
+							'<div class="list addbook" style="'+flexStyle+'"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
 						);
 						$('.addbook').click(function() {
 							$('.addbook').remove();
@@ -743,7 +749,7 @@ require(['jquery'], function($) {
 								} else {
 									alert(
 										"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
-										);
+									);
 								}
 							});
 							$(".addbook-ok").click(function() {
@@ -903,7 +909,7 @@ require(['jquery'], function($) {
 							} else {
 								alert(
 									"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
-									);
+								);
 							}
 						});
 						$(".addbook-ok").click(function() {
@@ -1354,6 +1360,58 @@ require(['jquery'], function($) {
 	$(".search-input").keydown(function(evt) {
 		// 使用回车键进行搜索
 		evt.keyCode === 13 && $(".search-btn").click();
+	});
+
+	$(".quick-change .content").click(function(evt) {
+		var tar = evt.target;
+		if (tar.nodeName === "LI") {
+			var type = tar.getAttribute("name");
+			if (settings.get("engines") !== type) {
+				if (type === "diy" && !settings.get('diyEngines')) {
+					var diyEngines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）");
+					console.log(diyEngines);
+					if (diyEngines) {
+						settings.set('diyEngines', diyEngines);
+					} else {
+						return false;
+					}
+				}
+				console.log("搜索引擎快切:" + type);
+				settings.set("engines", type);
+				var par = tar.parentElement;
+				if (par && par.childElementCount > 0) {
+					for (let i = 0; i < par.childElementCount; i++) {
+						par.children[i].setAttribute("class", "");
+					}
+				}
+				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
+				ce.innerHTML = tar.innerHTML;
+				tar.setAttribute("class", "choose-opt");
+			}
+		}
+	});
+	$(document).ready(function() {
+		var quickchangeObj = document.querySelector(".quick-change .content");
+		var browser = browserInfo();
+		if (quickchangeObj) {
+			var searchOpt = quickchangeObj.querySelectorAll("li");
+			if (searchOpt.length > 0) {
+				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
+				for (let i = 0; i < searchOpt.length; i++) {
+					var type = searchOpt[i].getAttribute("name");
+					if (type === "via" && browser === "via") {
+						searchOpt[i].style.display = "";
+					}
+					if (settings.get("engines") === type) {
+						searchOpt[i].setAttribute("class", "choose-opt");
+						ce.innerHTML = searchOpt[i].innerHTML;
+						break;
+					} else if ((i + 1) === searchOpt.length) {
+						console.log("搜索引擎快切栏初始化失败");
+					}
+				}
+			}
+		}
 	});
 
 	// 搜索函数
@@ -1962,7 +2020,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = 1.16;
+		app.version = 1.17;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2365,7 +2423,11 @@ require(['jquery'], function($) {
 				item = dom.parent().data("value"),
 				value = dom.val();
 			if (item === "engines" && value === "diy") {
-				var engines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）");
+				var protext = ""
+				if (settings.get('diyEngines')) {
+					protext = settings.get('diyEngines');
+				}
+				var engines = prompt("输入搜索引擎网址，（用“%s”代替搜索字词）", protext);
 				console.log(engines);
 				if (engines) {
 					settings.set('diyEngines', engines);
