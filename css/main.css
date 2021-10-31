@@ -441,7 +441,9 @@ body,html {
 	animation: down .35s;
 }
 .shortcut{
-	padding:0 10px;background:#efefef;line-height:25px;
+	padding:0 10px;
+	background:#efefef;
+	line-height:25px;
 	height: 44px;
 	line-height: 44px;
 	font-size:14px;
@@ -490,6 +492,41 @@ body,html {
 .shortcut3 li:not(:first-child){
 	background-color: #fff;
 	border-radius: 4px;
+}
+.quick-change{
+	padding: 0 10px;
+	background:#f5f5f5;
+}
+.quick-change .tittle-box{
+	height: 44px;
+	line-height: 44px;
+	margin: 0 10px;
+	font-weight: bold;
+}
+.quick-change ul{
+	display: flex;
+	align-items: center;
+	overflow-x: scroll;
+}
+.quick-change .choose-opt{
+	color: rgb(44, 123, 246);
+}
+.quick-change *>li{
+	text-align:center;
+	flex: 1;
+}
+.quick-change li{
+	padding: 0 10px;
+	margin: 0 4px;
+	flex: auto;
+	flex-shrink: 0;
+	height: 26px;
+	line-height: 26px;
+	font-size:14px;
+}
+.quick-change li{
+	background-color: #fff;
+	border-radius: 999px;
 }
 
 /* 设置页面 */
