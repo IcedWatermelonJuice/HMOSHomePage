@@ -1401,7 +1401,7 @@ require(['jquery'], function($) {
 				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
 				for (let i = 0; i < searchOpt.length; i++) {
 					var type = searchOpt[i].getAttribute("name");
-					if (type === "via" && browser === "via"&&earchOpt[i].style.display==="none") {
+					if (type === "via" && browser === "via"&&searchOpt[i].style.display==="none") {
 						searchOpt[i].style.display = "";
 					}
 					if (settings.get("engines") === type) {
