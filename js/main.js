@@ -58,58 +58,35 @@ require(['jquery'], function($) {
 		}
 	};
 	var settingsFn = function(storage, browser) {
+		this.storage = {
+			engines: "baidu",
+			bookcolor: "black",
+			booknumber: "Num4",
+			LOGOclickFn: "choicePage",
+			LOGOlongpressFn: "settingsPage",
+			LogoHeightSet: "40",
+			position: "0",
+			styleThin: true,
+			searchHistory: false,
+			SetbookMarksADD: true,
+			SEQuickChange: true,
+			nightMode: false,
+			autonightMode: true,
+			autonightMode2: false,
+			autonightMode2Array: "20:00-8:00"
+		};
+		var extraStorage = {};
 		if (browser === 'via') {
-			this.storage = {
-				engines: "baidu",
-				bookcolor: "black",
-				styleThin: true,
-				nightMode: false,
+			extraStorage = {
 				autonightMode: false,
-				autonightMode2: false,
-				autonightMode2Array: "20:00-8:00",
-				searchHistory: false,
-				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage",
-				SetbookMarksADD: true,
-				booknumber: "Num4",
-				LogoHeightSet: "40",
-				position: "0"
+				LOGOclickFn: "bookmarkList"
 			};
 		} else if (browser === 'x') {
-			this.storage = {
-				engines: "baidu",
-				bookcolor: "black",
-				styleThin: true,
-				nightMode: false,
-				autonightMode: true,
-				autonightMode2: false,
-				autonightMode2Array: "20:00-8:00",
-				searchHistory: false,
-				LOGOclickFn: "bookmarkList",
-				LOGOlongpressFn: "settingsPage",
-				SetbookMarksADD: true,
-				booknumber: "Num4",
-				LogoHeightSet: "40",
-				position: "0"
-			};
-		} else {
-			this.storage = {
-				engines: "baidu",
-				bookcolor: "black",
-				styleThin: true,
-				nightMode: false,
-				autonightMode: true,
-				autonightMode2: false,
-				autonightMode2Array: "20:00-8:00",
-				searchHistory: false,
-				LOGOclickFn: "choicePage",
-				LOGOlongpressFn: "settingsPage",
-				SetbookMarksADD: true,
-				booknumber: "Num4",
-				LogoHeightSet: "40",
-				position: "0"
+			extraStorage = {
+				LOGOclickFn: "bookmarkList"
 			};
 		}
+		this.storage = $.extend({}, this.storage, extraStorage);
 		this.initStorage = this.storage;
 		this.storage = $.extend({}, this.storage, storage);
 	}
@@ -149,6 +126,10 @@ require(['jquery'], function($) {
 				$(".logo").html('<img src="' + that.get('logo') + '" />');
 			} else {
 				$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
+			}
+			// 隐藏搜索引擎快切栏
+			if (!that.get('SEQuickChange')) {
+				$(".quick-change").hide();
 			}
 			// 夜间模式 和 壁纸 LOGO
 			var nightMode = {
@@ -1391,7 +1372,8 @@ require(['jquery'], function($) {
 			}
 		}
 	});
-	function initquickchange(){
+
+	function initquickchange() {
 		var quickchangeObj = document.querySelector(".quick-change .content");
 		var browser = browserInfo();
 		var successflag = false;
@@ -1401,14 +1383,14 @@ require(['jquery'], function($) {
 				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
 				for (let i = 0; i < searchOpt.length; i++) {
 					var type = searchOpt[i].getAttribute("name");
-					if (type === "via" && browser === "via"&&searchOpt[i].style.display==="none") {
+					if (type === "via" && browser === "via" && searchOpt[i].style.display === "none") {
 						searchOpt[i].style.display = "";
 					}
 					if (settings.get("engines") === type) {
 						searchOpt[i].setAttribute("class", "choose-opt");
 						ce.innerHTML = searchOpt[i].innerHTML;
 						successflag = true;
-					}else{
+					} else {
 						searchOpt[i].setAttribute("class", "");
 					}
 					if ((i + 1) === searchOpt.length && !successflag) {
@@ -2025,10 +2007,53 @@ require(['jquery'], function($) {
 			alert('长按LOGO功能错误！');
 		}
 	}
+	//主页数据导入、导出、加密、解密
+	var HPData = {
+		export: function(IsEncrypt) {
+			var data1 = JSON.stringify(bookMark.getJson());
+			var data2 = JSON.stringify(settings.getJson());
+			var data3 = false;
+			if (IsEncrypt) {
+				data1 = '"' + this.encrypt(data1) + '"';
+				data2 = '"' + this.encrypt(data2) + '"';
+				data3 = IsEncrypt;
+			}
+			var res = '{"bookMark":' + data1 + ',"setData":' + data2 + ',"IsEncrypt":' + data3 + '}';
+			return res;
+		},
+		import: function(data) {
+			var res = {};
+			var data1 = data.bookMark;
+			var data2 = data.setData;
+			var IsEncrypt = data.IsEncrypt;
+			if (IsEncrypt) {
+				data1 = JSON.parse(this.decrypt(data1));
+				data2 = JSON.parse(this.decrypt(data2));
+			}
+			res.bookMark = data1;
+			res.setData = data2;
+			return res;
+		},
+		encrypt: function(data) {
+			var res = String.fromCharCode(data.charCodeAt(0) + data.length);
+			for (var i = 1; i < data.length; i++) {
+				res += String.fromCharCode(data.charCodeAt(i) + data.charCodeAt(i - 1));
+			}
+			return escape(res);
+		},
+		decrypt: function(data) {
+			data = unescape(data);
+			var res = String.fromCharCode(data.charCodeAt(0) - data.length);
+			for (var i = 1; i < data.length; i++) {
+				res += String.fromCharCode(data.charCodeAt(i) - res.charCodeAt(i - 1));
+			}
+			return res;
+		}
+	}
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = 1.17;
+		app.version = 1.18;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2162,6 +2187,10 @@ require(['jquery'], function($) {
 				"title": "添加主页书签",
 				"type": "checkbox",
 				"value": "SetbookMarksADD"
+			}, {
+				"title": "显示搜索引擎快切栏",
+				"type": "checkbox",
+				"value": "SEQuickChange"
 			}, {
 				"title": "夜间模式",
 				"type": "checkbox",
@@ -2361,8 +2390,10 @@ require(['jquery'], function($) {
 			} else if (value === "export") {
 				var oInput = $('<input>');
 				// oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
-				oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + ',"setData":' +
-					JSON.stringify(settings.getJson()) + '}');
+				var IsEncrypt = confirm(
+					"是否对主页数据进行加密?\n点击确认进行加密，点击取消直接导出原始数据\n(PS:加密有助于保护数据安全,防止数据泄露或被恶意篡改,但是加密后的数据量会相对而言增加很多)"
+					);
+				oInput.val(HPData.export(IsEncrypt));
 				document.body.appendChild(oInput[0]);
 				console.log(store.get('bookMark'));
 				oInput.select();
@@ -2374,6 +2405,7 @@ require(['jquery'], function($) {
 				try {
 					if (data !== null && data !== "") {
 						data = JSON.parse(data);
+						data = HPData.import(data);
 						var r = confirm("是否覆盖原书签数据?\n(点击确定将覆盖原书签数据,点击取消将保留原书签数据)");
 						var newbookMarkData;
 						if (r) {
@@ -2484,6 +2516,11 @@ require(['jquery'], function($) {
 				$("body").addClass('styleThin');
 			} else if (item === 'styleThin' && value === false) {
 				$("body").removeClass('styleThin');
+			}
+			if (item === 'SEQuickChange' && value === true) {
+				$(".quick-change").show();
+			} else if (item === 'SEQuickChange' && value === false) {
+				$(".quick-change").hide();
 			}
 			if (item === 'autonightMode' && value === true) {
 				$("li[data-value=nightMode]").hide();
