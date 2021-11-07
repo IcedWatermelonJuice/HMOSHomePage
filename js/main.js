@@ -2711,7 +2711,7 @@ require(['jquery'], function($) {
 				$("li[data-value=inputCustomJs]").show();
 				$("li[data-value=inputCustomCss]").show();
 				$("li[data-value=applyCustomJsCss]").show();
-				if (!confirm("警告:自定义JS/CSS会增加主页不稳定性,其若输入的JS/CSS存在问题将导致不可逆的错误\n\n点击确定继续开启,点击取消终止开启")) {
+				if (!confirm("警告:自定义JS/CSS会增加主页不稳定性。若输入的JS/CSS存在问题可能导致发生不可逆的错误\n\n点击确定继续开启,点击取消终止开启")) {
 					value = false;
 					$("li[data-value=inputCustomJs]").hide();
 					$("li[data-value=inputCustomCss]").hide();
