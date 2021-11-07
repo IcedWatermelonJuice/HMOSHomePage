@@ -76,6 +76,8 @@ require(['jquery'], function($) {
 			autonightMode2Array: "20:00-8:00",
 			customJsCss: false
 		};
+		var defaultLogoHeight = Math.floor($(".logo").width() * (84 / 436));
+		this.storage.LogoHeightSet = defaultLogoHeight < 40 ? String(defaultLogoHeight) : "40";
 		var extraStorage = {};
 		if (browser === 'via') {
 			extraStorage = {
@@ -100,8 +102,12 @@ require(['jquery'], function($) {
 		getJson: function() {
 			return this.storage;
 		},
-		getinitSettings: function() {
-			return this.initStorage;
+		getinitSettings: function(key) {
+			if (key) {
+				return this.initStorage[key];
+			} else {
+				return this.initStorage;
+			}
 		},
 		// 读取设置项
 		get: function(key) {
@@ -356,7 +362,9 @@ require(['jquery'], function($) {
 			}
 		},
 		get: function() {
-			let setHeight = prompt("设置LOGO高度(非负数,单位px,像素),例如:40\n备注:40为默认高度,当为高度=0时,LOGO不显示");
+			var defaultHeight = settings.getinitSettings("LogoHeightSet");
+			let setHeight = prompt("设置LOGO高度(非负数,单位px,像素),例如:" + defaultHeight + "\n备注:" +
+				defaultHeight + "为默认高度,当为高度=0时,LOGO不显示");
 			try {
 				HeightNum = parseFloat(setHeight);
 				if (HeightNum >= 0) {
@@ -368,8 +376,15 @@ require(['jquery'], function($) {
 			} catch (e) {
 				alert("高度设定失败!");
 			}
+		},
+		auto: function(logoHeight, logoWidth) {
+			var defaultHeight = settings.get("LogoHeightSet");
+			if (logoHeight && logoWidth) {
+				defaultHeight = Math.floor($(".logo").width() * (logoHeight / logoWidth));
+				defaultHeight = String(defaultHeight);
+			}
+			return defaultHeight;
 		}
-
 	}
 
 	//整体偏离默认位置设置(通过设置empty_box这个空容器的margin-top来改变偏移)
@@ -1348,7 +1363,7 @@ require(['jquery'], function($) {
 			history.go(-1);
 			setTimeout(function() {
 				if (location.href.search("chrome-extension://") !== -1 && text.search(
-					"file://") !== -1) {
+						"file://") !== -1) {
 					alert("CRX插件版主页暂不支持访问本地file文件");
 				} else if (location.href.search("http") !== -1 && text.search("file://") !== -
 					1) {
@@ -1494,7 +1509,7 @@ require(['jquery'], function($) {
 			var data = this.getData();
 			if (data.js) {
 				var jsStr =
-				"function customJS(){try{%customjs%}catch(e){alert('自定义js错误');}}customJS();";
+					"function customJS(){try{%customjs%}catch(e){alert('自定义js错误');}}customJS();";
 				jsStr = jsStr.replace("%customjs%", data.js);
 				eval(jsStr);
 			}
@@ -2173,7 +2188,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = 1.19;
+		app.version = 1.20;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2497,6 +2512,15 @@ require(['jquery'], function($) {
 					var reader = new FileReader();
 					reader.onload = function() {
 						settings.set('logo', this.result);
+						var logoEle = new Image();
+						logoEle.src = this.result;
+						logoEle.onload=function(){
+							var autoHeight = LogoHeightFn.auto(logoEle.height, logoEle.width);
+							settings.set('LogoHeightSet', autoHeight);
+							$(".set-option[data-value=logoHeight] .set-description").text(
+								"当前高度(单位px,像素): " + autoHeight + "px");
+								logoEle.remove();
+						}
 					};
 					reader.readAsDataURL(file);
 				});
@@ -2505,7 +2529,7 @@ require(['jquery'], function($) {
 				if (delLogoConfirm === true) {
 					settings.set('wallpaper', '');
 					settings.set('logo', '');
-					settings.set('LogoHeightSet', '40');
+					settings.set('LogoHeightSet', settings.getinitSettings("LogoHeightSet"));
 					alert('壁纸和LOGO初始化成功!');
 					location.reload(false);
 				} else {
