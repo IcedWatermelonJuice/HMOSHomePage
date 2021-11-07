@@ -71,19 +71,25 @@ require(['jquery'], function($) {
 			SetbookMarksADD: true,
 			SEQuickChange: true,
 			nightMode: false,
-			autonightMode: true,
+			autonightMode: false,
 			autonightMode2: false,
-			autonightMode2Array: "20:00-8:00"
+			autonightMode2Array: "20:00-8:00",
+			customJsCss: false
 		};
 		var extraStorage = {};
 		if (browser === 'via') {
 			extraStorage = {
-				autonightMode: false,
 				LOGOclickFn: "bookmarkList"
 			};
 		} else if (browser === 'x') {
 			extraStorage = {
-				LOGOclickFn: "bookmarkList"
+				LOGOclickFn: "bookmarkList",
+				autonightMode: true
+			};
+		} else if (navigator.userAgent.search("Chrome") !== -1 && navigator.userAgent.search("Mobile") !== -
+			1) {
+			extraStorage = {
+				autonightMode: true
 			};
 		}
 		this.storage = $.extend({}, this.storage, extraStorage);
@@ -107,6 +113,31 @@ require(['jquery'], function($) {
 			store.set("setData", this.storage);
 			this.apply();
 		},
+		//设置LOGO
+		setLogo: function() {
+			var logoUrl, logoHeight;
+			if (this.get('logo')) {
+				logoUrl = this.get('logo');
+			} else {
+				if (this.get('nightMode')) {
+					logoUrl = "logo/HarmonyOS_logo(for nightMode).png";
+				} else {
+					logoUrl = "logo/HarmonyOS_logo.png";
+				}
+			}
+			if (this.get('LogoHeightSet')) {
+				logoHeight = this.get('LogoHeightSet');
+			} else {
+				logoHeight = "40";
+			}
+			var newcss = {
+				'height': logoHeight + 'px',
+				'background': 'url("' + logoUrl + '") no-repeat',
+				'background-size': "auto 100%",
+				'background-position': 'center',
+			};
+			return newcss;
+		},
 		// 应用设置项
 		apply: function() {
 			var that = this;
@@ -115,18 +146,12 @@ require(['jquery'], function($) {
 				$("body").addClass('styleThin');
 			}
 			$('.ornament-input-group').removeAttr('style');
-			// 加载LOGO
-			if (that.get('LogoHeightSet')) {
-				$(".logo").css("height", that.get('LogoHeightSet') + "px");
-			}
+			// 控制顶部距离
 			if (that.get('position')) {
 				$("#empty_box").css("marginTop", that.get('position') + "px");
 			}
-			if (that.get('logo')) {
-				$(".logo").html('<img src="' + that.get('logo') + '" />');
-			} else {
-				$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
-			}
+			// 加载LOGO
+			$(".logo").css(that.setLogo());
 			// 隐藏搜索引擎快切栏
 			if (!that.get('SEQuickChange')) {
 				$(".quick-change").hide();
@@ -137,6 +162,7 @@ require(['jquery'], function($) {
 					$("body").removeClass('theme-black theme-white').addClass('theme-white');
 					$("body").css("background-image", "");
 					$("#nightCss").removeAttr('disabled');
+					$(".logo").css(that.setLogo());
 				},
 				off: function() {
 					if (that.get('wallpaper')) {
@@ -147,22 +173,13 @@ require(['jquery'], function($) {
 					$("body").removeClass('theme-black theme-white').addClass('theme-' + that
 						.get('bookcolor'));
 					$("#nightCss").attr('disabled', true);
+					$(".logo").css(that.setLogo());
 				}
 			};
 			if (that.get('nightMode') === true) {
 				nightMode.on();
-				if (that.get('logo')) {
-					$(".logo").html('<img src="' + that.get('logo') + '" />');
-				} else {
-					$(".logo").html('<img src="logo/HarmonyOS_logo(for nightMode).png"/>');
-				}
 			} else {
 				nightMode.off();
-				if (that.get('logo')) {
-					$(".logo").html('<img src="' + that.get('logo') + '" />');
-				} else {
-					$(".logo").html('<img src="logo/HarmonyOS_logo.png"/>');
-				}
 			}
 		}
 	}
@@ -522,19 +539,19 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/gitee.png"
 			}, {
 				"name": "抖音",
-				"url": "https://douyin.com/recommend",
+				"url": "https://douyin.com",
 				"icon": "img/bookmarks/douyin.png"
 			}, {
 				"name": "B站",
-				"url": "https://bilibili.com/",
+				"url": "https://bilibili.com",
 				"icon": "img/bookmarks/bilibili.png"
 			}, {
 				"name": "爱奇艺",
-				"url": "https://iqiyi.com/",
+				"url": "https://iqiyi.com",
 				"icon": "img/bookmarks/iqiyi.png"
 			}, {
 				"name": "腾讯视频",
-				"url": "https://v.qq.com/",
+				"url": "https://v.qq.com",
 				"icon": "img/bookmarks/tencentvideo.png"
 			}],
 		};
@@ -1238,6 +1255,9 @@ require(['jquery'], function($) {
 			$(".search-btn").html(
 				/^\b((((https?|ftp):\/\/)?[-a-z0-9]+(\.[-a-z0-9]+)*\.(?:com|net|org|int|edu|gov|mil|arpa|asia|biz|info|name|pro|coop|aero|museum|[a-z][a-z]|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d))\b(\/[-a-z0-9_:\@&?=+,.!\/~%\$]*)?))|(file:\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])$/i
 				.test(wd) ? "进入" : "搜索");
+			if (wd.search("file://") !== -1) {
+				$(".search-btn").html("进入");
+			}
 			var has_char = escape(wd).indexOf("%u");
 			has_char < 0 ? $(".shortcut2").show() : $(".shortcut3").show();
 			$.ajax({
@@ -1327,7 +1347,15 @@ require(['jquery'], function($) {
 			!text.match(/^((ht|f)tp(s?)|file):\/\//) && (text = "http://" + text);
 			history.go(-1);
 			setTimeout(function() {
-				location.href = text;
+				if (location.href.search("chrome-extension://") !== -1 && text.search(
+					"file://") !== -1) {
+					alert("CRX插件版主页暂不支持访问本地file文件");
+				} else if (location.href.search("http") !== -1 && text.search("file://") !== -
+					1) {
+					alert("在线网页版主页暂不支持访问本地file文件");
+				} else {
+					location.href = text;
+				}
 			}, 1);
 		} else {
 			if (!text) {
@@ -1373,6 +1401,7 @@ require(['jquery'], function($) {
 		}
 	});
 
+	//搜索引擎快切
 	function initquickchange() {
 		var quickchangeObj = document.querySelector(".quick-change .content");
 		var browser = browserInfo();
@@ -1403,6 +1432,87 @@ require(['jquery'], function($) {
 	$(document).ready(function() {
 		initquickchange();
 	});
+
+	//自定义JS/CSS
+	var customJsCssFn = function(customData) {
+		this.customData = {
+			js: "",
+			css: ""
+		};
+		this.customData = $.extend({}, this.customData, customData);
+	}
+	customJsCssFn.prototype = {
+		getData: function(key) {
+			var res = false;
+			if (key) {
+				if (key === "js") {
+					res = this.customData.js;
+				}
+				if (key === "css") {
+					res = this.customData.css;
+				}
+			} else {
+				res = this.customData;
+			}
+			return res;
+		},
+		setData: function(key, val) {
+			if (key === "js") {
+				this.customData.js = val;
+			} else if (key === "css") {
+				this.customData.css = val;
+			} else {
+				console.log("customData类型错误,保存失败")
+			}
+		},
+		saveData: function(key, val) {
+			this.setData(key, val);
+			store.set("customData", this.getData());
+		},
+		clearData: function() {
+			this.saveData("js", "");
+			this.saveData("css", "");
+		},
+		promptData: function(key) {
+			var data;
+			var msg = "请输入自定义" + key + "\n点击确定,保存自定义" + key + "; 点击取消,删除自定义" + key;
+			var originData = this.getData(key);
+			if (!originData) {
+				originData = "";
+			}
+			data = prompt(msg, originData);
+			if (typeof data === "string") {
+				data = data.trim();
+			}
+			if (!data) {
+				data = "";
+			}
+			console.log("自定义" + key + " : " + data);
+			this.saveData(key, data);
+		},
+		on: function() {
+			var data = this.getData();
+			if (data.js) {
+				var jsStr =
+				"function customJS(){try{%customjs%}catch(e){alert('自定义js错误');}}customJS();";
+				jsStr = jsStr.replace("%customjs%", data.js);
+				eval(jsStr);
+			}
+			if (data.css) {
+				var cssBox = document.createElement("style");
+				cssBox.id = "customCssBox";
+				cssBox.innerHTML = data.css;
+				document.body.appendChild(cssBox);
+			}
+		},
+		init: function() {
+			if (settings.get("customJsCss")) {
+				this.on();
+			}
+		}
+	}
+	var customJsCss = new customJsCssFn(store.get("customData"));
+	customJsCss.init();
 
 	// 搜索函数
 	function searchText(text) {
@@ -1809,8 +1919,12 @@ require(['jquery'], function($) {
 			tabHtml += "<li>" + i + "</li>";
 			contentHtml += '<li class="choice-li swiper-slide">';
 			for (var i = 0, l = n.length; i < l; i++) {
-				contentHtml += '<a href="http://' + n[i].url + '"><div><img src="img/choice/' + n[i]
-					.img + '.png" /><p>' + n[i].hl + '</p><p>' + n[i].shl + '</p></div></a>';
+				contentHtml += '<a href="';
+				if (n[i].url.search("http") === -1) {
+					n[i].url = "https://" + n[i].url;
+				}
+				contentHtml += n[i].url + '"><div><img src="img/choice/' + n[i].img + '.png" /><p>' + n[
+					i].hl + '</p><p>' + n[i].shl + '</p></div></a>';
 			}
 			contentHtml += '</li>';
 		});
@@ -2012,26 +2126,32 @@ require(['jquery'], function($) {
 		export: function(IsEncrypt) {
 			var data1 = JSON.stringify(bookMark.getJson());
 			var data2 = JSON.stringify(settings.getJson());
-			var data3 = false;
+			var data3 = JSON.stringify(customJsCss.getData());
+			var flag = false;
 			if (IsEncrypt) {
 				data1 = '"' + this.encrypt(data1) + '"';
 				data2 = '"' + this.encrypt(data2) + '"';
-				data3 = IsEncrypt;
+				data3 = '"' + this.encrypt(data3) + '"';
+				flag = true;
 			}
-			var res = '{"bookMark":' + data1 + ',"setData":' + data2 + ',"IsEncrypt":' + data3 + '}';
+			var res = '{"bookMark":' + data1 + ',"setData":' + data2 + ',"customData":' + data3 +
+				',"IsEncrypt":' + flag + '}';
 			return res;
 		},
 		import: function(data) {
 			var res = {};
 			var data1 = data.bookMark;
 			var data2 = data.setData;
-			var IsEncrypt = data.IsEncrypt;
-			if (IsEncrypt) {
+			var data3 = data.customData;
+			var flag = data.IsEncrypt;
+			if (flag) {
 				data1 = JSON.parse(this.decrypt(data1));
 				data2 = JSON.parse(this.decrypt(data2));
+				data3 = JSON.parse(this.decrypt(data3));
 			}
 			res.bookMark = data1;
 			res.setData = data2;
+			res.customData = data3;
 			return res;
 		},
 		encrypt: function(data) {
@@ -2053,7 +2173,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = 1.18;
+		app.version = 1.19;
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2208,6 +2328,22 @@ require(['jquery'], function($) {
 				"value": "autonightMode2Array",
 				"description": "" + autonightMode2AyDes
 			}, {
+				"title": "自定义JS/CSS",
+				"type": "checkbox",
+				"value": "customJsCss"
+			}, {
+				"title": "自定义JS",
+				"value": "inputCustomJs",
+				"description": "点击输入自定义JS"
+			}, {
+				"title": "自定义CSS",
+				"value": "inputCustomCss",
+				"description": "点击输入自定义CSS"
+			}, {
+				"title": "应用自定义JS/CSS",
+				"value": "applyCustomJsCss",
+				"description": "已开启自定义JS/CSS,点击应用新的自定义JS/CSS"
+			}, {
 				"type": "hr"
 			}, {
 				"title": "备份数据",
@@ -2225,6 +2361,10 @@ require(['jquery'], function($) {
 				"title": "初始化书签和设置",
 				"value": "intibookMark",
 				"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
+			}, {
+				"title": "初始化自定义JS/CSS",
+				"value": "clearCustomJsCss",
+				"description": "清除所有自定义JS/CSS"
 			}, {
 				"type": "hr"
 			}, {
@@ -2307,7 +2447,16 @@ require(['jquery'], function($) {
 		if ((settings.get('autonightMode') === false) && (settings.get('autonightMode2') === false)) {
 			$("li[data-value=nightMode]").show();
 		}
-
+		//开启自定义JS/CSS才会显示JS、CSS设置项
+		if (settings.get("customJsCss") === true) {
+			$("li[data-value=inputCustomJs]").show();
+			$("li[data-value=inputCustomCss]").show();
+			$("li[data-value=applyCustomJsCss]").show();
+		} else {
+			$("li[data-value=inputCustomJs]").hide();
+			$("li[data-value=inputCustomCss]").hide();
+			$("li[data-value=applyCustomJsCss]").hide();
+		}
 
 
 
@@ -2374,6 +2523,13 @@ require(['jquery'], function($) {
 					alert('已取消初始化!');
 				}
 
+			} else if (value === "clearCustomJsCss") {
+				if (confirm("将清除所有JS/CSS!")) {
+					customJsCss.clearData();
+					location.reload();
+				} else {
+					alert('已取消初始化!');
+				}
 			} else if (value === "openGithub") {
 				// open($this.find('.set-description').text());
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
@@ -2389,13 +2545,11 @@ require(['jquery'], function($) {
 				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
-				// oInput.val('{"bookMark":' + JSON.stringify(bookMark.getJson()) + '}');
 				var IsEncrypt = confirm(
 					"是否对主页数据进行加密?\n点击确认进行加密，点击取消直接导出原始数据\n(PS:加密有助于保护数据安全,防止数据泄露或被恶意篡改,但是加密后的数据量会相对而言增加很多)"
-					);
+				);
 				oInput.val(HPData.export(IsEncrypt));
 				document.body.appendChild(oInput[0]);
-				console.log(store.get('bookMark'));
 				oInput.select();
 				document.execCommand("Copy");
 				alert('主页数据已备份到剪贴板!');
@@ -2420,6 +2574,7 @@ require(['jquery'], function($) {
 						store.set("bookMark", newbookMarkData);
 						store.set("setData", data.setData);
 						alert("主页数据恢复成功!");
+						store.set("customData", data.customData);
 						location.reload();
 					} else {
 						alert("主页数据恢复失败!");
@@ -2436,6 +2591,14 @@ require(['jquery'], function($) {
 			} else if (value === "position") {
 				PositionFn.get();
 				location.reload(false);
+			} else if (value === "inputCustomJs") {
+				customJsCss.promptData("js");
+			} else if (value === "inputCustomCss") {
+				customJsCss.promptData("css");
+			} else if (value === "applyCustomJsCss") {
+				alert("即将应用自定义JS/CSS");
+				settings.set("customJsCss", true);
+				location.reload();
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
 				$.fn.openSelect = function() {
@@ -2544,6 +2707,31 @@ require(['jquery'], function($) {
 				}
 				$("li[data-value=autonightMode2Array]").hide();
 			}
+			if (item === 'customJsCss' && value === true) {
+				$("li[data-value=inputCustomJs]").show();
+				$("li[data-value=inputCustomCss]").show();
+				$("li[data-value=applyCustomJsCss]").show();
+				if (!confirm("警告:自定义JS/CSS会增加主页不稳定性,其若输入的JS/CSS存在问题将导致不可逆的错误\n\n点击确定继续开启,点击取消终止开启")) {
+					value = false;
+					$("li[data-value=inputCustomJs]").hide();
+					$("li[data-value=inputCustomCss]").hide();
+					$("li[data-value=applyCustomJsCss] .set-description").html(
+						"已终止开启自定义JS/CSS,点击重启自定义JS/CSS");
+				}
+				var customJsCssData = customJsCss.getData();
+				if (customJsCssData.js || customJsCssData.css) {
+					settings.set("customJsCss", true);
+					customJsCss.on();
+				}
+			} else if (item === 'customJsCss' && value === false) {
+				$("li[data-value=inputCustomJs]").hide();
+				$("li[data-value=inputCustomCss]").hide();
+				$("li[data-value=applyCustomJsCss]").hide();
+				settings.set("customJsCss", false);
+				setTimeout(function() { //延迟刷新，让关闭动画放完，这样好看一点
+					location.reload();
+				}, 500);
+			}
 			// 保存设置
 			settings.set(item, value);
 		});
@@ -2629,8 +2817,8 @@ require(['jquery'], function($) {
 					});
 				} else if (phase === 'end' || phase === 'cancel') {
 					$('.logo').removeAttr("disabled style");
-					$('.logo').css("height", settings.get('LogoHeightSet') + "px");
 					$('.bookmark').removeAttr("disabled style");
+					settings.apply();
 					if (distance >= 100 && direction === "down") {
 						$('.ornament-input-group').css("transform", "").click();
 						$('.logo,.bookmark,.anitInput').css('opacity', '0');
