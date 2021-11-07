@@ -20,6 +20,7 @@
 * 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app
 * CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
+* Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 🌹开源致谢
 * 原项目名称：quarkHomePage(H5仿夸克浏览器主页)
 * 原项目作者：liumingye(刘明野)
@@ -27,8 +28,15 @@
 # 📪联系方式
 * Email：gem_xl@petalmail.com
 # 📕更新日志
+<版本 1.19>
+* 增加了自定义JS/CSS功能。注意：自定义JS或CSS会加剧主页的不稳定性，且如果JS/CSS存在错误可能导致不可逆的错误(页面崩溃，白屏等无法正常使用的场景)。如果产生不可逆错误，请直接清除主页的cookie、网页数据等(所有个性化设置也将全部消失)
+* 修改了精选页网页默认协议头，由"http"更改为"https"
+* 修改了默认主页书签中抖音的网址
+* 修复了搜索栏打开file://文件异常的问题
+* 修复了插件版搜索栏无法启用搜索预测联想词的问题
+
 <版本 1.18>
-* 增加主页数据加密/解密功能。现在在导出数据时将提示是否加密主页数据。加密主页数据后，有助于保护数据安全，防止数据泄露或被串改。(PS:加密后主页数据可以通过airportal快速跨端传输)
+* 增加了主页数据加密/解密功能。现在在导出数据时将提示是否加密主页数据。加密主页数据后，有助于保护数据安全，防止数据泄露或被串改。(PS:加密后主页数据可以通过airportal快速跨端传输)
 * 增加了搜索引擎快速切换工具栏显示/隐藏设置。
 
 <版本 1.17>
