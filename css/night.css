@@ -82,6 +82,9 @@ body {
 .addbook-input,#addbook-autofetch {
 	background: #212121;
 }
+.addbook-sitesLib div{
+	background: #212121;
+}
 .set-option .set-checkbox:checked + label:before {
 	-webkit-filter: brightness(60%);
 	filter: brightness(60%);
