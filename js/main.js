@@ -74,7 +74,9 @@ require(['jquery'], function($) {
 			autonightMode: false,
 			autonightMode2: false,
 			autonightMode2Array: "20:00-8:00",
-			customJsCss: false
+			customJsCss: false,
+			chromeBookmarks: "chrome://bookmarks/",
+			weatherApiIdKey: null
 		};
 		var defaultLogoHeight = Math.floor($(".logo").width() * (84 / 436));
 		this.storage.LogoHeightSet = defaultLogoHeight < 40 ? String(defaultLogoHeight) : "40";
@@ -521,25 +523,25 @@ require(['jquery'], function($) {
 		this.$ele = $(ele);
 		this.options = {
 			data: [{
+				"name": "书签",
+				"url": "openbookmarksList()",
+				"icon": "img/bookmarks/bookmarks.png"
+			}, {
 				"name": "精选",
 				"url": "choice()",
 				"icon": "img/bookmarks/discover.png"
-			}, {
-				"name": "AirPortal",
-				"url": "https://airportal.cn",
-				"icon": "img/bookmarks/airportal.png"
-			}, {
-				"name": "扫一扫",
-				"url": "https://www.the-qrcode-generator.com/scan",
-				"icon": "img/bookmarks/qrscan.png"
 			}, {
 				"name": "设置",
 				"url": "openSettingPage()",
 				"icon": "img/bookmarks/settings.png"
 			}, {
-				"name": "翻译",
-				"url": "https://translate.google.cn",
-				"icon": "img/bookmarks/translate.png"
+				"name": "扫一扫",
+				"url": "https://www.the-qrcode-generator.com/scan",
+				"icon": "img/bookmarks/qrscan.png"
+			}, {
+				"name": "AirPortal",
+				"url": "https://airportal.cn",
+				"icon": "img/bookmarks/airportal.png"
 			}, {
 				"name": "CSDN",
 				"url": "https://csdn.net",
@@ -602,6 +604,174 @@ require(['jquery'], function($) {
 				}
 			}
 			return false;
+		},
+		insetPage: function() {
+			var libData = this.getinitbookMarks();
+			var libHTML = "";
+			for (let i in libData) {
+				libHTML +=
+					`<div index="${i}"><img src="${libData[i].icon}"><p>${libData[i].name}</p></div>`;
+			}
+			$('#app').append(`<div class="page-bg"></div>
+			<div class="page-addbook">
+				<ul class="addbook-choice">
+					<li value="custom" class="current">自定义书签</li>
+					<li value="default">默认书签库</li>
+					<span class="active-span"></span>
+				</ul>
+				<div class="addbook-content">
+					<div class="addbook-sites" value="custom">
+					<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="https://" />
+					<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
+						<div id="addbook-upload">点击选择图标</div>
+						<div id="addbook-autofetch">点击自动获取图标</div>
+						<div class="addbook-ok">确认添加</div>
+					</div>
+					<div class="addbook-sites hide" value="default">
+					<div class="addbook-sitesLib">${libHTML}</div>
+					</div>
+					</div>
+					<div class="bottom-close"></div>
+				</div>
+			</div>`);
+
+			setTimeout(function() {
+				$(".page-bg").addClass("animation");
+				$(".addbook-choice").addClass("animation");
+				$(".addbook-content").addClass("animation");
+			}, 50);
+
+			//绑定事件
+			$("#addbook-upload").click(function() {
+				openFile(function() {
+					var file = this.files[0];
+					var reader = new FileReader();
+					reader.onload = function() {
+						$("#addbook-upload").html(
+							'<img src="' + this
+							.result +
+							'"></img><p>' + file
+							.name + '</p>');
+					};
+					$("#addbook-upload").css(
+						"pointer-events", "");
+					$(".addbook-ok").css(
+						"pointer-events",
+						"");
+					reader.readAsDataURL(file);
+					/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
+					$(".addbook-ok").css("pointer-events", "none");
+					uploadFile(file, {
+						success: function (url) {
+							$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
+						},
+						error: function (msg) {
+							$("#addbook-upload").html('上传图标失败！' + msg);
+						},
+						complete: function () {
+							$("#addbook-upload").css("pointer-events", "");
+							$(".addbook-ok").css("pointer-events", "");
+						}
+					})*/
+				});
+			});
+			$("#addbook-autofetch").click(function() {
+				var autofetchFlag = false,
+					url = $(".addbook-url").val(),
+					ImgObj = new Image();
+				if (url.search("http") === -1) {
+					url = "https://" + url;
+				}
+				var urlArr = url.split("/");
+				ImgUrl = urlArr[2];
+				if (ImgUrl) {
+					ImgUrl = "https://" + ImgUrl +
+						"/favicon.ico";
+					ImgObj.src = ImgUrl;
+					if (ImgObj.fileSize > 0 || (ImgObj.width >
+							0 &&
+							ImgObj.height > 0)) {
+						autofetchFlag = true;
+					}
+				}
+				if (autofetchFlag) {
+					alert("图标获取成功");
+					$("#addbook-upload").html('<img src="' +
+						ImgUrl +
+						'"></img><p>自动获取favicon</p>');
+				} else {
+					alert(
+						"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+					);
+				}
+			});
+			$(".addbook-ok").click(function() {
+				var name = $(".addbook-name").val(),
+					url = $(".addbook-url").val(),
+					icon = $("#addbook-upload img").attr("src");
+				if (name.length && url.length) {
+					if (!icon) {
+						// 绘制文字图标
+						var canvas = document.createElement(
+							"canvas");
+						canvas.height = 100;
+						canvas.width = 100;
+						var ctx = canvas.getContext("2d");
+						ctx.fillStyle = "#f5f5f5";
+						ctx.fillRect(0, 0, 100, 100);
+						ctx.fill();
+						ctx.fillStyle = "#222";
+						ctx.font = "40px Arial";
+						ctx.textAlign = "center";
+						ctx.textBaseline = "middle";
+						ctx.fillText(name.substr(0, 1), 50, 52);
+						icon = canvas.toDataURL("image/png");
+					}
+					$(".bottom-close").click();
+					bookMark.add(name, url, icon);
+				}
+			});
+			$(".bottom-close").click(function() {
+				$(".page-addbook").css({
+					"pointer-events": "none"
+				});
+				$(".page-bg").removeClass("animation");
+				$(".addbook-choice").removeClass("animation");
+				$(".addbook-content").removeClass("animation");
+				setTimeout(function() {
+					$(".page-addbook").remove();
+					$(".page-bg").remove();
+				}, 300);
+			});
+			$(".page-addbook").click(function(evt) {
+				if (evt.target === evt.currentTarget) {
+					$(".bottom-close").click();
+				}
+			});
+			$(".addbook-choice").click(function(evt) {
+				let target = evt.target;
+				if (target.tagName === "LI" && !target.classList.contains("current")) {
+					let value = target.getAttribute("value");
+					$(target).siblings("li").removeClass("current")
+					$(target).addClass("current");
+					$(".active-span").css("left", ($(target).position().left + 16) + "px");
+					$(".addbook-sites").each(function(i, ele) {
+						$(ele).addClass("hide");
+					})
+					$(`.addbook-sites[value=${value}]`).removeClass("hide");
+				}
+			});
+			$(".addbook-sitesLib").click(function(evt) {
+				let target = evt.target;
+				target = /p|img/i.test(target.tagName) ? target.parentElement : target;
+				let index = target.getAttribute("index");
+				if (index) {
+					let data = bookMark.getinitbookMarks();
+					data = data[index];
+					bookMark.add(data.name, data.url, data.icon);
+					$(".bottom-close").click();
+				}
+			})
 		},
 		bind: function() {
 			var that = this;
@@ -676,140 +846,7 @@ require(['jquery'], function($) {
 							// 取消书签编辑状态
 							$(document).click();
 							// 插入html
-							$('#app').append(`<div class="page-bg"></div>
-							<div class="page-addbook">
-								<ul class="addbook-choice">
-									<li class="current">站点</li>
-									<!-- <li>书签</li>
-									<li>历史</li> -->
-									<span class="active-span"></span>
-								</ul>
-								<div class="addbook-content">
-									<div class="addbook-sites">
-									<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value="http://" />
-									<input type="text" class="addbook-input addbook-name" placeholder="输入网站名" />
-										<div id="addbook-upload">点击选择图标</div>
-										<div id="addbook-autofetch">点击自动获取图标</div>
-										<div class="addbook-ok">确认添加</div>
-									</div>
-									<div class="bottom-close"></div>
-								</div>
-							</div>`);
-
-							setTimeout(function() {
-								$(".page-bg").addClass("animation");
-								$(".addbook-choice").addClass("animation");
-								$(".addbook-content").addClass("animation");
-							}, 50);
-
-							//绑定事件
-							$("#addbook-upload").click(function() {
-								openFile(function() {
-									var file = this.files[0];
-									var reader = new FileReader();
-									reader.onload = function() {
-										$("#addbook-upload").html(
-											'<img src="' + this
-											.result +
-											'"></img><p>' + file
-											.name + '</p>');
-									};
-									$("#addbook-upload").css(
-										"pointer-events", "");
-									$(".addbook-ok").css(
-										"pointer-events",
-										"");
-									reader.readAsDataURL(file);
-									/*$("#addbook-upload").html('上传图标中...').css("pointer-events", "none");
-									$(".addbook-ok").css("pointer-events", "none");
-									uploadFile(file, {
-										success: function (url) {
-											$("#addbook-upload").html('<img src="' + url + '"></img><p>' + file.name + '</p>');
-										},
-										error: function (msg) {
-											$("#addbook-upload").html('上传图标失败！' + msg);
-										},
-										complete: function () {
-											$("#addbook-upload").css("pointer-events", "");
-											$(".addbook-ok").css("pointer-events", "");
-										}
-									})*/
-								});
-							});
-							$("#addbook-autofetch").click(function() {
-								var autofetchFlag = false,
-									url = $(".addbook-url").val(),
-									ImgObj = new Image();
-								if (url.search("http") === -1) {
-									url = "https://" + url;
-								}
-								var urlArr = url.split("/");
-								ImgUrl = urlArr[2];
-								if (ImgUrl) {
-									ImgUrl = "https://" + ImgUrl +
-										"/favicon.ico";
-									ImgObj.src = ImgUrl;
-									if (ImgObj.fileSize > 0 || (ImgObj.width >
-											0 &&
-											ImgObj.height > 0)) {
-										autofetchFlag = true;
-									}
-								}
-								if (autofetchFlag) {
-									alert("图标获取成功");
-									$("#addbook-upload").html('<img src="' +
-										ImgUrl +
-										'"></img><p>自动获取favicon</p>');
-								} else {
-									alert(
-										"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
-									);
-								}
-							});
-							$(".addbook-ok").click(function() {
-								var name = $(".addbook-name").val(),
-									url = $(".addbook-url").val(),
-									icon = $("#addbook-upload img").attr("src");
-								if (name.length && url.length) {
-									if (!icon) {
-										// 绘制文字图标
-										var canvas = document.createElement(
-											"canvas");
-										canvas.height = 100;
-										canvas.width = 100;
-										var ctx = canvas.getContext("2d");
-										ctx.fillStyle = "#f5f5f5";
-										ctx.fillRect(0, 0, 100, 100);
-										ctx.fill();
-										ctx.fillStyle = "#222";
-										ctx.font = "40px Arial";
-										ctx.textAlign = "center";
-										ctx.textBaseline = "middle";
-										ctx.fillText(name.substr(0, 1), 50, 52);
-										icon = canvas.toDataURL("image/png");
-									}
-									$(".bottom-close").click();
-									bookMark.add(name, url, icon);
-								}
-							});
-							$(".bottom-close").click(function() {
-								$(".page-addbook").css({
-									"pointer-events": "none"
-								});
-								$(".page-bg").removeClass("animation");
-								$(".addbook-choice").removeClass("animation");
-								$(".addbook-content").removeClass("animation");
-								setTimeout(function() {
-									$(".page-addbook").remove();
-									$(".page-bg").remove();
-								}, 300);
-							});
-							$(".page-addbook").click(function(evt) {
-								if (evt.target === evt.currentTarget) {
-									$(".bottom-close").click();
-								}
-							});
-
+							that.insetPage();
 						})
 					} else {
 						$(".addbook").addClass("animation");
@@ -837,6 +874,9 @@ require(['jquery'], function($) {
 							case "openSettingPage()":
 								openSettingPage();
 								break;
+							case "openbookmarksList()":
+								openbookmarksList();
+								break;
 							default:
 								location.href = url;
 						}
@@ -852,114 +892,7 @@ require(['jquery'], function($) {
 						// 取消书签编辑状态
 						$(document).click();
 						// 插入html
-						$('#app').append(`<div class="page-bg"></div>
-						<div class="page-addbook">
-							<ul class="addbook-choice">
-								<li class="current">修改书签</li>
-								<span class="active-span"></span>
-							</ul>
-							<div class="addbook-content">
-								<div class="addbook-sites">
-								<input type="text" class="addbook-input addbook-url" placeholder="输入网址" value=` + turl + ` />
-								<input type="text" class="addbook-input addbook-name" placeholder="输入网站名"  value=` + tname + ` />
-									<div id="addbook-upload">点击选择图标</div>
-									<div id="addbook-autofetch">点击自动获取图标</div>
-									<div class="addbook-ok">确认修改</div>
-								</div>
-								<div class="bottom-close"></div>
-							</div>
-						</div>`);
-
-						setTimeout(function() {
-							$(".page-bg").addClass("animation");
-							$(".addbook-choice").addClass("animation");
-							$(".addbook-content").addClass("animation");
-						}, 50);
-
-						//绑定事件
-						$("#addbook-upload").click(function() {
-							openFile(function() {
-								var file = this.files[0];
-								var reader = new FileReader();
-								reader.onload = function() {
-									$("#addbook-upload").html(
-										'<img src="' + this
-										.result +
-										'"></img><p>' + file
-										.name + '</p>');
-								};
-								$("#addbook-upload").css(
-									"pointer-events", "");
-								$(".addbook-ok").css(
-									"pointer-events",
-									"");
-								reader.readAsDataURL(file);
-							});
-						});
-						$("#addbook-autofetch").click(function() {
-							var autofetchFlag = false,
-								url = $(".addbook-url").val(),
-								ImgObj = new Image();
-							if (url.search("http") === -1) {
-								url = "https://" + url;
-							}
-							var urlArr = url.split("/");
-							ImgUrl = urlArr[2];
-							if (ImgUrl) {
-								ImgUrl = "https://" + ImgUrl +
-									"/favicon.ico";
-								ImgObj.src = ImgUrl;
-								if (ImgObj.fileSize > 0 || (ImgObj.width >
-										0 &&
-										ImgObj.height > 0)) {
-									autofetchFlag = true;
-								}
-							}
-							if (autofetchFlag) {
-								alert("图标获取成功");
-								$("#addbook-upload").html('<img src="' +
-									ImgUrl +
-									'"></img><p>自动获取favicon</p>');
-							} else {
-								alert(
-									"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
-								);
-							}
-						});
-						$(".addbook-ok").click(function() {
-							var index = dom.index(),
-								name = $(".addbook-name").val(),
-								url = $(".addbook-url").val(),
-								icon = $("#addbook-upload img").attr("src");
-							console.log(name + ' ' + tname + ' ' + url + ' ' + turl +
-								' ' + icon);
-							if (name !== tname || url !== turl || !!icon) {
-								if (!icon) {
-									icon = "";
-								}
-								bookMark.edit(index, name, url, icon);
-								//location.reload(true);
-							}
-							$(".bottom-close").click();
-						});
-						$(".bottom-close").click(function() {
-							$(".page-addbook").css({
-								"pointer-events": "none"
-							});
-							$(".page-bg").removeClass("animation");
-							$(".addbook-choice").removeClass("animation");
-							$(".addbook-content").removeClass("animation");
-							setTimeout(function() {
-								$(".page-addbook").remove();
-								$(".page-bg").remove();
-							}, 300);
-						});
-						$(".page-addbook").click(function(evt) {
-							if (evt.target === evt.currentTarget) {
-								$(".bottom-close").click();
-							}
-						});
-
+						that.insetPage();
 					}
 				}
 			});
@@ -986,8 +919,8 @@ require(['jquery'], function($) {
 		},
 		add: function(name, url, icon) {
 			var data = this.options.data;
-			if ((url !== "choice()") && (url !== "openSettingPage()")) {
-				url = url.match(/:\/\//) ? url : "http://" + url;
+			if (!/choice()|openSettingPage()|openbookmarksList()/i.test(url)) {
+				url = url.match(/:\/\//) ? url : "https://" + url;
 			}
 			var i = data.length - 1;
 			var dom = $('<div class="list" data-url="' + url +
@@ -1028,7 +961,6 @@ require(['jquery'], function($) {
 			store.set("bookMark", data);
 		}
 	}
-
 
 	/**
 	 * 搜索历史构建函数
@@ -1268,7 +1200,7 @@ require(['jquery'], function($) {
 			$(".history").hide();
 			$(".empty-input").show();
 			$(".search-btn").html(
-				/^\b((((https?|ftp):\/\/)?[-a-z0-9]+(\.[-a-z0-9]+)*\.(?:com|net|org|int|edu|gov|mil|arpa|asia|biz|info|name|pro|coop|aero|museum|[a-z][a-z]|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d))\b(\/[-a-z0-9_:\@&?=+,.!\/~%\$]*)?))|(file:\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])$/i
+				/^\b((((https?|ftp):\/\/)?[-a-z0-9]+(\.[-a-z0-9]+)*\.(?:cn|com|net|org|int|edu|gov|io|app|mil|arpa|asia|biz|info|name|pro|coop|aero|museum|[a-z][a-z]|((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]\d)|\d))\b(\/[-a-z0-9_:\@&?=+,.!\/~%\$]*)?))|(file:\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])$/i
 				.test(wd) ? "进入" : "搜索");
 			if (wd.search("file://") !== -1) {
 				$(".search-btn").html("进入");
@@ -1403,45 +1335,31 @@ require(['jquery'], function($) {
 				}
 				console.log("搜索引擎快切:" + type);
 				settings.set("engines", type);
-				var par = tar.parentElement;
-				if (par && par.childElementCount > 0) {
-					for (let i = 0; i < par.childElementCount; i++) {
-						par.children[i].setAttribute("class", "");
-					}
-				}
-				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
-				ce.innerHTML = tar.innerHTML;
-				tar.setAttribute("class", "choose-opt");
+				$(tar).siblings().removeClass("choose-opt");
+				$(tar).addClass("choose-opt");
+				$(".current-engine").text(tar.innerHTML);
 			}
 		}
 	});
 
 	//搜索引擎快切
 	function initquickchange() {
-		var quickchangeObj = document.querySelector(".quick-change .content");
 		var browser = browserInfo();
 		var successflag = false;
-		if (quickchangeObj) {
-			var searchOpt = quickchangeObj.querySelectorAll("li");
-			if (searchOpt.length > 0) {
-				var ce = document.querySelector(".quick-change .tittle-box .current-engine");
-				for (let i = 0; i < searchOpt.length; i++) {
-					var type = searchOpt[i].getAttribute("name");
-					if (type === "via" && browser === "via" && searchOpt[i].style.display === "none") {
-						searchOpt[i].style.display = "";
-					}
-					if (settings.get("engines") === type) {
-						searchOpt[i].setAttribute("class", "choose-opt");
-						ce.innerHTML = searchOpt[i].innerHTML;
-						successflag = true;
-					} else {
-						searchOpt[i].setAttribute("class", "");
-					}
-					if ((i + 1) === searchOpt.length && !successflag) {
-						console.log("搜索引擎快切栏初始化失败");
-					}
-				}
+		$(".quick-change .content li").each(function(i, ele) {
+			ele = $(ele);
+			let type = ele.attr("name");
+			if (type === "via" && browser === "via" && ele.hasClass("hide")) {
+				ele.removeClass("hide");
 			}
+			if (settings.get("engines") === type) {
+				ele.addClass("choose-opt")
+				$(".current-engine").text(ele.text());
+				successflag = true;
+			}
+		});
+		if (!successflag) {
+			console.log("搜索引擎快切栏初始化失败");
 		}
 	}
 	$(document).ready(function() {
@@ -1541,14 +1459,15 @@ require(['jquery'], function($) {
 				window.via.searchText(text);
 			} else {
 				location.href = {
-					baidu: "https://m.baidu.com/s?wd=%s",
-					quark: "https://quark.sm.cn/s?q=%s",
-					google: "https://www.google.com/search?q=%s",
-					bing: "https://cn.bing.com/search?q=%s",
-					sm: "https://m.sm.cn/s?q=%s",
-					haosou: "https://m.so.com/s?q=%s",
-					sogou: "https://m.sogou.com/web/searchList.jsp?keyword=%s",
-					diy: settings.get('diyEngines')
+					"baidu": "https://m.baidu.com/s?wd=%s",
+					"baiduPC": "https://www.baidu.com/s?wd=%s",
+					"quark": "https://quark.sm.cn/s?q=%s",
+					"google": "https://google.com/search?q=%s",
+					"bing": "https://cn.bing.com/search?q=%s",
+					"sm": "https://m.sm.cn/s?q=%s",
+					"360": "https://so.com/s?q=%s",
+					"sogou": "https://sogou.com/web/searchList.jsp?keyword=%s",
+					"diy": settings.get('diyEngines')
 				} [settings.get('engines')].replace("%s", text);
 			}
 		}, 1);
@@ -1905,7 +1824,7 @@ require(['jquery'], function($) {
 			},
 			html =
 			'<div class="page-bg"></div><div class="page-choice"><div class="page-content"><ul class="choice-ul">',
-			tabHtml = '<li class="current">捷径</li>',
+			tabHtml = '<li>捷径</li>',
 			contentHtml = `<li class="choice-cut swiper-slide">
 			<div class="list h2">
 				<a class="flex-1 content weather" href="https://quark.sm.cn/s?q=天气"><div>访问中</div><div></div><div></div></a>
@@ -1913,14 +1832,14 @@ require(['jquery'], function($) {
 			</div>
 
 			<div class="list h3">
-				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(60, 68, 110) 0%, rgb(105, 121, 148) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list"></div></a>
+				<a class="flex-1 content" href="https://s.weibo.com/top/summary?cate=realtimehot" style="background-image:linear-gradient(135deg, rgb(60, 68, 110) 0%, rgb(105, 121, 148) 100%)"><div class="hl relative">微博热搜榜</div><div class="news-list">访问中</div></a>
 			</div>
 			<div class="list h3">
-				<a class="flex-1 content" href="https://www.iesdouyin.com/share/billboard/?id=0" style="background-image:linear-gradient(135deg,  rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">抖音热搜榜</div><div class="douyin-list"></div></a>
+				<a class="flex-1 content" href="https://www.iesdouyin.com/share/billboard/?id=0" style="background-image:linear-gradient(135deg,  rgb(34, 34, 80) 1%, rgb(60, 60, 89) 100%)"><div class="hl relative">抖音热搜榜</div><div class="douyin-list">访问中</div></a>
 			</div>
 
 			<div class="list h2">
-				<a class="flex-1 content" href="https://www.zhihu.com/billboard" style="background-image:linear-gradient(135deg, rgb(52, 55, 60) 0%, rgb(77, 78, 86) 100%)"><p class="hl relative">知乎热搜榜</p><div class="audio-list"><div class="audio-swipe"><div class="swiper-wrapper"></div></div></div><div class="cmp-icon" style="width: 146px;height: 99px;right: 10px;bottom: 0;background-image: url(img/shortcut/rebang.png);"></div></a>
+				<a class="flex-1 content" href="https://www.zhihu.com/billboard" style="background-image:linear-gradient(135deg, rgb(52, 55, 60) 0%, rgb(77, 78, 86) 100%)"><p class="hl relative">知乎热搜榜</p><div class="audio-list"><div class="audio-swipe"><div class="swiper-wrapper">访问中</div></div></div><div class="cmp-icon" style="width: 146px;height: 99px;right: 10px;bottom: 0;background-image: url(img/shortcut/rebang.png);"></div></a>
 			</div>
 
 			<div class="list">
@@ -2004,97 +1923,15 @@ require(['jquery'], function($) {
 				});
 			});
 
+
 			// 天气
-			$.ajax({
-				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=weather",
-				type: "get",
-				dataType: "json",
-				success: function(res) {
-					var data = res.data;
-					var color1 = data.color1;
-					var color2 = data.color2;
-					var location = data.location;
-					var temp = data.temp;
-					var air = data.air;
-					var weather = data.weather;
-					var html = '<div>' + temp + '</div><div>' + weather + '</div><div>' +
-						location + ' · ' + air +
-						'</div><div class="cmp-icon" id="lottie-box" style="background-image: url(' +
-						data.lottie + ');"></div>';
-					$('.weather').html(html).css("background-image",
-						"linear-gradient(-33deg," + color1 + " 0%," + color2 + " 99%)");
-				}
-			})
-
+			getWeather(settings.get("weatherApiIdKey"),settings.get("weatherApiCity"));
 			//微博热搜榜
-			$.ajax({
-				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=weibo",
-				type: "get",
-				dataType: "json",
-				success: function(res) {
-					var data = res.data;
-					var html = '';
-					for (var i = 0, l = data.length; i < l; i++) {
-						html +=
-							'<div class="news-item"><div class="news-item-count">' +
-							(i + 1) + '</div><div class="news-item-title">' + data[i]
-							.title +
-							'</div><div class="news-item-hot">' + data[i].hot +
-							'</div></div>';
-					}
-					$('.news-list').html(html);
-				}
-			});
+			getWeibo()
 			//抖音热搜榜
-			$.ajax({
-				url: "https://bird.ioliu.cn/v1?url=https://creator.douyin.com/aweme/v1/creator/data/billboard/?billboard_type=1",
-				type: "get",
-				dataType: "json",
-				success: function(res) {
-					var data = res.billboard_data;
-					var html = '';
-					for (var i = 0; i < 4; i++) {
-						html +=
-							'<div class="douyin-item"><div class="douyin-item-count">' +
-							(i + 1) + '</div><div class="douyin-item-title">' + data[i]
-							.title +
-							'</div><div class="douyin-item-hot">' + data[i].value +
-							'</div></div>';
-					}
-					$('.douyin-list').html(html);
-				}
-			});
+			getDouyin()
 			//知乎热搜榜
-			$.ajax({
-				url: "https://bird.ioliu.cn/v2?url=https://ai.sm.cn/quark/1/api?format=json&method=zhihu",
-				type: "get",
-				dataType: "json",
-				success: function(res) {
-					var data = res.data;
-					var html = '';
-					for (var i = 0, l = data.length; i < l; i++) {
-						html +=
-							'<div class="audio-item swiper-slide"><div class="audio-item-icon"></div><div class="audio-item-title">' +
-							data[i].title + '</div></div>';
-					}
-					$('.audio-list').find('.swiper-wrapper').html(html);
-					require(['Swiper'], function(Swiper) {
-						var swiper = new Swiper('.audio-swipe', {
-							allowTouchMove: false,
-							height: 54,
-							direction: 'vertical',
-							slidesPerView: 2,
-							slidesPerGroup: 2,
-							loop: true,
-							autoplay: {
-								delay: 5000,
-								disableOnInteraction: false,
-							},
-						});
-					})
-				}
-			});
-
+			getZhihu()
 		})
 	}
 
@@ -2110,6 +1947,19 @@ require(['jquery'], function($) {
 			location.href = "folder://";
 		} else if (browser === 'x') {
 			location.href = "x:bm?sort=default";
+		} else {
+			var url = settings.get("chromeBookmarks");
+			if (!url) {
+				console.log("获取不到chrome bookmarks url");
+				return false;
+			}
+			if (!/extension:/i.test(location.protocol)) {
+				alert("chromium内核浏览器由于chromium内核限制，非插件版无法使用此功能");
+				return false;
+			}
+			chrome.tabs.create({
+				"url": url
+			});
 		}
 	}
 	//设置LOGOclickFn
@@ -2185,10 +2035,24 @@ require(['jquery'], function($) {
 			return res;
 		}
 	}
+	//检测新版本(版号来源Github)
+	function getnewVersion() {
+		var newVersion = "fail to get newVersion";
+		$.ajax({
+			url: "https://bird.ioliu.cn/v2?url=https://icedwatermelonjuice.github.io/HMOSHomePage/",
+			async: false,
+			success: function(result) {
+				newVersion = result.slice(result.search("version:") + "version:"
+					.length, result.length - 1);
+			},
+		});
+		return newVersion;
+	}
+
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.20.1";
+		app.version = "1.22";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2199,6 +2063,10 @@ require(['jquery'], function($) {
 		} else {
 			positionDes = "向下偏移" + positionDes + "px";
 		}
+		var weatherApiIdKey=settings.get("weatherApiIdKey");
+		weatherApiIdKey=weatherApiIdKey?weatherApiIdKey.replace("&"," ").replace("appid=","id:").replace("appsecret=","key:"):"默认值，建议使用自己的id和key";
+		var weatherApiCity=settings.get("weatherApiCity");
+		weatherApiCity=weatherApiCity?weatherApiCity:"未填城市，默认ip定位（地级市）";
 		//构建设置HTML
 		var data = [{
 				"type": "hr"
@@ -2207,8 +2075,11 @@ require(['jquery'], function($) {
 				"type": "select",
 				"value": "engines",
 				"data": [{
-					"t": "百度搜索",
+					"t": "手机百度",
 					"v": "baidu"
+				}, {
+					"t": "百度搜索",
+					"v": "baiduPC"
 				}, {
 					"t": "跟随Via",
 					"v": "via"
@@ -2225,8 +2096,8 @@ require(['jquery'], function($) {
 					"t": "神马搜索",
 					"v": "sm"
 				}, {
-					"t": "好搜搜索",
-					"v": "haosou"
+					"t": "360搜索",
+					"v": "360"
 				}, {
 					"t": "搜狗搜索",
 					"v": "sogou"
@@ -2269,21 +2140,6 @@ require(['jquery'], function($) {
 				"title": "点击LOGO",
 				"type": "select",
 				"value": "LOGOclickFn",
-				"data": [{
-					"t": "打开书签",
-					"v": "bookmarkList"
-				}, {
-					"t": "打开设置",
-					"v": "settingsPage"
-				}, {
-					"t": "打开精选",
-					"v": "choicePage"
-				}]
-			},
-			{
-				"title": "长按LOGO",
-				"type": "select",
-				"value": "LOGOlongpressFn",
 				"data": [{
 					"t": "打开书签",
 					"v": "bookmarkList"
@@ -2361,6 +2217,20 @@ require(['jquery'], function($) {
 			}, {
 				"type": "hr"
 			}, {
+				"title": "chrome插件书签地址",
+				"value": "chromeBookmarks",
+				"description": settings.get("chromeBookmarks")
+			}, {
+				"title": "实况天气城市",
+				"value": "weatherApiCity",
+				"description": weatherApiCity
+			}, {
+				"title": "天气接口ID和Key",
+				"value": "weatherApiIdKey",
+				"description": weatherApiIdKey
+			}, {
+				"type": "hr"
+			}, {
 				"title": "备份数据",
 				"value": "export",
 				"description": "备份主页数据到剪贴板"
@@ -2395,6 +2265,11 @@ require(['jquery'], function($) {
 				"title": "Gitee(可能不是最新版本)",
 				"value": "openGitee",
 				"description": "https://gitee.com/gem_xl/HMOSHomePage"
+
+			}, {
+				"title": "天气Api(点击前往获取id与key)",
+				"value": "openWeatherApi",
+				"description": "http://www.yiketianqi.com"
 
 			}
 		];
@@ -2431,9 +2306,14 @@ require(['jquery'], function($) {
 		if (browser !== 'via') {
 			$('option[value=via]').hide();
 		}
-		// 只有via或x浏览器才在点击/长按LOGO设置里显示打开书签选项
-		if ((browser !== 'via') && (browser !== 'x')) {
+		// 只有via、x浏览器或chrome插件，才在点击/长按LOGO设置里显示打开书签选项
+		if (browser !== 'via' && browser !== 'x' && !/chrome-extension/i.test(location.href))
+		{
 			$('option[value=bookmarkList]').hide();
+		}
+		// 只有非via、x浏览器才显示chrome书签地址设置
+		if (browser === 'via' && browser === 'x'){
+			$('.set-option[data-value=chromeBookmarks]').hide();
 		}
 		//屏蔽via浏览器的自动夜间模式
 		if (browser === 'via') {
@@ -2472,10 +2352,6 @@ require(['jquery'], function($) {
 			$("li[data-value=inputCustomCss]").hide();
 			$("li[data-value=applyCustomJsCss]").hide();
 		}
-
-
-
-
 		$(".set-option .set-select").map(function() {
 			$(this).val(settings.get($(this).parent().data('value')));
 		});
@@ -2514,12 +2390,14 @@ require(['jquery'], function($) {
 						settings.set('logo', this.result);
 						var logoEle = new Image();
 						logoEle.src = this.result;
-						logoEle.onload=function(){
-							var autoHeight = LogoHeightFn.auto(logoEle.height, logoEle.width);
+						logoEle.onload = function() {
+							var autoHeight = LogoHeightFn.auto(logoEle.height, logoEle
+								.width);
 							settings.set('LogoHeightSet', autoHeight);
-							$(".set-option[data-value=logoHeight] .set-description").text(
-								"当前高度(单位px,像素): " + autoHeight + "px");
-								logoEle.remove();
+							$(".set-option[data-value=logoHeight] .set-description")
+								.text(
+									"当前高度(单位px,像素): " + autoHeight + "px");
+							logoEle.remove();
 						}
 					};
 					reader.readAsDataURL(file);
@@ -2559,6 +2437,10 @@ require(['jquery'], function($) {
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
 				location.href = $this.find('.set-description').text();
 			} else if (value === "openGitee") {
+				// open($this.find('.set-description').text());
+				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
+				location.href = $this.find('.set-description').text();
+			} else if (value === "openWeatherApi") {
 				// open($this.find('.set-description').text());
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
 				location.href = $this.find('.set-description').text();
@@ -2623,6 +2505,38 @@ require(['jquery'], function($) {
 				alert("即将应用自定义JS/CSS");
 				settings.set("customJsCss", true);
 				location.reload();
+			} else if (value === "weatherApiCity") {
+				var defaultData=settings.get("weatherApiCity");
+				defaultData=defaultData?defaultData:"";
+				var city=prompt("请输入实况天气定位城市，例如：北京，上海\n若输入为空值，则使用ip定位到地级市",defaultData);
+				city=city.trim();
+				settings.set("weatherApiCity",city);
+				$(".set-option[data-value=weatherApiCity] .set-description").text(city);
+			} else if (value === "weatherApiIdKey") {
+				var defaultData=settings.get("weatherApiIdKey");
+				if(/^appid=[A-Za-z0-9]+&appsecret=[A-Za-z0-9]+$/.test(defaultData)){
+					defaultData=defaultData.replace(/(appid|appsecret)?=/g,"").split("&");
+				}else{
+					defaultData=["",""];
+				}
+				var id=prompt("请输入自己的天气接口Id\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配",defaultData[0]);
+				id=id.trim();
+				var key=prompt("请输入自己的天气接口Key\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配",defaultData[1]);
+				key=key.trim();
+				if(id && key && confirm(`请确认个人id和key:\nid:${id} key:${key}`)){
+						settings.set("weatherApiIdKey",`appid=${id}&appsecret=${key}`);
+						$(".set-option[data-value=weatherApiIdKey] .set-description").text(`id:${id} key:${key}`);
+				}else if(confirm("确定使用默认公共Id和Key?")){
+					settings.set("weatherApiIdKey","");
+					$(".set-option[data-value=weatherApiIdKey] .set-description").text("默认值，建议使用自己的id和key")
+				}
+			} else if (value === "chromeBookmarks") {
+				var defaultData=settings.get("chromeBookmarks");
+				defaultData=defaultData?defaultData:"chrome://bookmarks/";
+				var url=prompt("请输入新的chrome书签插件地址",defaultData);
+				url=url.trim();
+				settings.set("chromeBookmarks",url);
+				$(".set-option[data-value=chromeBookmarks] .set-description").text(url);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
 				$.fn.openSelect = function() {
@@ -2761,19 +2675,7 @@ require(['jquery'], function($) {
 		});
 
 	}
-	//检测新版本(版号来源Github)
-	function getnewVersion() {
-		var newVersion = "fail to get newVersion";
-		$.ajax({
-			url: "https://bird.ioliu.cn/v2?url=https://icedwatermelonjuice.github.io/HMOSHomePage/",
-			async: false,
-			success: function(result) {
-				newVersion = result.slice(result.search("version:") + "version:"
-					.length, result.length - 1);
-			},
-		});
-		return newVersion;
-	}
+
 
 	//设置点击/长按LOGO功能冲突检测
 	function DetectLogoFnConflicts() {
