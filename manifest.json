@@ -1,0 +1,22 @@
+{
+	"manifest_version": 2,
+	"name": "HMOSHomePage",
+	"description": "适用于手机/平板的浏览器主页（兼容pc端浏览器，如edge、chrome、hwbrowser）",
+	"version": "1.22",
+	"default_locale": "zh_CN",
+	"content_security_policy": "script-src 'self' 'unsafe-eval' https://suggestion.baidu.com/ ; object-src 'self'",
+	"optional_permissions": ["storage", "https://suggestion.baidu.com/","https://ai.sm.cn/*","https://creator.douyin.com/*"],
+	"permissions":["bookmarks","tabs"],
+	"icons": {
+		"64": "logo/favicon.ico"
+	},
+	"browser_action": {
+		"default_icon": {
+			"64": "logo/favicon.ico"
+		}
+	},
+	"chrome_url_overrides": {
+		"newtab": "index.html"
+	},
+	"homepage_url": "https://icedwatermelonjuice.github.io/HMOSHomePage/"
+}
