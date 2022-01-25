@@ -2,10 +2,10 @@
 gitee仓库：https://gitee.com/wangjins/weather_api
 开发文档：http://doc.tianqiapi.com/603579
 */
-function getWeather(IdKey,city) {
-	IdKey=IdKey?IdKey:"appid=23035354&appsecret=8YvlPNrz";
-	city=city?"&city="+city:"";
-	var url="https://yiketianqi.com/api?unescape=1&version=v1&"+IdKey+city;
+function getWeather(IdKey, city) {
+	IdKey = IdKey ? IdKey : "appid=23035354&appsecret=8YvlPNrz";
+	city = city ? "&city=" + city : "";
+	var url = "https://yiketianqi.com/api?unescape=1&version=v1&" + IdKey + city;
 	console.log(url)
 	$.ajax({
 		url: url,
@@ -13,7 +13,7 @@ function getWeather(IdKey,city) {
 		dataType: "json",
 		success: function(res) {
 			var location = res.city;
-			var data=res.data[0];
+			var data = res.data[0];
 			var temp = data.tem;
 			var air = data.air_level;
 			var weather = data.wea;
@@ -47,7 +47,7 @@ function getWeibo() {
 }
 
 function getDouyin() {
-	$.ajax({//https://creator.douyin.com/aweme/v1/creator/data/billboard/?billboard_type=1
+	$.ajax({ //https://creator.douyin.com/aweme/v1/creator/data/billboard/?billboard_type=1
 		url: "https://tenapi.cn/douyinresou/",
 		type: "get",
 		dataType: "json",
@@ -99,13 +99,18 @@ function getZhihu() {
 	});
 }
 
-function test(){
-	$.ajax({
-		url: "https://tenapi.cn/zhihuresou/",
-		type: "GET",
-		dataType:"json",
-		success: function(res) {
-			console.log(res);
-		}
-	});
+function test(imgSrc) {
+	var img = new Image();
+	img.src=imgSrc;
+	$("#app").append(img)
+	$(img).ready(function(){
+		console.log(img)
+		var canvas = document.createElement("canvas");
+		canvas.width = img.width;
+		canvas.height = img.height;
+		var ctx = canvas.getContext("2d");
+		ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+		var dataURL = canvas.toDataURL();
+		console.log(dataURL);
+	})
 }

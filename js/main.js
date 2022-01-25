@@ -605,7 +605,7 @@ require(['jquery'], function($) {
 			}
 			return false;
 		},
-		insetPage: function() {
+		insertPage: function() {
 			var libData = this.getinitbookMarks();
 			var libHTML = "";
 			for (let i in libData) {
@@ -640,7 +640,7 @@ require(['jquery'], function($) {
 				$(".addbook-choice").addClass("animation");
 				$(".addbook-content").addClass("animation");
 			}, 50);
-
+			
 			//绑定事件
 			$("#addbook-upload").click(function() {
 				openFile(function() {
@@ -846,7 +846,7 @@ require(['jquery'], function($) {
 							// 取消书签编辑状态
 							$(document).click();
 							// 插入html
-							that.insetPage();
+							that.insertPage();
 						})
 					} else {
 						$(".addbook").addClass("animation");
@@ -892,7 +892,7 @@ require(['jquery'], function($) {
 						// 取消书签编辑状态
 						$(document).click();
 						// 插入html
-						that.insetPage();
+						that.insertPage();
 					}
 				}
 			});
@@ -1925,7 +1925,7 @@ require(['jquery'], function($) {
 
 
 			// 天气
-			getWeather(settings.get("weatherApiIdKey"),settings.get("weatherApiCity"));
+			getWeather(settings.get("weatherApiIdKey"), settings.get("weatherApiCity"));
 			//微博热搜榜
 			getWeibo()
 			//抖音热搜榜
@@ -2039,11 +2039,11 @@ require(['jquery'], function($) {
 	function getnewVersion() {
 		var newVersion = "fail to get newVersion";
 		$.ajax({
-			url: "https://bird.ioliu.cn/v2?url=https://icedwatermelonjuice.github.io/HMOSHomePage/",
+			url: "https://tenapi.cn/title/?url=https://icedwatermelonjuice.github.io/HMOSHomePage/",
+			dataType: "json",
 			async: false,
-			success: function(result) {
-				newVersion = result.slice(result.search("version:") + "version:"
-					.length, result.length - 1);
+			success: function(res) {
+				newVersion = res.data.description.replace("HomePage version", "");
 			},
 		});
 		return newVersion;
@@ -2052,7 +2052,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.22";
+		app.version = "1.23";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2063,216 +2063,230 @@ require(['jquery'], function($) {
 		} else {
 			positionDes = "向下偏移" + positionDes + "px";
 		}
-		var weatherApiIdKey=settings.get("weatherApiIdKey");
-		weatherApiIdKey=weatherApiIdKey?weatherApiIdKey.replace("&"," ").replace("appid=","id:").replace("appsecret=","key:"):"默认值，建议使用自己的id和key";
-		var weatherApiCity=settings.get("weatherApiCity");
-		weatherApiCity=weatherApiCity?weatherApiCity:"未填城市，默认ip定位（地级市）";
+		var weatherApiIdKey = settings.get("weatherApiIdKey");
+		weatherApiIdKey = weatherApiIdKey ? weatherApiIdKey.replace("&", " ").replace("appid=", "id:").replace(
+			"appsecret=", "key:") : "默认值，建议使用自己的id和key";
+		var weatherApiCity = settings.get("weatherApiCity");
+		weatherApiCity = weatherApiCity ? weatherApiCity : "未填城市，默认ip定位（地级市）";
 		//构建设置HTML
 		var data = [{
-				"type": "hr"
+			"type": "hr"
+		}, {
+			"title": "搜索引擎",
+			"type": "select",
+			"value": "engines",
+			"data": [{
+				"t": "手机百度",
+				"v": "baidu"
 			}, {
-				"title": "搜索引擎",
-				"type": "select",
-				"value": "engines",
-				"data": [{
-					"t": "手机百度",
-					"v": "baidu"
-				}, {
-					"t": "百度搜索",
-					"v": "baiduPC"
-				}, {
-					"t": "跟随Via",
-					"v": "via"
-				}, {
-					"t": "夸克搜索",
-					"v": "quark"
-				}, {
-					"t": "谷歌搜索",
-					"v": "google"
-				}, {
-					"t": "必应搜索",
-					"v": "bing"
-				}, {
-					"t": "神马搜索",
-					"v": "sm"
-				}, {
-					"t": "360搜索",
-					"v": "360"
-				}, {
-					"t": "搜狗搜索",
-					"v": "sogou"
-				}, {
-					"t": "自定义",
-					"v": "diy"
-				}]
+				"t": "百度搜索",
+				"v": "baiduPC"
 			}, {
-				"title": "图标颜色",
-				"type": "select",
-				"value": "bookcolor",
-				"data": [{
-					"t": "深色图标",
-					"v": "black"
-				}, {
-					"t": "浅色图标",
-					"v": "white"
-				}]
+				"t": "跟随Via",
+				"v": "via"
 			}, {
-				"title": "图标数量",
-				"type": "select",
-				"value": "booknumber",
-				"data": [{
-					"t": "每行四个",
-					"v": "Num4"
-				}, {
-					"t": "每行五个",
-					"v": "Num5"
-				}, {
-					"t": "每行六个",
-					"v": "Num6"
-				}, {
-					"t": "每行七个",
-					"v": "Num7"
-				}, {
-					"t": "每行八个",
-					"v": "Num8"
-				}]
+				"t": "夸克搜索",
+				"v": "quark"
 			}, {
-				"title": "点击LOGO",
-				"type": "select",
-				"value": "LOGOclickFn",
-				"data": [{
-					"t": "打开书签",
-					"v": "bookmarkList"
-				}, {
-					"t": "打开设置",
-					"v": "settingsPage"
-				}, {
-					"t": "打开精选",
-					"v": "choicePage"
-				}]
+				"t": "谷歌搜索",
+				"v": "google"
 			}, {
-				"title": "主页壁纸",
-				"value": "wallpaper"
+				"t": "必应搜索",
+				"v": "bing"
 			}, {
-				"title": "主页LOGO",
-				"value": "logo"
+				"t": "神马搜索",
+				"v": "sm"
 			}, {
-				"title": "LOGO高度",
-				"value": "logoHeight",
-				"description": "当前高度(单位px,像素): " + logoHeightDes + "px"
+				"t": "360搜索",
+				"v": "360"
 			}, {
-				"title": "整体位置",
-				"value": "position",
-				"description": "当前位置: " + positionDes
+				"t": "搜狗搜索",
+				"v": "sogou"
 			}, {
-				"type": "hr"
+				"t": "自定义",
+				"v": "diy"
+			}]
+		}, {
+			"title": "图标颜色",
+			"type": "select",
+			"value": "bookcolor",
+			"data": [{
+				"t": "深色图标",
+				"v": "black"
 			}, {
-				"title": "主页样式细圆",
-				"type": "checkbox",
-				"value": "styleThin"
+				"t": "浅色图标",
+				"v": "white"
+			}]
+		}, {
+			"title": "图标数量",
+			"type": "select",
+			"value": "booknumber",
+			"data": [{
+				"t": "每行四个",
+				"v": "Num4"
 			}, {
-				"title": "保存搜索栏历史",
-				"type": "checkbox",
-				"value": "searchHistory"
+				"t": "每行五个",
+				"v": "Num5"
 			}, {
-				"title": "添加主页书签",
-				"type": "checkbox",
-				"value": "SetbookMarksADD"
+				"t": "每行六个",
+				"v": "Num6"
 			}, {
-				"title": "显示搜索引擎快切栏",
-				"type": "checkbox",
-				"value": "SEQuickChange"
+				"t": "每行七个",
+				"v": "Num7"
 			}, {
-				"title": "夜间模式",
-				"type": "checkbox",
-				"value": "nightMode"
+				"t": "每行八个",
+				"v": "Num8"
+			}]
+		}, {
+			"title": "点击LOGO",
+			"type": "select",
+			"value": "LOGOclickFn",
+			"data": [{
+				"t": "打开书签",
+				"v": "bookmarkList"
 			}, {
-				"title": "自动夜间模式(跟随浏览器)",
-				"type": "checkbox",
-				"value": "autonightMode"
+				"t": "打开设置",
+				"v": "settingsPage"
 			}, {
-				"title": "自动夜间模式(用户定时)",
-				"type": "checkbox",
-				"value": "autonightMode2"
+				"t": "打开精选",
+				"v": "choicePage"
+			}]
+		}, {
+			"title": "长按LOGO",
+			"type": "select",
+			"value": "LOGOlongpressFn",
+			"data": [{
+				"t": "打开书签",
+				"v": "bookmarkList"
 			}, {
-				"title": "夜间模式定时区间",
-				"value": "autonightMode2Array",
-				"description": "" + autonightMode2AyDes
+				"t": "打开设置",
+				"v": "settingsPage"
 			}, {
-				"title": "自定义JS/CSS",
-				"type": "checkbox",
-				"value": "customJsCss"
-			}, {
-				"title": "自定义JS",
-				"value": "inputCustomJs",
-				"description": "点击输入自定义JS"
-			}, {
-				"title": "自定义CSS",
-				"value": "inputCustomCss",
-				"description": "点击输入自定义CSS"
-			}, {
-				"title": "应用自定义JS/CSS",
-				"value": "applyCustomJsCss",
-				"description": "已开启自定义JS/CSS,点击应用新的自定义JS/CSS"
-			}, {
-				"type": "hr"
-			}, {
-				"title": "chrome插件书签地址",
-				"value": "chromeBookmarks",
-				"description": settings.get("chromeBookmarks")
-			}, {
-				"title": "实况天气城市",
-				"value": "weatherApiCity",
-				"description": weatherApiCity
-			}, {
-				"title": "天气接口ID和Key",
-				"value": "weatherApiIdKey",
-				"description": weatherApiIdKey
-			}, {
-				"type": "hr"
-			}, {
-				"title": "备份数据",
-				"value": "export",
-				"description": "备份主页数据到剪贴板"
-			}, {
-				"title": "恢复数据",
-				"value": "import",
-				"description": "从剪贴板恢复主页数据"
-			}, {
-				"title": "初始化壁纸和LOGO",
-				"value": "delLogo",
-				"description": "恢复默认壁纸和LOGO"
-			}, {
-				"title": "初始化书签和设置",
-				"value": "intibookMark",
-				"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
-			}, {
-				"title": "初始化自定义JS/CSS",
-				"value": "clearCustomJsCss",
-				"description": "清除所有自定义JS/CSS"
-			}, {
-				"type": "hr"
-			}, {
-				"title": "关于",
-				"value": "aboutVersion",
-				"description": "当前版本:" + app.version + " (点击检查更新)"
-			}, {
-				"title": "Github",
-				"value": "openGithub",
-				"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
+				"t": "打开精选",
+				"v": "choicePage"
+			}]
+		}, {
+			"title": "主页壁纸",
+			"value": "wallpaper"
+		}, {
+			"title": "主页LOGO",
+			"value": "logo"
+		}, {
+			"title": "LOGO高度",
+			"value": "logoHeight",
+			"description": "当前高度(单位px,像素): " + logoHeightDes + "px"
+		}, {
+			"title": "整体位置",
+			"value": "position",
+			"description": "当前位置: " + positionDes
+		}, {
+			"type": "hr"
+		}, {
+			"title": "主页样式细圆",
+			"type": "checkbox",
+			"value": "styleThin"
+		}, {
+			"title": "保存搜索栏历史",
+			"type": "checkbox",
+			"value": "searchHistory"
+		}, {
+			"title": "添加主页书签",
+			"type": "checkbox",
+			"value": "SetbookMarksADD"
+		}, {
+			"title": "显示搜索引擎快切栏",
+			"type": "checkbox",
+			"value": "SEQuickChange"
+		}, {
+			"title": "夜间模式",
+			"type": "checkbox",
+			"value": "nightMode"
+		}, {
+			"title": "自动夜间模式(跟随浏览器)",
+			"type": "checkbox",
+			"value": "autonightMode"
+		}, {
+			"title": "自动夜间模式(用户定时)",
+			"type": "checkbox",
+			"value": "autonightMode2"
+		}, {
+			"title": "夜间模式定时区间",
+			"value": "autonightMode2Array",
+			"description": "" + autonightMode2AyDes
+		}, {
+			"title": "自定义JS/CSS",
+			"type": "checkbox",
+			"value": "customJsCss"
+		}, {
+			"title": "自定义JS",
+			"value": "inputCustomJs",
+			"description": "点击输入自定义JS"
+		}, {
+			"title": "自定义CSS",
+			"value": "inputCustomCss",
+			"description": "点击输入自定义CSS"
+		}, {
+			"title": "应用自定义JS/CSS",
+			"value": "applyCustomJsCss",
+			"description": "已开启自定义JS/CSS,点击应用新的自定义JS/CSS"
+		}, {
+			"type": "hr"
+		}, {
+			"title": "chrome插件书签地址",
+			"value": "chromeBookmarks",
+			"description": settings.get("chromeBookmarks")
+		}, {
+			"title": "实况天气城市",
+			"value": "weatherApiCity",
+			"description": weatherApiCity
+		}, {
+			"title": "天气接口ID和Key",
+			"value": "weatherApiIdKey",
+			"description": weatherApiIdKey
+		}, {
+			"type": "hr"
+		}, {
+			"title": "备份数据",
+			"value": "export",
+			"description": "备份主页数据到剪贴板"
+		}, {
+			"title": "恢复数据",
+			"value": "import",
+			"description": "从剪贴板恢复主页数据"
+		}, {
+			"title": "初始化壁纸和LOGO",
+			"value": "delLogo",
+			"description": "恢复默认壁纸和LOGO"
+		}, {
+			"title": "初始化书签和设置",
+			"value": "intibookMark",
+			"description": "恢复默认书签和设置(除主题和LOGO两项之外)"
+		}, {
+			"title": "初始化自定义JS/CSS",
+			"value": "clearCustomJsCss",
+			"description": "清除所有自定义JS/CSS"
+		}, {
+			"type": "hr"
+		}, {
+			"title": "关于",
+			"value": "aboutVersion",
+			"description": "当前版本:" + app.version + " (点击检查更新)"
+		}, {
+			"title": "Github",
+			"value": "openGithub",
+			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
 
-			}, {
-				"title": "Gitee(可能不是最新版本)",
-				"value": "openGitee",
-				"description": "https://gitee.com/gem_xl/HMOSHomePage"
+		}, {
+			"title": "Gitee(可能不是最新版本)",
+			"value": "openGitee",
+			"description": "https://gitee.com/gem_xl/HMOSHomePage"
 
-			}, {
-				"title": "天气Api(点击前往获取id与key)",
-				"value": "openWeatherApi",
-				"description": "http://www.yiketianqi.com"
+		}, {
+			"title": "天气Api(点击前往获取id与key)",
+			"value": "openWeatherApi",
+			"description": "http://www.yiketianqi.com"
 
-			}
-		];
+		}];
 		var html =
 			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">自     定     义     设     置</p></div><ul class="set-option-from">';
 		for (var json of data) {
@@ -2307,12 +2321,11 @@ require(['jquery'], function($) {
 			$('option[value=via]').hide();
 		}
 		// 只有via、x浏览器或chrome插件，才在点击/长按LOGO设置里显示打开书签选项
-		if (browser !== 'via' && browser !== 'x' && !/chrome-extension/i.test(location.href))
-		{
+		if (browser !== 'via' && browser !== 'x' && !/chrome-extension/i.test(location.href)) {
 			$('option[value=bookmarkList]').hide();
 		}
 		// 只有非via、x浏览器才显示chrome书签地址设置
-		if (browser === 'via' && browser === 'x'){
+		if (browser === 'via' || browser === 'x') {
 			$('.set-option[data-value=chromeBookmarks]').hide();
 		}
 		//屏蔽via浏览器的自动夜间模式
@@ -2445,9 +2458,8 @@ require(['jquery'], function($) {
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
 				location.href = $this.find('.set-description').text();
 			} else if (value === "aboutVersion") {
-				getnewVersion();
-				let alertMessage = '当前版本: ' + app.version + '\n最新版本: ' + getnewVersion() +
-					'\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com';
+				let alertMessage =
+					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com`;
 				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
@@ -2506,36 +2518,38 @@ require(['jquery'], function($) {
 				settings.set("customJsCss", true);
 				location.reload();
 			} else if (value === "weatherApiCity") {
-				var defaultData=settings.get("weatherApiCity");
-				defaultData=defaultData?defaultData:"";
-				var city=prompt("请输入实况天气定位城市，例如：北京，上海\n若输入为空值，则使用ip定位到地级市",defaultData);
-				city=city.trim();
-				settings.set("weatherApiCity",city);
+				var defaultData = settings.get("weatherApiCity");
+				defaultData = defaultData ? defaultData : "";
+				var city = prompt("请输入实况天气定位城市，例如：北京，上海\n若输入为空值，则使用ip定位到地级市", defaultData);
+				city = city.trim();
+				settings.set("weatherApiCity", city);
 				$(".set-option[data-value=weatherApiCity] .set-description").text(city);
 			} else if (value === "weatherApiIdKey") {
-				var defaultData=settings.get("weatherApiIdKey");
-				if(/^appid=[A-Za-z0-9]+&appsecret=[A-Za-z0-9]+$/.test(defaultData)){
-					defaultData=defaultData.replace(/(appid|appsecret)?=/g,"").split("&");
-				}else{
-					defaultData=["",""];
+				var defaultData = settings.get("weatherApiIdKey");
+				if (/^appid=[A-Za-z0-9]+&appsecret=[A-Za-z0-9]+$/.test(defaultData)) {
+					defaultData = defaultData.replace(/(appid|appsecret)?=/g, "").split("&");
+				} else {
+					defaultData = ["", ""];
 				}
-				var id=prompt("请输入自己的天气接口Id\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配",defaultData[0]);
-				id=id.trim();
-				var key=prompt("请输入自己的天气接口Key\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配",defaultData[1]);
-				key=key.trim();
-				if(id && key && confirm(`请确认个人id和key:\nid:${id} key:${key}`)){
-						settings.set("weatherApiIdKey",`appid=${id}&appsecret=${key}`);
-						$(".set-option[data-value=weatherApiIdKey] .set-description").text(`id:${id} key:${key}`);
-				}else if(confirm("确定使用默认公共Id和Key?")){
-					settings.set("weatherApiIdKey","");
-					$(".set-option[data-value=weatherApiIdKey] .set-description").text("默认值，建议使用自己的id和key")
+				var id = prompt("请输入自己的天气接口Id\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配", defaultData[0]);
+				id = id.trim();
+				var key = prompt("请输入自己的天气接口Key\n若输入为空值，则使用默认公共Id和Key\n注：Id与Key需相匹配", defaultData[1]);
+				key = key.trim();
+				if (id && key && confirm(`请确认个人id和key:\nid:${id} key:${key}`)) {
+					settings.set("weatherApiIdKey", `appid=${id}&appsecret=${key}`);
+					$(".set-option[data-value=weatherApiIdKey] .set-description").text(
+						`id:${id} key:${key}`);
+				} else if (confirm("确定使用默认公共Id和Key?")) {
+					settings.set("weatherApiIdKey", "");
+					$(".set-option[data-value=weatherApiIdKey] .set-description").text(
+						"默认值，建议使用自己的id和key")
 				}
 			} else if (value === "chromeBookmarks") {
-				var defaultData=settings.get("chromeBookmarks");
-				defaultData=defaultData?defaultData:"chrome://bookmarks/";
-				var url=prompt("请输入新的chrome书签插件地址",defaultData);
-				url=url.trim();
-				settings.set("chromeBookmarks",url);
+				var defaultData = settings.get("chromeBookmarks");
+				defaultData = defaultData ? defaultData : "chrome://bookmarks/";
+				var url = prompt("请输入新的chrome书签插件地址", defaultData);
+				url = url.trim();
+				settings.set("chromeBookmarks", url);
 				$(".set-option[data-value=chromeBookmarks] .set-description").text(url);
 			} else if (evt.target.className !== 'set-select' && $this.find('.set-select')
 				.length > 0) {
