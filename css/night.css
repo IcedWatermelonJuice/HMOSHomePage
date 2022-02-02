@@ -47,8 +47,11 @@ body {
 	color: #666;
 }
 .quick-change li{
-	background: #fff;
+	background-color: transparent;
+	line-height: 22px;
+	border: 2px #fff solid;
 	filter: brightness(60%);
+	color: #fff;
 }
 .history li {
 	background: #1f1f1f;
