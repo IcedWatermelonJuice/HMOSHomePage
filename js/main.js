@@ -69,6 +69,7 @@ require(['jquery'], function($) {
 			styleThin: true,
 			searchHistory: false,
 			SetbookMarksADD: true,
+			SetbookMarksDisplay: true,
 			SEQuickChange: true,
 			nightMode: false,
 			autonightMode: false,
@@ -160,6 +161,10 @@ require(['jquery'], function($) {
 			}
 			// 加载LOGO
 			$(".logo").css(that.setLogo());
+			// 隐藏书签栏
+			if (!that.get('SetbookMarksDisplay')) {
+				$(".bookmark_outer_container").addClass("hide");
+			}
 			// 隐藏搜索引擎快切栏
 			if (!that.get('SEQuickChange')) {
 				$(".quick-change").hide();
@@ -304,49 +309,21 @@ require(['jquery'], function($) {
 		if (settings.get("booknumber") === "Num4") {
 			return "";
 		} else if (settings.get("booknumber") === "Num5") {
-			return "20%";
+			return "repeat(5,20%)";
 		} else if (settings.get("booknumber") === "Num6") {
-			return "16.66%";
+			return "repeat(6,16.66%)";
 		} else if (settings.get("booknumber") === "Num7") {
-			return "14.28%";
+			return "repeat(7,14.28%)";
 		} else if (settings.get("booknumber") === "Num8") {
-			return "12.5%";
+			return "repeat(8,12.5%)";
 		} else {
 			return "";
-			alert("booknumber error");
-		}
-	}
-
-	function setbookmarkNum() {
-		let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-		if (settings.get("booknumber") === "Num4") {
-			for (let i = 0; i < bookmarkListOBJ.length; i++) {
-				bookmarkListOBJ[i].removeAttribute("style");
-			}
-		} else if (settings.get("booknumber") === "Num5") {
-			for (let i = 0; i < bookmarkListOBJ.length; i++) {
-				bookmarkListOBJ[i].style.flex = "0 0 20%";
-			}
-		} else if (settings.get("booknumber") === "Num6") {
-			for (let i = 0; i < bookmarkListOBJ.length; i++) {
-				bookmarkListOBJ[i].style.flex = "0 0 16.66%";
-			}
-		} else if (settings.get("booknumber") === "Num7") {
-			for (let i = 0; i < bookmarkListOBJ.length; i++) {
-				bookmarkListOBJ[i].style.flex = "0 0 14.28%";
-			}
-		} else if (settings.get("booknumber") === "Num8") {
-			for (let i = 0; i < bookmarkListOBJ.length; i++) {
-				bookmarkListOBJ[i].style.flex = "0 0 12.5%";
-			}
+			alert("set bookmarks number error");
 		}
 	}
 
 	function bookmarkNumSet() {
-		let bookmarkStyleNum = document.getElementsByClassName("bookmark")[0].children[0].style.flex;
-		if (bookmarkStyleNum !== getbooknumber()) {
-			setbookmarkNum();
-		}
+		$(".bookmark").css("gridTemplateColumns", getbooknumber());
 	}
 
 	//LOGO高度设置:
@@ -597,13 +574,14 @@ require(['jquery'], function($) {
 		},
 		searchURL: function(url) {
 			var data = this.options.data;
+			var res=false;
 			for (let i = 0; i < data.length; i++) {
 				if (data[i].url === url) {
-					return true;
+					res=true;
 					break;
 				}
 			}
-			return false;
+			return res;
 		},
 		insertPage: function() {
 			var libData = this.getinitbookMarks();
@@ -640,7 +618,7 @@ require(['jquery'], function($) {
 				$(".addbook-choice").addClass("animation");
 				$(".addbook-content").addClass("animation");
 			}, 50);
-			
+
 			//绑定事件
 			$("#addbook-upload").click(function() {
 				openFile(function() {
@@ -750,11 +728,13 @@ require(['jquery'], function($) {
 			});
 			$(".addbook-choice").click(function(evt) {
 				let target = evt.target;
+				console.log($(".addbook-choice li").index(target))
 				if (target.tagName === "LI" && !target.classList.contains("current")) {
 					let value = target.getAttribute("value");
 					$(target).siblings("li").removeClass("current")
 					$(target).addClass("current");
-					$(".active-span").css("left", ($(target).position().left + 16) + "px");
+					let index=$(".addbook-choice li").index(target);
+					$(".active-span").css("transform", `translateX(${index*112}px)`);
 					$(".addbook-sites").each(function(i, ele) {
 						$(ele).addClass("hide");
 					})
@@ -831,15 +811,8 @@ require(['jquery'], function($) {
 				}
 				if (settings.get("SetbookMarksADD") === true) {
 					if ($('.addbook').length === 0) {
-						var flexStyle = that.$ele[0].children[0].style.flex;
-						if (flexStyle) {
-							flexStyle = "flex:" + flexStyle + ";";
-						} else {
-							flexStyle = "";
-						}
 						that.$ele.append(
-							'<div class="list addbook" style="' + flexStyle +
-							'"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
+							'<div class="list addbook"><div class="img"><svg viewBox="0 0 1024 1024"><path class="st0" d="M673,489.2H534.8V350.9c0-12.7-10.4-23-23-23c-12.7,0-23,10.4-23,23v138.2H350.6c-12.7,0-23,10.4-23,23c0,12.7,10.4,23,23,23h138.2v138.2c0,12.7,10.4,23,23,23c12.7,0,23-10.4,23-23V535.2H673c12.7,0,23-10.4,23-23C696.1,499.5,685.7,489.2,673,489.2z" fill="#222"/></svg></div></div>'
 						);
 						$('.addbook').click(function() {
 							$('.addbook').remove();
@@ -900,6 +873,10 @@ require(['jquery'], function($) {
 		del: function(index) {
 			var that = this;
 			var data = this.options.data;
+			if (this.getJson().length <= 1) {
+				alert("书签数量必须>1\n如果想要隐藏书签，请前往设置页面");
+				return false;
+			}
 			this.$ele.css("overflow", "visible");
 			var dom = this.$ele.find('.list').eq(index);
 			dom.css({
@@ -1122,7 +1099,7 @@ require(['jquery'], function($) {
 			}).addClass("animation");
 			$(".search-input").val("").focus();
 			$(".history").show().addClass("animation");
-			$(".input-bg").addClass("animation");
+			$(".input-bg").addClass("animation").css("border-color", "var(--dark)");
 			$(".shortcut").addClass("animation");
 		}, 1);
 	});
@@ -2052,7 +2029,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.23";
+		app.version = "1.23.1";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2193,6 +2170,10 @@ require(['jquery'], function($) {
 			"title": "添加主页书签",
 			"type": "checkbox",
 			"value": "SetbookMarksADD"
+		}, {
+			"title": "显示主页书签",
+			"type": "checkbox",
+			"value": "SetbookMarksDisplay"
 		}, {
 			"title": "显示搜索引擎快切栏",
 			"type": "checkbox",
@@ -2592,32 +2573,31 @@ require(['jquery'], function($) {
 				}
 			}
 			//每行图标数量设置
-			if (item === "booknumber" && value === "Num4") {
-				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-				for (let i = 0; i < bookmarkListOBJ.length; i++) {
-					bookmarkListOBJ[i].removeAttribute("style");
+			if (item === "booknumber") {
+				let numset = "repeat(4,25%)";
+				switch (value) {
+					case "Num4":
+						numset = "repeat(4,25%)";
+						break;
+					case "Num5":
+						numset = "repeat(5,20%)";
+						break;
+					case "Num6":
+						numset = "repeat(6,16.66%)";
+						break;
+					case "Num7":
+						numset = "repeat(7,14.28%)";
+						break;
+					case "Num8":
+						numset = "repeat(12.5%)";
+						break;
+					default:
+						numset = "repeat(4,25%)";
+						break;
 				}
-			} else if (item === "booknumber" && value === "Num5") {
-				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-				for (let i = 0; i < bookmarkListOBJ.length; i++) {
-					bookmarkListOBJ[i].style.flex = "0 0 20%";
-				}
-			} else if (item === "booknumber" && value === "Num6") {
-				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-				for (let i = 0; i < bookmarkListOBJ.length; i++) {
-					bookmarkListOBJ[i].style.flex = "0 0 16.66%";
-				}
-			} else if (item === "booknumber" && value === "Num7") {
-				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-				for (let i = 0; i < bookmarkListOBJ.length; i++) {
-					bookmarkListOBJ[i].style.flex = "0 0 14.28%";
-				}
-			} else if (item === "booknumber" && value === "Num8") {
-				let bookmarkListOBJ = document.getElementsByClassName("bookmark")[0].children;
-				for (let i = 0; i < bookmarkListOBJ.length; i++) {
-					bookmarkListOBJ[i].style.flex = "0 0 12.5%";
-				}
+				$(".bookmark").css("gridTemplateColumns",numset)
 			}
+
 			// 保存设置
 			settings.set(item, value);
 		});
@@ -2631,6 +2611,11 @@ require(['jquery'], function($) {
 				$("body").addClass('styleThin');
 			} else if (item === 'styleThin' && value === false) {
 				$("body").removeClass('styleThin');
+			}
+			if (item === 'SetbookMarksDisplay' && value === true) {
+				$(".bookmark_outer_container").removeClass("hide");
+			} else if (item === 'SetbookMarksDisplay' && value === false) {
+				$(".bookmark_outer_container").addClass("hide");
 			}
 			if (item === 'SEQuickChange' && value === true) {
 				$(".quick-change").show();
@@ -2692,30 +2677,26 @@ require(['jquery'], function($) {
 
 
 	//设置点击/长按LOGO功能冲突检测
+	var DetectConflictsNum=0;
 	function DetectLogoFnConflicts() {
-		//settingsPage
-		if (!bookMark.searchURL("openSettingPage()")) {
-			if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get("LOGOlongpressFn") !==
-					"settingsPage")) {
-
-				setTimeout(function() {
-					if ((settings.get("LOGOclickFn") !== "settingsPage") && (settings.get(
-							"LOGOlongpressFn") !== "settingsPage")) {
-						if (!bookMark.searchURL("openSettingPage()")) {
-							settings.set("LOGOclickFn", settings.initStorage["LOGOclickFn"]);
-							settings.set("LOGOlongpressFn", settings.initStorage["LOGOlongpressFn"]);
-							alert('检测到LOGO功能与主页书签中均无设置，已重置LOGO功能');
-							location.reload(false);
-						};
-					}
-				}, 5000);
-			} else {
-				if (settings.get("LogoHeightSet") === "0") {
-					bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png")
-					alert('LOGO已隐藏,已自动添加主页书签-设置');
-					location.reload(false);
-				}
-			}
+		var logoDisplay=settings.get("LogoHeightSet") !== "0"?true:false;
+		var logoCKhasSet=settings.get("LOGOclickFn") === "settingsPage"?true:false;
+		var logoLPhasSet=settings.get("LOGOlongpressFn") === "settingsPage"?true:false;
+		var logoHasSetFn=logoDisplay&&(logoCKhasSet||logoLPhasSet);
+		var bookDisplay=settings.get("SetbookMarksDisplay")?true:false;
+		var bookHasSet=bookMark.searchURL("openSettingPage()")?true:false;
+		var bookHasSetFn=bookDisplay&&bookHasSet;
+		if(logoHasSetFn||bookHasSetFn){//若书签隐藏或无设置书签
+			DetectConflictsNum=0;
+		}else{
+			DetectConflictsNum+=1;
+		}
+		if(DetectConflictsNum>5){
+			DetectConflictsNum=0;
+			settings.set("SetbookMarksDisplay",true);
+			$(".bookmark_outer_container").removeClass("hide");
+			!bookHasSet&&bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png");
+			alert("未检测到设置入口，已显示主页书签并添加设置书签\nLOGO功能（点击或长按LOGO，且不能隐藏）与桌面书签（不能隐藏书签）必须有设置入口");
 		}
 	}
 	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突 搜索引擎快切初始化
@@ -2757,7 +2738,11 @@ require(['jquery'], function($) {
 					});
 				} else if (phase === 'end' || phase === 'cancel') {
 					$('.logo').removeAttr("disabled style");
-					$('.bookmark').removeAttr("disabled style");
+					$('.bookmark').removeAttr("disabled").css({
+						'opacity': "",
+						'transform': "",
+						'transition-duration': ""
+					});
 					settings.apply();
 					if (distance >= 100 && direction === "down") {
 						$('.ornament-input-group').css("transform", "").click();
