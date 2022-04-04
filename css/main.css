@@ -527,7 +527,7 @@ html {
 
 .addbook-sitesLib {
 	display: grid;
-	grid-template-columns: auto auto;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 	grid-template-rows: auto;
 }
 
