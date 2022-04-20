@@ -2258,11 +2258,6 @@ require(['jquery'], function($) {
 			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
 
 		}, {
-			"title": "Gitee(可能不是最新版本)",
-			"value": "openGitee",
-			"description": "https://gitee.com/gem_xl/HMOSHomePage"
-
-		}, {
 			"title": "天气Api(点击前往获取id与key)",
 			"value": "openWeatherApi",
 			"description": "http://www.yiketianqi.com"
@@ -2440,7 +2435,7 @@ require(['jquery'], function($) {
 				location.href = $this.find('.set-description').text();
 			} else if (value === "aboutVersion") {
 				let alertMessage =
-					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com`;
+					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系方式: 请通过github反馈`;
 				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
