@@ -21,7 +21,6 @@
 * 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app
 * CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
-* Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 🌹开源致谢
 * 原项目名称：quarkHomePage(H5仿夸克浏览器主页)
 * 原项目作者：liumingye(刘明野)
