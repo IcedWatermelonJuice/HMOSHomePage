@@ -21,11 +21,20 @@
 * 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app
 * CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
+* Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
 # 🌹开源致谢
 * 原项目名称：quarkHomePage(H5仿夸克浏览器主页)
 * 原项目作者：liumingye(刘明野)
 * 原仓库地址：https://gitee.com/liumingye/quarkHomePage
+# 📪联系方式
+* Email：gem_xl@petalmail.com
 # 📕更新日志
+<版本 1.24>
+* 修复“修改原有书签”不可使用的问题
+* 书签增改页、设置页、精选页增加对浏览器返回功能的支持
+* 优化书签增改页“自动获取图标”功能
+* 删除一些没有必要的控制台信息，增加部分可用于检错的控制台信息
+
 <版本 1.23>
 * 更换检查更新时所用的api，修复检查更新不可用的问题
 * 修复长按LOGO功能设置消失的问题
