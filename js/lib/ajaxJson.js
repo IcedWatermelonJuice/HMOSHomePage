@@ -6,7 +6,6 @@ function getWeather(IdKey, city) {
 	IdKey = IdKey ? IdKey : "appid=23035354&appsecret=8YvlPNrz";
 	city = city ? "&city=" + city : "";
 	var url = "https://yiketianqi.com/api?unescape=1&version=v1&" + IdKey + city;
-	console.log(url)
 	$.ajax({
 		url: url,
 		type: "get",
