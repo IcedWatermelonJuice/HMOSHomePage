@@ -343,7 +343,7 @@ html {
 .bookmark {
 	text-align: center;
 	display: grid;
-	grid-template-columns: repeat(4,25%);
+	grid-template-columns: repeat(4, 25%);
 	padding: 0 5px 180px;
 }
 
@@ -457,8 +457,10 @@ html {
 	flex-direction: column;
 	background: transparent;
 }
-
 /* 添加书签 */
+.page-addbook .bottom-close{
+	background: unset!important;
+}
 .addbook-choice {
 	display: flex;
 	padding: 20px 10px;
@@ -586,6 +588,7 @@ html {
 #addbook-upload img {
 	height: 100%;
 	float: left;
+	border-radius: 10px;
 }
 
 #addbook-upload p {
