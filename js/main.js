@@ -574,16 +574,16 @@ require(['jquery'], function($) {
 		},
 		searchURL: function(url) {
 			var data = this.options.data;
-			var res=false;
+			var res = false;
 			for (let i = 0; i < data.length; i++) {
 				if (data[i].url === url) {
-					res=true;
+					res = true;
 					break;
 				}
 			}
 			return res;
 		},
-		insertPage: function() {
+		insertPage: function(siteData) {
 			var libData = this.getinitbookMarks();
 			var libHTML = "";
 			for (let i in libData) {
@@ -612,6 +612,15 @@ require(['jquery'], function($) {
 					<div class="bottom-close"></div>
 				</div>
 			</div>`);
+			if (siteData) {
+				$(".page-addbook .addbook-url").val(siteData.url);
+				$(".page-addbook .addbook-name").val(siteData.name);
+				$(".page-addbook #addbook-upload").html(
+				`<img src="${siteData.img}"></img><p>原书签图标</p>`);
+				$(".page-addbook .addbook-ok").text("确认修改");
+			}
+
+			history.pushState(null, document.title, changeParam("page", siteData?"editbook":"addbook"));
 
 			setTimeout(function() {
 				$(".page-bg").addClass("animation");
@@ -619,6 +628,22 @@ require(['jquery'], function($) {
 				$(".addbook-content").addClass("animation");
 			}, 50);
 
+			function drawIcon(name) {
+				var canvas = document.createElement(
+					"canvas");
+				canvas.height = 100;
+				canvas.width = 100;
+				var ctx = canvas.getContext("2d");
+				ctx.fillStyle = "#f5f5f5";
+				ctx.fillRect(0, 0, 100, 100);
+				ctx.fill();
+				ctx.fillStyle = "#222";
+				ctx.font = "40px Arial";
+				ctx.textAlign = "center";
+				ctx.textBaseline = "middle";
+				ctx.fillText(name.substr(0, 1), 50, 52);
+				return canvas.toDataURL("image/png");
+			}
 			//绑定事件
 			$("#addbook-upload").click(function() {
 				openFile(function() {
@@ -654,8 +679,12 @@ require(['jquery'], function($) {
 				});
 			});
 			$("#addbook-autofetch").click(function() {
-				var autofetchFlag = false,
-					url = $(".addbook-url").val(),
+				var t = $("#addbook-autofetch").attr("auto_timer");
+				if (t) {
+					alert("正在获取,请稍后");
+					return false
+				}
+				var url = $(".addbook-url").val(),
 					ImgObj = new Image();
 				if (url.search("http") === -1) {
 					url = "https://" + url;
@@ -666,22 +695,34 @@ require(['jquery'], function($) {
 					ImgUrl = "https://" + ImgUrl +
 						"/favicon.ico";
 					ImgObj.src = ImgUrl;
-					if (ImgObj.fileSize > 0 || (ImgObj.width >
-							0 &&
-							ImgObj.height > 0)) {
-						autofetchFlag = true;
+					t = setInterval(() => {
+						if (ImgObj.fileSize > 0 || (ImgObj.width > 0 && ImgObj.height >
+								0)) {
+							clearInterval(t);
+							$("#addbook-autofetch").removeAttr("auto_timer")
+							alert("图标获取成功");
+							$("#addbook-upload").html('<img src="' + ImgUrl +
+								'"></img><p>自动获取的favicon</p>');
+						}
+						console.log("autofetch", $("#addbook-autofetch").attr(
+							"auto_timer"))
+					}, 200)
+					$("#addbook-autofetch").attr("auto_timer", t);
+				}
+				setTimeout(() => {
+					clearInterval(t);
+					if ($("#addbook-autofetch").attr("auto_timer")) {
+						$("#addbook-autofetch").removeAttr("auto_timer");
+						if ($(".addbook-name").val()) {
+							$("#addbook-upload").html('<img src="' + drawIcon($(
+									".addbook-name").val()) +
+								'"></img><p>自动生成的文字图标</p>');
+						}
+						alert(
+							"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
+						);
 					}
-				}
-				if (autofetchFlag) {
-					alert("图标获取成功");
-					$("#addbook-upload").html('<img src="' +
-						ImgUrl +
-						'"></img><p>自动获取favicon</p>');
-				} else {
-					alert(
-						"图标获取失败\n请检查URL或再次尝试。如果多次获取都失败，可能对方服务器禁止获取网站favicon.ico或favicon.ico不存在"
-					);
-				}
+				}, 2000)
 			});
 			$(".addbook-ok").click(function() {
 				var name = $(".addbook-name").val(),
@@ -690,26 +731,18 @@ require(['jquery'], function($) {
 				if (name.length && url.length) {
 					if (!icon) {
 						// 绘制文字图标
-						var canvas = document.createElement(
-							"canvas");
-						canvas.height = 100;
-						canvas.width = 100;
-						var ctx = canvas.getContext("2d");
-						ctx.fillStyle = "#f5f5f5";
-						ctx.fillRect(0, 0, 100, 100);
-						ctx.fill();
-						ctx.fillStyle = "#222";
-						ctx.font = "40px Arial";
-						ctx.textAlign = "center";
-						ctx.textBaseline = "middle";
-						ctx.fillText(name.substr(0, 1), 50, 52);
-						icon = canvas.toDataURL("image/png");
+						icon = drawIcon(name);
 					}
 					$(".bottom-close").click();
-					bookMark.add(name, url, icon);
+					if (siteData.index) {
+						bookMark.edit(siteData.index, name, url, icon);
+					} else {
+						bookMark.add(name, url, icon);
+					}
 				}
 			});
 			$(".bottom-close").click(function() {
+				history.replaceState(null, document.title, location.origin + location.pathname);
 				$(".page-addbook").css({
 					"pointer-events": "none"
 				});
@@ -728,12 +761,11 @@ require(['jquery'], function($) {
 			});
 			$(".addbook-choice").click(function(evt) {
 				let target = evt.target;
-				console.log($(".addbook-choice li").index(target))
 				if (target.tagName === "LI" && !target.classList.contains("current")) {
 					let value = target.getAttribute("value");
 					$(target).siblings("li").removeClass("current")
 					$(target).addClass("current");
-					let index=$(".addbook-choice li").index(target);
+					let index = $(".addbook-choice li").index(target);
 					$(".active-span").css("transform", `translateX(${index*112}px)`);
 					$(".addbook-sites").each(function(i, ele) {
 						$(ele).addClass("hide");
@@ -748,7 +780,11 @@ require(['jquery'], function($) {
 				if (index) {
 					let data = bookMark.getinitbookMarks();
 					data = data[index];
-					bookMark.add(data.name, data.url, data.icon);
+					if (siteData) {
+						bookMark.edit(siteData.index, data.name, data.url, data.icon);
+					} else {
+						bookMark.add(data.name, data.url, data.icon);
+					}
 					$(".bottom-close").click();
 				}
 			})
@@ -858,14 +894,17 @@ require(['jquery'], function($) {
 					if (evt.target.className === "delbook") {
 						that.del(dom.index());
 					} else if (evt.target.className === "editbook") {
-						var targetBook = $(".bookmark").find(".list").eq(dom.index());
-						//var turl=targetBook.attr("data-url");
-						var turl = dom.data("url");
-						var tname = dom.find(".text").text();
+						var siteData = {
+							index: dom.index(),
+							url: dom.data("url"),
+							name: dom.find(".text").text(),
+							img: dom.find("div.img")[0].style.backgroundImage.replace(
+								`url("`, "").replace(`")`, "")
+						}
 						// 取消书签编辑状态
 						$(document).click();
 						// 插入html
-						that.insertPage();
+						that.insertPage(siteData);
 					}
 				}
 			});
@@ -1151,6 +1190,15 @@ require(['jquery'], function($) {
 				$('.emptyHistory').removeClass('animation');
 				$('body').css("pointer-events", "");
 			});
+		}
+		if ($(".page-choice").is(":visible")) {
+			$(".page-choice .bottom-close").click();
+		}
+		if ($(".page-addbook").is(":visible")) {
+			$(".page-addbook .bottom-close").click();
+		}
+		if ($(".page-settings").is(":visible")) {
+			$(".page-settings .set-back").click();
 		}
 	}, false);
 
@@ -1821,7 +1869,7 @@ require(['jquery'], function($) {
 
 			<div class="list">
 				<a class="flex-1 content" href="https://www.xuexi.cn" style="background-image:linear-gradient(136deg, rgb(255, 81, 81) 0%, rgb(255, 111, 88) 100%)"><p class="hl">学习强国</p><p class="shl">梦想从学习开始</br>事业从实践起步</br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp——习近平</p><div class="cmp-icon" style="right: 20px; top: 26px; width: 65px; height: 64px; background-image: url(img/shortcut/xuexi.png);"></div></a>
-				<a class="flex-right content" href="https://translate.google.cn/?hl=zh-CN" style="linear-gradient(-36deg, rgb(97, 71, 183) 0%, rgb(132, 113, 196) 99%)"><div class="hl">谷歌翻译</div><div class="cmp-icon" style="right: 22px; bottom: 0px; width: 47px; height: 45px; background-image: url(img/shortcut/fanyi.png);"></div></a>
+				<a class="flex-right content" href="https://www.deepl.com/zh/translator" style="linear-gradient(-36deg, rgb(97, 71, 183) 0%, rgb(132, 113, 196) 99%)"><div class="hl" style="width: 60px;text-align: center">DeepL</div><div class="cmp-icon" style="right: 22px; bottom: 0px; width: 47px; height: 45px; background-image: url(img/shortcut/fanyi.png);"></div></a>
 			</div>
 
 			</li>`;
@@ -1844,6 +1892,7 @@ require(['jquery'], function($) {
 		$('#app').append(html + tabHtml +
 			'<span class="active-span"></span></ul><div class="choice-swipe"><ul class="swiper-wrapper"><div style="position:absolute;text-align:center;top:50%;width:100%;margin-top:-64px;color:#444">正在加载页面中...</div></ul></div><div class="bottom-close"></div></div></div>'
 		);
+		history.pushState(null, document.title, changeParam("page", "choice"));
 
 		setTimeout(function() {
 			$(".page-bg").addClass("animation");
@@ -1889,6 +1938,7 @@ require(['jquery'], function($) {
 
 			// 绑定关闭按钮事件
 			$(".bottom-close").click(function() {
+				history.replaceState(null, document.title, location.origin + location.pathname);
 				$(".page-choice").css('pointer-events', 'none').removeClass("animation");
 				$(".page-bg").removeClass("animation");
 				$(".page-choice").on('transitionend', function(evt) {
@@ -2029,7 +2079,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.23.1";
+		app.version = "1.24";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2258,6 +2308,11 @@ require(['jquery'], function($) {
 			"description": "https://github.com/IcedWatermelonJuice/HMOSHomePage"
 
 		}, {
+			"title": "Gitee(可能不是最新版本)",
+			"value": "openGitee",
+			"description": "https://gitee.com/gem_xl/HMOSHomePage"
+
+		}, {
 			"title": "天气Api(点击前往获取id与key)",
 			"value": "openWeatherApi",
 			"description": "http://www.yiketianqi.com"
@@ -2289,6 +2344,7 @@ require(['jquery'], function($) {
 		}
 		html += '</ul></div>';
 		$('#app').append(html);
+		history.pushState(null, document.title, changeParam("page", "settings"));
 		$(".page-settings").show();
 		$(".page-settings").addClass('animation');
 		// 只有via浏览器才在搜索引擎设置里显示跟随via选项
@@ -2357,6 +2413,7 @@ require(['jquery'], function($) {
 				}
 				$(".page-settings").remove();
 			});
+			history.replaceState(null, document.title, location.origin + location.pathname);
 		});
 
 		$(".set-option").click(function(evt) {
@@ -2435,7 +2492,7 @@ require(['jquery'], function($) {
 				location.href = $this.find('.set-description').text();
 			} else if (value === "aboutVersion") {
 				let alertMessage =
-					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系方式: 请通过github反馈`;
+					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com`;
 				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
@@ -2590,7 +2647,7 @@ require(['jquery'], function($) {
 						numset = "repeat(4,25%)";
 						break;
 				}
-				$(".bookmark").css("gridTemplateColumns",numset)
+				$(".bookmark").css("gridTemplateColumns", numset)
 			}
 
 			// 保存设置
@@ -2672,25 +2729,26 @@ require(['jquery'], function($) {
 
 
 	//设置点击/长按LOGO功能冲突检测
-	var DetectConflictsNum=0;
+	var DetectConflictsNum = 0;
+
 	function DetectLogoFnConflicts() {
-		var logoDisplay=settings.get("LogoHeightSet") !== "0"?true:false;
-		var logoCKhasSet=settings.get("LOGOclickFn") === "settingsPage"?true:false;
-		var logoLPhasSet=settings.get("LOGOlongpressFn") === "settingsPage"?true:false;
-		var logoHasSetFn=logoDisplay&&(logoCKhasSet||logoLPhasSet);
-		var bookDisplay=settings.get("SetbookMarksDisplay")?true:false;
-		var bookHasSet=bookMark.searchURL("openSettingPage()")?true:false;
-		var bookHasSetFn=bookDisplay&&bookHasSet;
-		if(logoHasSetFn||bookHasSetFn){//若书签隐藏或无设置书签
-			DetectConflictsNum=0;
-		}else{
-			DetectConflictsNum+=1;
+		var logoDisplay = settings.get("LogoHeightSet") !== "0" ? true : false;
+		var logoCKhasSet = settings.get("LOGOclickFn") === "settingsPage" ? true : false;
+		var logoLPhasSet = settings.get("LOGOlongpressFn") === "settingsPage" ? true : false;
+		var logoHasSetFn = logoDisplay && (logoCKhasSet || logoLPhasSet);
+		var bookDisplay = settings.get("SetbookMarksDisplay") ? true : false;
+		var bookHasSet = bookMark.searchURL("openSettingPage()") ? true : false;
+		var bookHasSetFn = bookDisplay && bookHasSet;
+		if (logoHasSetFn || bookHasSetFn) { //若书签隐藏或无设置书签
+			DetectConflictsNum = 0;
+		} else {
+			DetectConflictsNum += 1;
 		}
-		if(DetectConflictsNum>5){
-			DetectConflictsNum=0;
-			settings.set("SetbookMarksDisplay",true);
+		if (DetectConflictsNum > 5) {
+			DetectConflictsNum = 0;
+			settings.set("SetbookMarksDisplay", true);
 			$(".bookmark_outer_container").removeClass("hide");
-			!bookHasSet&&bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png");
+			!bookHasSet && bookMark.add("设置", "openSettingPage()", "img/bookmarks/settings.png");
 			alert("未检测到设置入口，已显示主页书签并添加设置书签\nLOGO功能（点击或长按LOGO，且不能隐藏）与桌面书签（不能隐藏书签）必须有设置入口");
 		}
 	}
