@@ -307,6 +307,28 @@ html {
 }
 
 /**
+ * scan页面
+*/
+.page-scan {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.page-scan iframe {
+	width: 80%;
+	height: 80%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+}
+
+/**
  * home页面
 */
 .page-home {
@@ -314,7 +336,6 @@ html {
 	padding: 30px;
 	height: 100%;
 	padding-top: 175px;
-
 }
 
 .logo {
@@ -457,10 +478,12 @@ html {
 	flex-direction: column;
 	background: transparent;
 }
+
 /* 添加书签 */
-.page-addbook .bottom-close{
-	background: unset!important;
+.page-addbook .bottom-close {
+	background: unset !important;
 }
+
 .addbook-choice {
 	display: flex;
 	padding: 20px 10px;
@@ -773,6 +796,51 @@ html {
 	opacity: 1;
 }
 
+.voice-input-active .voice-input {
+	display: block;
+}
+
+.voice-input-active .search-input {
+	padding-left: 0;
+}
+
+.voice-input {
+	display: none;
+	padding-left: 20px;
+	width: 50px;
+	height: 100%;
+	position: relative;
+}
+
+.voice-input-bg {
+	width: 100vw;
+	height: 100vh;
+	background-color: transparent;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+}
+
+.voice-input[isActive] rect,
+.voice-input[isActive] path {
+	stroke: var(--blue);
+}
+
+.voice-input svg {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-10px, -10px);
+}
+
+.voice-input rect,
+.voice-input path {
+	stroke: var(--dark);
+}
+
 .search-input {
 	flex: 1;
 	border: 0;
@@ -795,6 +863,14 @@ html {
 	height: 46px;
 	background: url(../img/delete.png) no-repeat center;
 	background-size: 16px;
+}
+
+.fullscreen-input {
+	stroke: var(--dark);
+	width: 1.2rem;
+	height: 100%;
+	margin-right: calc(25px - 0.6rem);
+	text-align: center;
 }
 
 .search-btn {
@@ -913,6 +989,79 @@ html {
 	border-radius: 999px;
 }
 
+.fullscreen-search-page {
+	padding: 10px;
+	height: 100%;
+	width: 100%;
+	padding: 20px;
+}
+
+.fullscreen-search-page-header {
+	width: 100%;
+	height: 49px;
+	position: relative;
+}
+
+.fullscreen-search-page-header svg {
+	position: absolute;
+	top: 0;
+	right: 0;
+	stroke: var(--dark);
+}
+
+.fullscreen-search-page-body {
+	width: 100%;
+	height: calc(100% - 100px);
+}
+
+.fullscreen-search-page-body textarea {
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	border: 0;
+	resize: none;
+	font-weight: bold;
+}
+
+.fullscreen-search-page-foot {
+	width: 100%;
+	height: 49px;
+	position: relative;
+}
+
+.fullscreen-search-page-foot .line-center {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.fullscreen-search-page-foot div[svg-keyboard-normal] svg {
+	stroke: var(--dark);
+}
+
+.fullscreen-search-page-foot div[svg-keyboard-normal] svg circle {
+	fill: var(--dark);
+}
+
+.fullscreen-search-page-foot div[svg-keyboard-select] svg {
+	stroke: var(--blue);
+}
+
+.fullscreen-search-page-foot div[svg-keyboard-select] svg circle {
+	fill: var(--blue);
+}
+
+.fullscreen-search-page-foot button {
+	right: 0;
+	width: 50px;
+	height: 30px;
+	line-height: 30px;
+	border: 0;
+	border-radius: 10px;
+	color: var(--white);
+	background-color: var(--blue);
+}
+
 /* 设置页面 */
 .page-settings {
 	opacity: 0;
@@ -930,6 +1079,10 @@ html {
 .set-option-from {
 	overflow: auto;
 	height: calc(100% - 50px);
+}
+
+.set-option-from.only-stable-options .set-option[isDev] {
+	display: none;
 }
 
 .set-header {
@@ -1057,6 +1210,17 @@ html {
 .set-hr {
 	height: 10px;
 	background-color: #f9f9f9;
+}
+
+.set-markdown-page {
+	height: calc(100% - 50px);
+}
+
+.set-markdown-page iframe {
+	width: calc(100% - 40px);
+	height: calc(100% - 20px);
+	margin: 0 20px 5px;
+	border: 0;
 }
 
 /* 精选页面 */
