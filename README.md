@@ -16,6 +16,11 @@
 * 添加书签时支持自动获取网站favicon
 * 设置页支持检查版本更新(以github版本为标准)
 * 搜索栏/书签支持http、https、ftp、file类URL转跳（file类型URL仅支持本地主页）
+# 📝后续计划
+* 语音搜索
+* 长文本搜索
+* 主页书签文件夹
+* 自定义默认书签库
 # 🌐相关地址
 * 在线使用地址(GithubPage可能会被墙)：https://icedwatermelonjuice.github.io/HMOSHomePage
 * 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app

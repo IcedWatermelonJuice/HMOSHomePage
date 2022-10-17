@@ -1336,9 +1336,7 @@ require(['jquery'], function($) {
 		setTimeout(() => {
 			dom.removeAttr("delay");
 		}, 500)
-	}).keydown(function(evt) {
-		evt.keyCode === 13 && $(".fullscreen-search-page-foot button").click();
-	});
+	})
 	$(".fullscreen-search-page-foot div").click(function(e) {
 		e = $(e.currentTarget);
 		console.log(e)
@@ -2060,16 +2058,16 @@ require(['jquery'], function($) {
 					$(".page-bg").remove();
 				});
 			});
-
-
-			// 天气
-			getWeather(settings.get("weatherApiIdKey"), settings.get("weatherApiCity"));
-			//微博热搜榜
-			getWeibo()
-			//抖音热搜榜
-			getDouyin()
-			//知乎热搜榜
-			getZhihu()
+			require(["ajaxJson"], function(ajaxJson) {
+				//天气
+				ajaxJson.getWeather(settings.get("weatherApiIdKey"), settings.get("weatherApiCity"));
+				//微博热搜榜
+				ajaxJson.getWeibo()
+				//抖音热搜榜
+				ajaxJson.getDouyin()
+				//知乎热搜榜
+				ajaxJson.getZhihu()
+			});
 		})
 	}
 
@@ -2888,7 +2886,6 @@ require(['jquery'], function($) {
 			$(".set-markdown-page").show();
 			history.pushState(null, document.title, changeParam("page", "aboutVersion"));
 		})
-
 	}
 
 	//扫一扫
