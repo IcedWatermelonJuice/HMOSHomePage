@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>书签</title>
+		<script>
+			var jsonTree = function(json, select = 0) {
+				// 字符串转dom对象
+				function $(dom) {
+					var e = document.createElement("div");
+					e.innerHTML = dom;
+					return e.children[0];
+				}
+				// 是否JSON对象
+				function isJSON(val) {
+					if (typeof val !== "object" || !val) {
+						return false
+					}
+					try {
+						val = JSON.stringify(val);
+						val = JSON.parse(val);
+						return true
+					} catch (e) {
+						return false
+					}
+				}
+				// 创建层级结构
+				function create(index, key, val) {
+					var html =
+						`${key?`<a class="label" layer="${index}">${key}</a>`:""}<ul class="container${select>=index?" select":""}" layer="${index}">`;
+					for (let i in val) {
+						html +=
+							`<li class="item" layer="${index}">${isJSON(val[i])?create(index+1,i,val[i]):val[i]}</li>`
+					}
+					return html + "</ul>"
+				}
+				var dom = $(create(0, "", json));
+				dom.querySelectorAll("a").forEach((e) => {
+					if(e.href&&/javascript:/.test(e.href)){
+						return null
+					}
+					e.onclick = function() {
+						var layer = e.getAttribute("layer"),
+							ul = e.parentElement.querySelector(`ul[layer="${layer}"]`);
+						if(ul.classList.contains("select")){
+							ul.classList.remove("select");
+							ul.querySelectorAll("ul").forEach((e)=>{
+								e.classList.remove("select");
+							})
+						}else{
+							ul.classList.add("select")
+						}
+					}
+				})
+				return dom
+			}
+		</script>
+		<style>
+			ul:not(.select) {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="test"></div>
+		<script>
+			var a = {
+					"a0": {
+						"a0-0": {
+							"a0-0-0": "000",
+							"a0-0-1": "001"
+						},
+						"a0-1": {
+							"a0-1-0": "010",
+							"a0-1-1": "011"
+						}
+					},
+					"a1": {
+						"a1-0": {
+							"a1-0-0": "100",
+							"a1-0-1": "101"
+						},
+						"a1-1": {
+							"a1-1-0": "110",
+							"a1-1-1": "111"
+						}
+					}
+				},
+				select = 0;
+			document.querySelector("#test").append(jsonTree(a, select))
+		</script>
+	</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>README.md</title>
+		<style>
+			body::-webkit-scrollbar {
+				display: none;
+			}
+		</style>
+		<script src="../js/lib/marked.min.js"></script>
+		<script>
+			var url = new URL(location.href),
+				css = document.createElement("style");
+			if (url.search.length > 1) {
+				url = url.searchParams;
+				css.innerHTML = `
+					body{
+						${url.get("bg")?"background:"+url.get("bg")+";":""}
+						${url.get("color")?"color:"+url.get("color")+";":""}
+					}
+					a{
+						${url.get("color")?"color:"+url.get("color")+";":""}
+					}
+				`;
+				document.querySelector("head").append(css);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="README">
+			若没有成功加载README文件，请<a href="javascript:load()">点击这里</a>
+		</div>
+		<script>
+			function load() {
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", "../README.md");
+				xhr.onload = function(e) {
+					if (this.status == 200 || this.status == 304) {
+						document.querySelector("#README").innerHTML = marked.parse(this.responseText);
+						document.querySelectorAll("#README a").forEach((e) => {
+							e.target = "_top";
+						})
+					}
+				}
+				xhr.send();
+			}
+			load();
+		</script>
+	</body>
+</html>
