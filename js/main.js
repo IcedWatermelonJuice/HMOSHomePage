@@ -59,6 +59,7 @@ require(['jquery'], function($) {
 	};
 	var settingsFn = function(storage, browser) {
 		this.storage = {
+			devMode: false,
 			engines: "baidu",
 			bookcolor: "black",
 			booknumber: "Num4",
@@ -76,6 +77,8 @@ require(['jquery'], function($) {
 			autonightMode2: false,
 			autonightMode2Array: "20:00-8:00",
 			customJsCss: false,
+			voiceInput: false,
+			fullscreenInput: false,
 			chromeBookmarks: "chrome://bookmarks/",
 			weatherApiIdKey: null
 		};
@@ -193,6 +196,18 @@ require(['jquery'], function($) {
 				nightMode.on();
 			} else {
 				nightMode.off();
+			}
+			// 语音输入
+			if(that.get('voiceInput') === true){
+				$(".input-bg").addClass("voice-input-active");
+			}else{
+				$(".input-bg").removeClass("voice-input-active");
+			}
+			// 长文本输入
+			if(that.get('fullscreenInput') === true){
+				$(".fullscreen-input").show();
+			}else{
+				$(".fullscreen-input").hide();
 			}
 		}
 	}
@@ -401,7 +416,12 @@ require(['jquery'], function($) {
 		}
 
 	}
-
+	/**
+	 * DOM是否存在某个attribute
+	 */
+	$.fn.hasAttr = function(attr) {
+		return this.attr(attr) !== undefined
+	}
 	/**
 	 * DOM长按事件
 	 */
@@ -420,7 +440,7 @@ require(['jquery'], function($) {
 				};
 				timeout = setTimeout(function() {
 					if ($this.attr("disabled") === undefined) {
-						fn();
+						fn($this);
 					}
 				}, 700);
 			}, {
@@ -513,7 +533,7 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/settings.png"
 			}, {
 				"name": "扫一扫",
-				"url": "https://www.the-qrcode-generator.com/scan",
+				"url": "openscanWebsite()",
 				"icon": "img/bookmarks/qrscan.png"
 			}, {
 				"name": "AirPortal",
@@ -616,11 +636,12 @@ require(['jquery'], function($) {
 				$(".page-addbook .addbook-url").val(siteData.url);
 				$(".page-addbook .addbook-name").val(siteData.name);
 				$(".page-addbook #addbook-upload").html(
-				`<img src="${siteData.img}"></img><p>原书签图标</p>`);
+					`<img src="${siteData.img}"></img><p>原书签图标</p>`);
 				$(".page-addbook .addbook-ok").text("确认修改");
 			}
 
-			history.pushState(null, document.title, changeParam("page", siteData?"editbook":"addbook"));
+			history.pushState(null, document.title, changeParam("page", siteData ? "editbook" :
+				"addbook"));
 
 			setTimeout(function() {
 				$(".page-bg").addClass("animation");
@@ -734,7 +755,7 @@ require(['jquery'], function($) {
 						icon = drawIcon(name);
 					}
 					$(".bottom-close").click();
-					if (siteData.index) {
+					if (siteData && siteData.index) {
 						bookMark.edit(siteData.index, name, url, icon);
 					} else {
 						bookMark.add(name, url, icon);
@@ -876,6 +897,7 @@ require(['jquery'], function($) {
 				if (that.status !== "editing") {
 					var url = dom.data("url");
 					if (url) {
+						console.log(url)
 						switch (url) {
 							case "choice()":
 								choice();
@@ -885,6 +907,9 @@ require(['jquery'], function($) {
 								break;
 							case "openbookmarksList()":
 								openbookmarksList();
+								break;
+							case "openscanWebsite()":
+								openscanWebsite();
 								break;
 							default:
 								location.href = url;
@@ -935,7 +960,7 @@ require(['jquery'], function($) {
 		},
 		add: function(name, url, icon) {
 			var data = this.options.data;
-			if (!/choice()|openSettingPage()|openbookmarksList()/i.test(url)) {
+			if (!/choice()|openSettingPage()|openbookmarksList()|openscanWebsite()/i.test(url)) {
 				url = url.match(/:\/\//) ? url : "https://" + url;
 			}
 			var i = data.length - 1;
@@ -959,7 +984,7 @@ require(['jquery'], function($) {
 		},
 		edit: function(index, name, url, icon) {
 			var data = this.options.data;
-			if ((url !== "choice()") && (url !== "openSettingPage()")) {
+			if (!/choice()|openSettingPage()|openbookmarksList()|openscanWebsite()/i.test(url)) {
 				url = url.match(/:\/\//) ? url : "http://" + url;
 			}
 			if (icon === "") {
@@ -1291,6 +1316,41 @@ require(['jquery'], function($) {
 		$(".search-input").focus().val("").trigger("propertychange");
 	});
 
+	$(".fullscreen-input").click(function() {
+		$(".fullscreen-search-page-body textarea").val($(".search-input").val());
+		$(".page-search .entire-search-page").hide();
+		$(".page-search .fullscreen-search-page").show();
+	});
+	$(".fullscreen-search-page-header svg").click(function() {
+		$(".search-input").val($(".fullscreen-search-page-body textarea").val());
+		$(".page-search .fullscreen-search-page").hide();
+		$(".page-search .entire-search-page").show();
+		$(".search-input").trigger("propertychange");
+	})
+	$(".fullscreen-search-page-body textarea").focus(function() {
+		var dom = $(".fullscreen-search-page-foot div[svg-keyboard-normal]");
+		dom.removeAttr("svg-keyboard-normal").attr("svg-keyboard-select", "").remove("delay");
+	}).blur(function() {
+		var dom = $(".fullscreen-search-page-foot div[svg-keyboard-select]");
+		dom.removeAttr("svg-keyboard-select").attr("svg-keyboard-normal", "").attr("delay", "");
+		setTimeout(() => {
+			dom.removeAttr("delay");
+		}, 500)
+	}).keydown(function(evt) {
+		evt.keyCode === 13 && $(".fullscreen-search-page-foot button").click();
+	});
+	$(".fullscreen-search-page-foot div").click(function(e) {
+		e = $(e.currentTarget);
+		console.log(e)
+		if (e.hasAttr("svg-keyboard-normal") && !e.hasAttr("delay")) {
+			$(".fullscreen-search-page-body textarea").focus();
+		}
+	})
+	$(".fullscreen-search-page-foot button").click(function() {
+		$(".fullscreen-search-page-header svg").click();
+		$(".search-btn").click();
+	})
+
 	$(".shortcut1,.shortcut2").click(function(evt) {
 		$(".search-input").focus().val($(".search-input").val() + evt.target.innerText).trigger(
 			"propertychange");
@@ -1387,10 +1447,61 @@ require(['jquery'], function($) {
 			console.log("搜索引擎快切栏初始化失败");
 		}
 	}
+	//语音输入
+	function initvoiceInput() { // .input-bg + .voice-input-active
+		var vtt = null;
+		$(".voice-input").click(() => {
+			if (settings.get("voiceInput") === true) {
+				if (!vtt) {
+					loadVTT();
+				}
+				vtt.isActive || $(".voice-input[isActive]")[0] ? vtt.stop() : vtt.start();
+			} else {
+				$(".input-bg").removeClass("voice-input-active");
+				alert("语音转文字暂不可用");
+			}
+		})
+		if (settings.get("voiceInput")) {
+			$(".input-bg").addClass("voice-input-active");
+			loadVTT();
+		} else {
+			$(".input-bg").removeClass("voice-input-active");
+		}
+
+		function loadVTT() {
+			require(["js-voiceToText"], () => {
+				vtt = new voiceToTextJS({
+					success: function(r) {
+						r = r.trim();
+						if (r) {
+							$(".search-input").val(r);
+							$(".empty-input").show();
+							$(".search-btn").text("搜索")
+						}
+					},
+					start: function() {
+						$(".voice-input").attr("isActive", "");
+						$("#app").append(`<div class="voice-input-bg"></div>`);
+						var that = this;
+						$(".voice-input-bg").click(() => {
+							vtt.stop();
+						})
+					},
+					stop: function() {
+						$(".voice-input").removeAttr("isActive");
+						$(".voice-input-bg").remove()
+					},
+					cancel: function() {
+						this.stop();
+					}
+				})
+			})
+		}
+	}
 	$(document).ready(function() {
 		initquickchange();
+		initvoiceInput();
 	});
-
 	//自定义JS/CSS
 	var customJsCssFn = function(customData) {
 		this.customData = {
@@ -2079,7 +2190,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.24";
+		app.version = "1.25";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2261,6 +2372,20 @@ require(['jquery'], function($) {
 			"value": "applyCustomJsCss",
 			"description": "已开启自定义JS/CSS,点击应用新的自定义JS/CSS"
 		}, {
+			"title": "语音搜索(测试功能,可能很多bug,谨慎开启)",
+			"type": "checkbox",
+			"value": "voiceInput",
+			"isDev": true,
+			"defVal": false,
+			"description": "测试平台为edge，其他平台效果未知",
+		}, {
+			"title": "长文本搜索(测试功能,可能很多bug,谨慎开启)",
+			"type": "checkbox",
+			"value": "fullscreenInput",
+			"isDev": true,
+			"defVal": false,
+			"description": "测试平台为edge，其他平台效果未知",
+		}, {
 			"type": "hr"
 		}, {
 			"title": "chrome插件书签地址",
@@ -2319,12 +2444,12 @@ require(['jquery'], function($) {
 
 		}];
 		var html =
-			'<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo">自     定     义     设     置</p></div><ul class="set-option-from">';
+			`<div class="page-settings"><div class="set-header"><div class="set-back"></div><p class="set-logo" data-value="set">自 定 义 设 置</p><p class="set-logo" data-value="md">关 于 本 主 页</p></div><ul class="set-option-from ${settings.get("devMode")?"":"only-stable-options"}">`;
 		for (var json of data) {
 			if (json.type === 'hr') {
 				html += `<li class="set-hr"></li>`;
 			} else {
-				html += `<li class="set-option" ${json.value ? `data-value="${json.value}"` : ''}>
+				html += `<li class="set-option" ${json.isDev?`isDev=${json.defVal}`:""} ${json.value ? `data-value="${json.value}"` : ''}>
 							<div class="set-text">
 								<p class="set-title">${json.title}</p>
 								${json.description ? `<div class="set-description">${json.description}</div>` : ''}
@@ -2342,11 +2467,34 @@ require(['jquery'], function($) {
 				html += `</li>`;
 			}
 		}
-		html += '</ul></div>';
+		html += '</ul><div class="set-markdown-page" style="display:none"></div></div>';
 		$('#app').append(html);
+		$(".page-settings .set-logo[data-value=set]").dblclick(() => {
+			var dom = $(".page-settings .set-option-from");
+			if (dom.hasClass("only-stable-options")) {
+				dom.removeClass("only-stable-options");
+				settings.set("devMode", true);
+				alert("已进入开发者模式\n⚠️此模式下的测试功能选项的修改可能会导致页面显示错误或相关联功能异常");
+			} else {
+				if (confirm(`⚠退出开发者模式，将清除“测试功能”项相关数据。\n是否继续？`)) {
+					dom.addClass("only-stable-options");
+					dom.find(".set-option[isDev] ").each((i, e) => {
+						settings.set($(e).data("value"), $(e).attr("isDev") === "true");
+					})
+					settings.set("devMode", false);
+					alert("已退出开发者模式，即将刷新页面");
+					location.reload();
+				}
+			}
+		}).longPress((e) => {
+			e.dblclick();
+		})
 		history.pushState(null, document.title, changeParam("page", "settings"));
 		$(".page-settings").show();
 		$(".page-settings").addClass('animation');
+		$(".set-markdown-page").html(
+			`<iframe src="html/README.html?bg=${$(".page-settings").css("backgroundColor")}&color=${$(".page-settings").css("color")}"></iframe>`
+		)
 		// 只有via浏览器才在搜索引擎设置里显示跟随via选项
 		var browser = browserInfo();
 		if (browser !== 'via') {
@@ -2406,14 +2554,22 @@ require(['jquery'], function($) {
 		});
 
 		$(".set-back").click(function() {
-			$(".page-settings").css("pointer-events", "none").removeClass("animation");
-			$(".page-settings").on('transitionend', function(evt) {
-				if (evt.target !== this) {
-					return;
-				}
-				$(".page-settings").remove();
-			});
-			history.replaceState(null, document.title, location.origin + location.pathname);
+			if ($(".set-option-from").is(":visible")) {
+				$(".page-settings").css("pointer-events", "none").removeClass("animation");
+				$(".page-settings").on('transitionend', function(evt) {
+					if (evt.target !== this) {
+						return;
+					}
+					$(".page-settings").remove();
+				});
+				history.replaceState(null, document.title, location.origin + location.pathname);
+			} else if ($(".set-markdown-page").is(":visible")) {
+				$(".set-logo[data-value=md]").hide();
+				$(".set-logo[data-value=set]").show();
+				$(".set-markdown-page").hide();
+				$(".set-option-from").show();
+				history.replaceState(null, document.title, changeParam("page", "settings"));
+			}
 		});
 
 		$(".set-option").click(function(evt) {
@@ -2490,10 +2646,6 @@ require(['jquery'], function($) {
 				// open($this.find('.set-description').text());
 				//kiwi本地页面暂时无法使用open()方法,替换为location.href方法
 				location.href = $this.find('.set-description').text();
-			} else if (value === "aboutVersion") {
-				let alertMessage =
-					`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系邮箱: gem_xl@petalmail.com`;
-				alert(alertMessage);
 			} else if (value === "export") {
 				var oInput = $('<input>');
 				var IsEncrypt = confirm(
@@ -2724,9 +2876,29 @@ require(['jquery'], function($) {
 			// 保存设置
 			settings.set(item, value);
 		});
+		$(".set-option[data-value=aboutVersion]").click(() => {
+			let alertMessage =
+				`当前版本:${app.version}\n最新版本:${getnewVersion()}\n本作作者: IcedWatermelonJuice\n原作作者: liumingye\n联系方式: Github Issues\n更多信息: 请长按“关于”或点击“Github”、“Gitee”`;
+			alert(alertMessage);
+		}).longPress(() => {
+			changeREADMEtheme();
+			$(".set-logo[data-value=set]").hide();
+			$(".set-logo[data-value=md]").show();
+			$(".set-option-from").hide();
+			$(".set-markdown-page").show();
+			history.pushState(null, document.title, changeParam("page", "aboutVersion"));
+		})
 
 	}
 
+	//扫一扫
+	function openscanWebsite() {
+		var scanUrl =
+			"https://icedwatermelonjuice.github.io/QRcode-Tool/index.html?mode=scan&autoJump=true&autoClose=true&darkMode=" +
+			($("#nightCss[disabled]")[0] ? false : true);
+		console.log(scanUrl)
+		open(scanUrl);
+	}
 
 	//设置点击/长按LOGO功能冲突检测
 	var DetectConflictsNum = 0;
@@ -2752,6 +2924,16 @@ require(['jquery'], function($) {
 			alert("未检测到设置入口，已显示主页书签并添加设置书签\nLOGO功能（点击或长按LOGO，且不能隐藏）与桌面书签（不能隐藏书签）必须有设置入口");
 		}
 	}
+	// README 主题色切换
+	function changeREADMEtheme() {
+		if ($(".set-markdown-page iframe")[0]) {
+			var src =
+				`html/README.html?bg=${$(".page-settings").css("backgroundColor")}&color=${$(".page-settings").css("color")}`;
+			if ($(".set-markdown-page iframe").attr("src") !== src) {
+				$(".set-markdown-page iframe").attr("src", src);
+			} else {}
+		}
+	}
 	//1s定时器，用于自动夜间模式 和 设置点击/长按LOGO功能冲突 搜索引擎快切初始化
 	function IntervalFnSet() {
 		autoNightModeOn();
@@ -2759,6 +2941,7 @@ require(['jquery'], function($) {
 		LogoHeightFn.set();
 		PositionFn.set();
 		initquickchange();
+		changeREADMEtheme()
 	}
 	setInterval(IntervalFnSet, 1000);
 
