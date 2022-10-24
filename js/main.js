@@ -819,40 +819,23 @@ require(['jquery'], function($) {
 					that.status = "editing";
 					$('.logo,.ornament-input-group').css('pointer-events', 'none');
 					$('.addbook').remove();
-					require(['jquery-sortable'], function() {
-						that.$ele.sortable({
-							animation: 150,
-							fallbackTolerance: 3,
-							touchStartThreshold: 3,
-							ghostClass: "ghost",
-							onEnd: function(evt) {
-								var startID = evt.oldIndex,
-									endID = evt.newIndex;
-								if (startID > endID) {
-									data.splice(endID, 0, data[startID]);
-									data.splice(startID + 1, 1);
-								} else {
-									data.splice(endID + 1, 0, data[
-										startID]);
-									data.splice(startID, 1);
-								}
-								store.set("bookMark", data);
-							}
-						});
-					})
 					$(document).click(function() {
 						$(document).unbind("click");
 						$('.logo,.ornament-input-group').css('pointer-events', '');
 						$(".delbook").addClass("animation");
 						$(".editbook").addClass("animation");
-						$(".delbook").on('transitionend', function(evt) {
+						function transitionend(evt){
 							if (evt.target !== this) {
 								return;
 							}
-							$(".delbook").remove();
-							that.$ele.sortable("destroy");
+							this.remove();
+							if(typeof that.$ele.sortable==="function"){
+								that.$ele.sortable("destroy");
+							}
 							that.status = "";
-						});
+						}
+						$(".delbook").on('transitionend', transitionend);
+						$(".editbook").on('transitionend', transitionend);
 					});
 					var $list = that.$ele.find(".list");
 					for (var i = $list.length; i > -1; i--) {
@@ -1598,6 +1581,7 @@ require(['jquery'], function($) {
 					"quark": "https://quark.sm.cn/s?q=%s",
 					"google": "https://google.com/search?q=%s",
 					"bing": "https://cn.bing.com/search?q=%s",
+					"toutiao": "https://so.toutiao.com/search?keyword=%s",
 					"sm": "https://m.sm.cn/s?q=%s",
 					"360": "https://so.com/s?q=%s",
 					"sogou": "https://sogou.com/web/searchList.jsp?keyword=%s",
@@ -2188,7 +2172,7 @@ require(['jquery'], function($) {
 	//设置页面
 	function openSettingPage() {
 		var app = {};
-		app.version = "1.25";
+		app.version = "1.25.1";
 		var autonightMode2AyDes = settings.get('autonightMode2Array');
 		var logoHeightDes = settings.get('LogoHeightSet');
 		var positionDes = settings.get('position');
@@ -2229,6 +2213,9 @@ require(['jquery'], function($) {
 			}, {
 				"t": "必应搜索",
 				"v": "bing"
+			}, {
+				"t": "头条搜索",
+				"v": "toutiao"
 			}, {
 				"t": "神马搜索",
 				"v": "sm"
