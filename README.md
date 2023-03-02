@@ -23,7 +23,7 @@
 * 自定义默认书签库
 # 🌐相关地址
 * 在线使用地址(GithubPage可能会被墙)：https://icedwatermelonjuice.github.io/HMOSHomePage
-* 备用在线地址(国内地址访问较慢)：https://gem-hp.rth.app
+* 备用在线地址(国内地址访问较慢)：https://gem-hp.rth1.one
 * CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
 * Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
 * Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
