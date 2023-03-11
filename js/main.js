@@ -134,7 +134,7 @@ require(['jquery'], function($) {
 				if (this.get('nightMode')) {
 					logoUrl = "logo/HarmonyOS_logo(for nightMode).png";
 				} else {
-					logoUrl = "logo/HarmonyOS_logo.png";
+					logoUrl = "logo/baidu.png";
 				}
 			}
 			if (this.get('LogoHeightSet')) {
