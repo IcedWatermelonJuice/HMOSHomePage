@@ -520,10 +520,6 @@ require(['jquery'], function($) {
 		this.$ele = $(ele);
 		this.options = {
 			data: [{
-				"name": "书签",
-				"url": "openbookmarksList()",
-				"icon": "img/bookmarks/bookmarks.png"
-			}, {
 				"name": "精选",
 				"url": "choice()",
 				"icon": "img/bookmarks/discover.png"
@@ -532,41 +528,29 @@ require(['jquery'], function($) {
 				"url": "openSettingPage()",
 				"icon": "img/bookmarks/settings.png"
 			}, {
-				"name": "扫一扫",
-				"url": "openscanWebsite()",
-				"icon": "img/bookmarks/qrscan.png"
-			}, {
 				"name": "AirPortal",
 				"url": "https://airportal.cn",
 				"icon": "img/bookmarks/airportal.png"
-			}, {
-				"name": "CSDN",
-				"url": "https://csdn.net",
-				"icon": "img/bookmarks/csdn.png"
-			}, {
+			},{
 				"name": "Github",
 				"url": "https://github.com",
 				"icon": "img/bookmarks/github.png"
 			}, {
-				"name": "Gitee",
+				"name": "Nga",
 				"url": "https://gitee.com",
-				"icon": "img/bookmarks/gitee.png"
+				"icon": "img/bookmarks/nga.png"
 			}, {
-				"name": "抖音",
+				"name": "Pixiv",
 				"url": "https://douyin.com",
-				"icon": "img/bookmarks/douyin.png"
+				"icon": "img/bookmarks/pixiv.png"
 			}, {
-				"name": "B站",
+				"name": "Hostloc",
 				"url": "https://bilibili.com",
-				"icon": "img/bookmarks/bilibili.png"
+				"icon": "img/bookmarks/hostloc.png"
 			}, {
-				"name": "爱奇艺",
+				"name": "Hanime1",
 				"url": "https://iqiyi.com",
-				"icon": "img/bookmarks/iqiyi.png"
-			}, {
-				"name": "腾讯视频",
-				"url": "https://v.qq.com",
-				"icon": "img/bookmarks/tencentvideo.png"
+				"icon": "img/bookmarks/hanime1.png"
 			}],
 		};
 		this.intiOptions = this.options;
