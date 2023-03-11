@@ -2590,7 +2590,7 @@ require(['jquery'], function($) {
 			} else if (value === "delLogo") {
 				let delLogoConfirm = confirm("将删除自定义壁纸和LOGO,恢复默认壁纸和LOGO!");
 				if (delLogoConfirm === true) {
-					settings.set('wallpaper', 'img/background.png');
+					settings.set('wallpaper', '');
 					settings.set('logo', '');
 					settings.set('LogoHeightSet', settings.getinitSettings("LogoHeightSet"));
 					alert('壁纸和LOGO初始化成功!');
