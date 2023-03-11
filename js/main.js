@@ -537,19 +537,19 @@ require(['jquery'], function($) {
 				"icon": "img/bookmarks/github.png"
 			}, {
 				"name": "Nga",
-				"url": "https://gitee.com",
+				"url": "https://nga.178.com/thread.php?fid=524",
 				"icon": "img/bookmarks/nga.png"
 			}, {
 				"name": "Pixiv",
-				"url": "https://douyin.com",
+				"url": "https://www.pixiv.net/novel/bookmark_new.php",
 				"icon": "img/bookmarks/pixiv.png"
 			}, {
 				"name": "Hostloc",
-				"url": "https://bilibili.com",
+				"url": "https://hostloc.com",
 				"icon": "img/bookmarks/hostloc.png"
 			}, {
 				"name": "Hanime1",
-				"url": "https://iqiyi.com",
+				"url": "https://hanime1.me",
 				"icon": "img/bookmarks/hanime1.png"
 			}],
 		};
