@@ -125,20 +125,6 @@ require(['jquery'], function($) {
 			store.set("setData", this.storage);
 			this.apply();
 		},
-		//设置壁纸
-		setLogo: function() {
-			var BackgroundUrl;
-			if (this.get('wallpaper')) {
-				BackgroundUrl = this.get('wallpaper');
-			} else {
-				if (this.get('nightMode')) {
-					BackgroundUrl = "img/background.png";
-				} else {
-					BackgroundUrl = "img/background.png";
-				}
-			}
-
-		},
 		//设置LOGO
 		setLogo: function() {
 			var logoUrl, logoHeight;
