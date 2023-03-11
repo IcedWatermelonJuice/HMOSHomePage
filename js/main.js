@@ -528,22 +528,22 @@ require(['jquery'], function($) {
 				"url": "openSettingPage()",
 				"icon": "img/bookmarks/settings.png"
 			}, {
-				"name": "AirPortal",
-				"url": "https://airportal.cn",
-				"icon": "img/bookmarks/airportal.png"
-			},{
 				"name": "Github",
 				"url": "https://github.com",
 				"icon": "img/bookmarks/github.png"
 			}, {
 				"name": "Nga",
-				"url": "https://nga.178.com/thread.php?fid=524",
+				"url": "https://nga.178.com",
 				"icon": "img/bookmarks/nga.png"
 			}, {
 				"name": "Pixiv",
 				"url": "https://www.pixiv.net/novel/bookmark_new.php",
 				"icon": "img/bookmarks/pixiv.png"
 			}, {
+				"name": "South+",
+				"url": "https://www.south-plus.net/simple/index.php?f9.html",
+				"icon": "img/bookmarks/south.png"
+			},{
 				"name": "Hostloc",
 				"url": "https://hostloc.com",
 				"icon": "img/bookmarks/hostloc.png"
