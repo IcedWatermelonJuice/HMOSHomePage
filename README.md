@@ -22,11 +22,8 @@
 * 主页书签文件夹
 * 自定义默认书签库
 # 🌐相关地址
-* 在线使用地址(GithubPage可能会被墙)：https://icedwatermelonjuice.github.io/HMOSHomePage
-* 备用在线地址(国内地址访问较慢)：https://gem-hp.rth1.one
-* CRX插件版下载：https://github.com/IcedWatermelonJuice/HMOSHomePage/releases
-* Github仓库：https://github.com/IcedWatermelonJuice/HMOSHomePage
-* Gitee仓库：https://gitee.com/gem_xl/HMOSHomePage
+* 在线使用地址(GithubPage可能会被墙)：https://wpoimui.github.io/HMOSHomePage/
+
 # 🌹开源致谢
 * 原项目名称：quarkHomePage(H5仿夸克浏览器主页)
 * 原项目作者：liumingye(刘明野)
